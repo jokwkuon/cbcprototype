@@ -1,0 +1,7 @@
+id,risk,impact,mitigation,status
+R-001,Scope exceeds semester,High,Agree phased MVP and change control,Open
+R-002,Data students do not have frontend/backend skills,High,Use Track A or mixed team,Open
+R-003,HubSpot records may be stale,Medium,Audit and flag uncertain contacts,Open
+R-004,Finance metrics not precisely defined,High,Obtain written definitions and test values,Open
+R-005,Confidential data exposed in public repo,Critical,Synthetic fixtures and restricted external storage,Open
+R-006,No post-term maintainer,High,Assign maintainer before production launch,Open

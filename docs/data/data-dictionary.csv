@@ -1,0 +1,9 @@
+entity,field,type,required,definition,status
+organizations,id,uuid,yes,Unique internal organization identifier,PROPOSED
+organizations,name,text,yes,Legal or familiar name,NEEDS_REVIEW
+contacts,id,uuid,yes,Unique contact identifier,PROPOSED
+contacts,email,text,no,Primary email,NEEDS_REVIEW
+opportunities,stage,text,yes,Approved pipeline status,NEEDS_DEFINITION
+contributions,amount,decimal,no,Amount and meaning defined by Finance,NEEDS_DEFINITION
+activities,occurred_at,timestamp,no,Time of interaction,NEEDS_REVIEW
+tasks,due_date,date,no,Date action is due,NEEDS_REVIEW

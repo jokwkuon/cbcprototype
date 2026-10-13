@@ -1,0 +1,14 @@
+id,module,requirement,priority,status,owner,acceptance
+REQ-001,Organizations,Create edit and find organization records,MUST,PROPOSED,CBC sponsor,Approved user manages organization successfully
+REQ-002,Contacts,Manage contacts linked to organizations,MUST,PROPOSED,CBC sponsor,Contact and organization relationships work
+REQ-003,Pipeline,Manage sponsorship stages and opportunities,MUST,NEEDS_DEFINITION,Partnerships,Approved opportunity workflow demonstrated
+REQ-004,Giving,Distinguish commitments from received funds,MUST,NEEDS_DEFINITION,Finance,Numbers reconcile with approved finance example
+REQ-005,Activities,Log interactions and manage due tasks,MUST,PROPOSED,Partnerships,Next action and overdue dates calculate correctly
+REQ-006,Analytics,Show approved metrics in dashboard,MUST,NEEDS_DEFINITION,Leadership,Metrics match approved source records
+REQ-007,Import,Load reviewed legacy HubSpot records,SHOULD,NEEDS_AUDIT,CBC technical liaison,Imported records traceable to source
+REQ-008,Access,Restrict sensitive access by role,MUST,NEEDS_DEFINITION,CBC admin,Unauthorized operations denied
+REQ-009,Membership,Manage memberships and renewals,LATER,PROPOSED,Membership lead,Defined lifecycle and metrics verified
+REQ-010,Programs,Track participants and outcomes,LATER,PROPOSED,Programs lead,Approved cohort reporting works
+REQ-011,Mentorship,Manage pairs and check-ins,LATER,PROPOSED,Mentorship lead,Check-in history and rules verified
+REQ-012,Documents,Manage linked file records,LATER,PROPOSED,CBC admin,Files protected by approved access rules
+REQ-013,Reports,Provide six functional report categories,LATER,PROPOSED,Leadership,Reports match approved examples

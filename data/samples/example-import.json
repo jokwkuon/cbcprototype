@@ -1,0 +1,18 @@
+{
+  "_notice": "SYNTHETIC DATA ONLY",
+  "organizations": [
+    {
+      "external_id": "demo-org-1",
+      "name": "Example Partner Ltd"
+    }
+  ],
+  "contacts": [
+    {
+      "external_id": "demo-contact-1",
+      "first_name": "Alex",
+      "last_name": "Example",
+      "email": "alex@example.org",
+      "organization_external_id": "demo-org-1"
+    }
+  ]
+}

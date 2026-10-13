@@ -1,0 +1,11 @@
+# Data security and access review (open)
+- [ ] CBC identifies permitted data categories and owners.
+- [ ] No real contact/financial/student data in this public repository.
+- [ ] Student work uses synthetic data until explicit CBC authorization.
+- [ ] Define administrator, staff, finance/program and board reporting roles.
+- [ ] Enforce restrictions server-side, not just through hidden UI.
+- [ ] Protect Drive files independently of in-app document permissions.
+- [ ] Keep authentication tokens and cloud keys out of Git.
+- [ ] Approve cloud region, backup, retention and deletion processes.
+- [ ] Plan to revoke student access at academic-term conclusion.
+- [ ] CBC reviews privacy and security before any real-data deployment.
