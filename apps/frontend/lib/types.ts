@@ -1,0 +1,3 @@
+export type Role = "admin" | "staff" | "finance" | "viewer";
+export type Organization = { id: string; name: string; organization_type: string | null; industry: string | null; website: string | null; relationship_owner: string | null; relationship_status: string; relationship_strength: string; priority_level: string; potential: string; notes: string | null; created_at: string; };
+export type Contact = { id: string; first_name: string; last_name: string; title: string | null; email: string | null; phone: string | null; organization_id: string | null; organization?: { name: string } | null; created_at: string; };

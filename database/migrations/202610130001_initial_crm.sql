@@ -1,0 +1,21 @@
+create extension if not exists pgcrypto;
+create type public.app_role as enum ('admin','staff','finance','viewer');
+create type public.relationship_status as enum ('Prospect','Cultivate','Proposal','Committed','Active','Lapsed');
+create table public.profiles (id uuid primary key references auth.users(id) on delete cascade, full_name text not null, role public.app_role not null default 'viewer', created_at timestamptz not null default now(), updated_at timestamptz not null default now());
+create table public.organizations (id uuid primary key default gen_random_uuid(), name text not null check (length(trim(name)) > 0), organization_type text, industry text, website text, relationship_owner uuid references public.profiles(id) on delete set null, relationship_status public.relationship_status not null default 'Prospect', relationship_strength text not null default 'Medium' check (relationship_strength in ('High','Medium','Low')), priority_level text not null default 'Medium' check (priority_level in ('High','Medium','Low')), potential text not null default 'Medium' check (potential in ('High','Medium','Low')), notes text, created_at timestamptz not null default now(), updated_at timestamptz not null default now());
+create table public.contacts (id uuid primary key default gen_random_uuid(), organization_id uuid references public.organizations(id) on delete set null, first_name text not null check (length(trim(first_name)) > 0), last_name text not null check (length(trim(last_name)) > 0), title text, email text, phone text, created_at timestamptz not null default now(), updated_at timestamptz not null default now());
+create index organizations_name_idx on public.organizations using gin (to_tsvector('simple', name)); create index organizations_status_idx on public.organizations(relationship_status); create index contacts_organization_idx on public.contacts(organization_id); create index contacts_name_idx on public.contacts(last_name, first_name);
+create or replace function public.current_role() returns public.app_role language sql stable security definer set search_path=public as $$ select role from public.profiles where id=auth.uid() $$;
+alter table public.profiles enable row level security; alter table public.organizations enable row level security; alter table public.contacts enable row level security;
+create policy "signed in profiles" on public.profiles for select to authenticated using (id=auth.uid() or public.current_role()='admin');
+create policy "staff can read organizations" on public.organizations for select to authenticated using (public.current_role() in ('admin','staff','finance','viewer'));
+create policy "staff can write organizations" on public.organizations for all to authenticated using (public.current_role() in ('admin','staff')) with check (public.current_role() in ('admin','staff'));
+create policy "signed in can read contacts" on public.contacts for select to authenticated using (public.current_role() in ('admin','staff','finance','viewer'));
+create policy "staff can write contacts" on public.contacts for all to authenticated using (public.current_role() in ('admin','staff')) with check (public.current_role() in ('admin','staff'));
+create or replace function public.handle_new_user() returns trigger language plpgsql security definer set search_path=public as $$ begin insert into public.profiles(id,full_name) values(new.id,coalesce(new.raw_user_meta_data->>'full_name',split_part(new.email,'@',1))); return new; end; $$;
+create trigger on_auth_user_created after insert on auth.users for each row execute procedure public.handle_new_user();
+create or replace function public.touch_updated_at() returns trigger language plpgsql as $$ begin new.updated_at=now(); return new; end; $$;
+create trigger profiles_touch_updated_at before update on public.profiles for each row execute procedure public.touch_updated_at();
+create trigger organizations_touch_updated_at before update on public.organizations for each row execute procedure public.touch_updated_at();
+create trigger contacts_touch_updated_at before update on public.contacts for each row execute procedure public.touch_updated_at();
+-- Role changes must be performed by a trusted admin migration/operator, never from the browser.
