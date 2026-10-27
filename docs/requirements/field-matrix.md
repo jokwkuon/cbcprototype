@@ -6,7 +6,7 @@ This is a field-level inventory and proposed design, not an approved schema. [Re
 
 M = manual; A = source AUTO (linked, system-populated or calculated, not necessarily a formula). All missing mappings and routes are proposals. Names beginning with `giving`, `outcomes`, `engagement`, or ending in `latest`, `count`, `next` describe proposed queries, not existing columns or approved calculations. Default UI location is the module detail page, editable fields also in create/edit forms; derived fields are read-only. Directory-specific fields and metrics follow below.
 
-Status: **Code** = migration + read/write UI/action inspected, runtime unverified; **Partial** = migration exists but editor or display absent; **Missing** = required mapping/UI absent. Day 1 adds **Local DB + browser fixture** (isolated PostgreSQL assertions and browser coverage against a synthetic Supabase HTTP fixture), **Represented / pending** (read-only label exists, no calculation), and **Draft only** (locked entity proposal, no module UI). None means hosted end-to-end verification or CBC acceptance.
+Status: **Code** = migration + read/write UI/action inspected, runtime unverified; **Partial** = migration exists but editor or display absent; **Missing** = required mapping/UI absent. Day 1 adds **Local DB + browser fixture** (isolated PostgreSQL assertions and browser coverage against a synthetic Supabase HTTP fixture), **Represented / pending** (read-only label exists, no calculation), and **Draft only** (locked entity proposal, no module UI). A later readiness pass adds **Local Supabase E2E (selected flow)** for rows exercised in real local Auth/PostgREST browser workflows. Neither local status means cloud-hosted deployment or CBC acceptance.
 
 Validation legend (proposed unless explicitly marked existing): **T** trim text; requiredness/length need CBC review. **R** valid existing referenced record and authorized selection, relationship cardinality needs review. **D** valid date/time, chronology and timezone rules need approval. **N** decimal precision/currency/sign and aggregation rules need approval. **E** approved controlled values; do not infer exhaustive enums from examples. **C** source linkage, null/tie/period/eligibility rules and reconciliation example required; show “Definition pending” until approved. Existing names have nonblank DB/action checks; email has action regex + HTML validation; FK integrity exists for contact organization and organization owner. Existing status enum and High/Medium/Low checks are in the migration; their business approval is unverified. Day 1 parser validates HTTP(S) URLs without embedded credentials, finite estimated amounts, enums, identifiers and email. Incremental DB constraints cover finite amounts, email/URL syntax and same-organization primary contact; historical URL/email checks use NOT VALID to avoid forced data cleanup. See ADR-010 for ownership and active status.
 
@@ -14,12 +14,12 @@ Validation legend (proposed unless explicitly marked existing): **T** trim text;
 
 | ID | Field | Source p. | Type | M/A | Database mapping | UI location | Validation | Status |
 |---|---|---|---|---|---|---|---|---|
-| ORG-01 | Organization Name | 2 | text | M | organizations.name | /organizations detail/form | Existing nonblank DB + action | Local DB + browser fixture |
+| ORG-01 | Organization Name | 2 | text | M | organizations.name | /organizations detail/form | Existing nonblank DB + action | Local Supabase E2E (selected flow) |
 | ORG-02 | Organization Type | 2 | text | M | organizations.organization_type | /organizations detail/form | T | Local DB + browser fixture |
 | ORG-03 | Industry | 2 | text | M | organizations.industry | /organizations detail/form | T | Local DB + browser fixture |
 | ORG-04 | Website | 2 | text / URL | M | organizations.website | /organizations detail/form | HTTP(S) parser; DB syntax check | Local DB + browser fixture |
-| ORG-05 | Primary Contact | 2 | contact reference | A | organizations.primary_contact_id | /organizations edit: affiliated-contact selector; linked detail | Composite FK; explicit selection; delete clears pointer | Local DB + browser fixture |
-| ORG-06 | Relationship Owner | 2 | user reference | M | organizations.relationship_owner | /organizations create/admin edit + detail | ADR-010: RLS, active-Staff target check, immutable staff ownership | Local DB + browser fixture |
+| ORG-05 | Primary Contact | 2 | contact reference | A | organizations.primary_contact_id | /organizations edit: affiliated-contact selector; linked detail | Composite FK; explicit selection; delete clears pointer | Local Supabase E2E (selected flow) |
+| ORG-06 | Relationship Owner | 2 | user reference | M | organizations.relationship_owner | /organizations create/admin edit + detail | ADR-010: RLS, active-Staff target check, immutable staff ownership | Local Supabase E2E (selected flow) |
 | ORG-07 | Relationship Status | 2 | enum | M | organizations.relationship_status | /organizations detail/form | Existing enum/check; CBC approval pending | Local DB + browser fixture |
 | ORG-08 | Relationship Strength | 2 | enum | M | organizations.relationship_strength | /organizations create/edit + detail | Existing H/M/L checks + shared parser | Local DB + browser fixture |
 | ORG-09 | Priority Level | 2 | enum | M | organizations.priority_level | /organizations detail/form | Existing enum/check; CBC approval pending | Local DB + browser fixture |
@@ -31,22 +31,22 @@ Validation legend (proposed unless explicitly marked existing): **T** trim text;
 | ORG-15 | Next Action | 2 | task reference | A | tasks.description via linked activity | /organizations detail: related history | First incomplete action by due date (undated last), then UUID | Local DB + browser fixture |
 | ORG-16 | Next Action Date | 2 | date | A | tasks.due_date | /organizations detail: related history | First incomplete action by due date (undated last), then UUID | Local DB + browser fixture |
 | ORG-17 | Renewal Date | 2 | date | A | agreements.renewal_date (proposed) | /organizations detail: Definition pending | C; no formula implemented | Represented / pending |
-| ORG-18 | Notes | 2 | text | M | organizations.notes | /organizations detail/form | T | Local DB + browser fixture |
+| ORG-18 | Notes | 2 | text | M | organizations.notes | /organizations detail/form | T | Local Supabase E2E (selected flow) |
 
 ## Contacts — REQ-002
 
 | ID | Field | Source p. | Type | M/A | Database mapping | UI location | Validation | Status |
 |---|---|---|---|---|---|---|---|---|
-| CON-01 | First Name | 4 | text | M | contacts.first_name | /contacts detail/form | Existing nonblank DB + action | Local DB + browser fixture |
-| CON-02 | Last Name | 4 | text | M | contacts.last_name | /contacts detail/form | Existing nonblank DB + action | Local DB + browser fixture |
-| CON-03 | Title | 4 | text | M | contacts.title | /contacts detail/form | T | Local DB + browser fixture |
-| CON-04 | Organization | 4 | organization reference | A | contacts.organization_id | /contacts form selector + linked detail; AUTO display, manual association | C | Local DB + browser fixture |
+| CON-01 | First Name | 4 | text | M | contacts.first_name | /contacts detail/form | Existing nonblank DB + action | Local Supabase E2E (selected flow) |
+| CON-02 | Last Name | 4 | text | M | contacts.last_name | /contacts detail/form | Existing nonblank DB + action | Local Supabase E2E (selected flow) |
+| CON-03 | Title | 4 | text | M | contacts.title | /contacts detail/form | T | Local Supabase E2E (selected flow) |
+| CON-04 | Organization | 4 | organization reference | A | contacts.organization_id | /contacts form selector + linked detail; AUTO display, manual association | FK; explicit contacts_organization_id_fkey hint prevents ambiguous REST embed | Local Supabase E2E (selected flow) |
 | CON-05 | Email | 4 | text / email | M | contacts.email | /contacts detail/form | Email parser + HTML + DB syntax check | Local DB + browser fixture |
 | CON-06 | Phone | 4 | text | M | contacts.phone | /contacts detail/form | T | Local DB + browser fixture |
 | CON-07 | Contact Type | 4 | lookup | M | contacts.contact_type | /contacts detail/form | Free text; controlled taxonomy pending | Local DB + browser fixture |
 | CON-08 | Influence Level | 4 | enum | M | contacts.influence_level | /contacts detail/form | Nullable H/M/L parser + DB check | Local DB + browser fixture |
 | CON-09 | Relationship Owner | 4 | user reference | A | organizations.relationship_owner | /contacts detail: inherited owner label | Linked organization; restricted directory visibility | Local DB + browser fixture |
-| CON-10 | Last Contact | 4 | timestamp | A | activity_last_contact(...) | /contacts detail: related history | Latest nonfuture linked timestamp | Local DB + browser fixture |
+| CON-10 | Last Contact | 4 | timestamp | A | activity_last_contact(...) | /contacts detail: related history | Latest nonfuture linked timestamp | Local Supabase E2E (selected flow) |
 | CON-11 | Next Action | 4 | task reference | A | tasks.description via linked activity | /contacts detail: related history | First incomplete action by due date (undated last), then UUID | Local DB + browser fixture |
 | CON-12 | Events Attended | 4 | count / history | A | contacts.attendance (proposed) | /contacts detail: Definition pending | C; no formula implemented | Represented / pending |
 | CON-13 | Giving History | 4 | contribution history | A | contacts.contributions (proposed) | /contacts detail: Definition pending | C; no formula implemented | Represented / pending |
@@ -78,21 +78,21 @@ Validation legend (proposed unless explicitly marked existing): **T** trim text;
 
 | ID | Field | Source p. | Type | M/A | Database mapping | UI location | Validation | Status |
 |---|---|---|---|---|---|---|---|---|
-| ACT-01 | Date / Time | 8 | timestamp | M | activities.occurred_at | /activities create/edit/detail | Required finite timestamptz; UTC input; strict calendar/parser validation | Local DB + browser fixture |
-| ACT-02 | Activity Type | 8 | text | M | activities.activity_type | /activities create/edit/detail | Required nonblank; free text with source examples | Local DB + browser fixture |
-| ACT-03 | Organization | 8 | organization reference | M | activities.organization_id | /activities create/edit/detail | Optional organization FK; read/write access checked | Local DB + browser fixture |
-| ACT-04 | Contact(s) | 8 | contact references | M | activity_contacts.contact_id | /activities create/edit/detail | FK + composite PK; atomic participant replacement; multi-select | Local DB + browser fixture |
+| ACT-01 | Date / Time | 8 | timestamp | M | activities.occurred_at | /activities create/edit/detail | Required finite timestamptz; UTC input; strict calendar/parser validation | Local Supabase E2E (selected flow) |
+| ACT-02 | Activity Type | 8 | text | M | activities.activity_type | /activities create/edit/detail | Required nonblank; free text with source examples | Local Supabase E2E (selected flow) |
+| ACT-03 | Organization | 8 | organization reference | M | activities.organization_id | /activities create/edit/detail | Optional organization FK; read/write access checked | Local Supabase E2E (selected flow) |
+| ACT-04 | Contact(s) | 8 | contact references | M | activity_contacts.contact_id | /activities create/edit/detail | FK + composite PK; atomic participant replacement; multi-select | Local Supabase E2E (selected flow) |
 | ACT-05 | Location | 8 | text | M | activities.location | /activities create/edit/detail | Trimmed optional text; persisted through invoker RPC | Local DB + browser fixture |
-| ACT-06 | Purpose | 8 | text | M | activities.purpose | /activities create/edit/detail | Trimmed optional text; persisted through invoker RPC | Local DB + browser fixture |
+| ACT-06 | Purpose | 8 | text | M | activities.purpose | /activities create/edit/detail | Trimmed optional text; persisted through invoker RPC | Local Supabase E2E (selected flow) |
 | ACT-07 | Key Discussion | 8 | text | M | activities.key_discussion | /activities create/edit/detail | Trimmed optional text; persisted through invoker RPC | Local DB + browser fixture |
 | ACT-08 | Sponsor Needs | 8 | text | M | activities.sponsor_needs | /activities create/edit/detail | Trimmed optional text; persisted through invoker RPC | Local DB + browser fixture |
 | ACT-09 | CBC Opportunity | 8 | text | M | activities.cbc_opportunity | /activities create/edit/detail | Trimmed optional text; persisted through invoker RPC | Local DB + browser fixture |
-| ACT-10 | Outcome | 8 | text | M | activities.outcome | /activities create/edit/detail | Trimmed optional text; persisted through invoker RPC | Local DB + browser fixture |
-| ACT-11 | Next Action | 8 | text | M | tasks.description | /activities detail + follow-up create/edit | Nonblank description; multiple follow-ups per activity | Local DB + browser fixture |
-| ACT-12 | Action Owner | 8 | user reference | M | tasks.owner_id | /activities detail + follow-up create/edit | Restricted directory; DB validation; inactive/hidden target rejected | Local DB + browser fixture |
-| ACT-13 | Due Date | 8 | date | M | tasks.due_date | /activities detail + follow-up create/edit | Optional finite calendar date; Calgary timezone | Local DB + browser fixture |
-| ACT-14 | Status | 8 | enum | A | follow_ups.status / follow_up_status(...) | /activities detail/list; dashboard queue | Computed on SELECT: Complete precedes Overdue; before Calgary today only | Local DB + browser fixture |
-| ACT-15 | Last Contact | 8 | timestamp | A | activity_last_contact(...) | /activities detail; organization/contact histories | Invoker RPC; latest nonfuture linked timestamp | Local DB + browser fixture |
+| ACT-10 | Outcome | 8 | text | M | activities.outcome | /activities create/edit/detail | Trimmed optional text; persisted through invoker RPC | Local Supabase E2E (selected flow) |
+| ACT-11 | Next Action | 8 | text | M | tasks.description | /activities detail + follow-up create/edit | Nonblank description; multiple follow-ups per activity | Local Supabase E2E (selected flow) |
+| ACT-12 | Action Owner | 8 | user reference | M | tasks.owner_id | /activities detail + follow-up create/edit | Restricted directory; DB validation; inactive/hidden target rejected | Local Supabase E2E (selected flow) |
+| ACT-13 | Due Date | 8 | date | M | tasks.due_date | /activities detail + follow-up create/edit | Optional finite calendar date; Calgary timezone | Local Supabase E2E (selected flow) |
+| ACT-14 | Status | 8 | enum | A | follow_ups.status / follow_up_status(...) | /activities detail/list; dashboard queue | Computed on SELECT: Complete precedes Overdue; before Calgary today only | Local Supabase E2E (selected flow) |
+| ACT-15 | Last Contact | 8 | timestamp | A | activity_last_contact(...) | /activities detail; organization/contact histories | Invoker RPC; latest nonfuture linked timestamp | Local Supabase E2E (selected flow) |
 
 ## Sponsor Interests — REQ-003 (extension; no dedicated ID)
 
@@ -280,3 +280,11 @@ All 15 ACT fields from physical pp.7–8 are implemented locally. Activity listi
 Coverage is **48/133 detailed fields represented**: 43 stored/linked/calculated fields locally implemented and five explicit pending displays (organization current/lifetime giving and renewal; contact events/giving). The other 85 fields remain future-module work. Day 1 counts above are retained as historical evidence; this section supersedes them.
 
 The additive Activities migration remains local-only. Actual RLS/RPC/constraint assertions run on isolated PostgreSQL 18.6; the real app/actions run against a test-only HTTP fixture in Chromium. No hosted migration, Auth/PostgREST integration or CBC acceptance is claimed. Operational date/count conventions are explicit in ADR-011 and remain subject to CBC review, not presented as approved KPIs. See progress for executed verification totals.
+
+## Integration readiness — REQ-001/002/005/006/008
+
+A fresh **real local Supabase PostgreSQL 17 + Auth + PostgREST** environment now applies all four canonical migrations without manual schema edits. Two migration/seed replays preserve applied history and the named synthetic baseline. Twenty real API checks and three real-browser scenarios exercise authentication, creation/editing, relationships, status/history/action queues and read-only roles. Selected row statuses above reflect those flows; other local DB/fixture evidence remains unchanged. **Cloud-hosted deployment has not been performed.**
+
+The contact organization embed needed an explicit FK hint after the composite primary-contact FK introduced a second relationship; both affected queries are fixed and verified against actual PostgREST. All 97 SQL assertions also pass on a fresh PostgreSQL 17 database. Fresh official Supabase places pgcrypto in extensions and reports zero local security-advisor findings; the existing hosted project's placement remains unverified.
+
+Coverage remains 48/133 represented (43 locally implemented, five pending), with no new financial/KPI definitions. Exact connection steps, private credential handling and required cloud approvals are in [hosted integration readiness](../delivery/hosted-integration-readiness.md). Next: Sponsorship & Giving, then Sponsor Interests.

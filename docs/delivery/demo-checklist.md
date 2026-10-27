@@ -75,3 +75,19 @@ Organizations/Contacts represent 33 detailed fields: 23 stored/linked displays a
 AT-06 now has local SQL and browser evidence for log/participants, multiple follow-ups, ownership/due dates, completion/reopening, overdue/Last Contact/next actions and dashboard queue. SQL fixtures include fixed-date, Calgary DST/midnight, atomic rollback, direct role denial and hidden/inactive owner scenarios. Browser tests use the real app against a synthetic HTTP fixture; SQL tests run on actual local PostgreSQL 18.6. Hosted Supabase remains untouched.
 
 Current total: **48/133 detailed fields represented**, 43 locally implemented and five explicit pending displays. Eight remaining navigation destinations/85 detailed fields are deferred. Activities search, status filter, due-week/overdue/upcoming panels, related histories and error states are included. Automated demonstration is not CBC sign-off.
+
+## Real local Supabase integration readiness
+
+- [x] Four canonical migrations apply on a fresh real Supabase PostgreSQL 17 environment; order, dependencies, RLS, grants and migration versions audited.
+- [x] Two migration/seed replays preserve history and named fixture counts; no manual schema edits/reset required.
+- [x] Synthetic real Auth accounts plus organization/contact/activity/six follow-up scenarios prepared.
+- [x] Twenty real Auth/PostgREST checks pass, including role/ownership/directory/escalation/anonymous/signup denial paths.
+- [x] Three real-browser scenarios pass: admin authentication and full create/edit/relationship/action/calculated-field workflow; Finance/Viewer read-only controls.
+- [x] 97 SQL assertions pass on fresh PostgreSQL 17; nine validation tests and three readiness guard tests pass.
+- [x] Typecheck/lint/production build and existing nine fixture browser regressions pass.
+- [x] Fresh Supabase pgcrypto namespace is extensions; local security advisors report zero findings. Existing hosted placement remains unverified.
+- [x] Credential/generated artifacts ignored and private; no private key in frontend, console report or commit.
+- [ ] Approval for a separate **cloud** demo project, migration target, secure configuration and deployment. No existing hosted modification authorized or performed.
+- [ ] Cloud-specific API/browser verification and CBC acceptance.
+
+Local integration is now verified rather than inferred from a mock API. Earlier hosted/local-auth deferrals are superseded only for this separate local stack; cloud deployment and CBC review remain pending. See [readiness and connection guide](hosted-integration-readiness.md). Next implementation: Sponsorship & Giving, followed by Sponsor Interests.

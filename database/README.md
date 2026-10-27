@@ -36,3 +36,11 @@ CBC_PG_BIN=/path/to/postgres/bin PGHOST=/private/socket/directory PGPORT=55439 P
 Use only a dedicated disposable server: the auth bootstrap creates test roles. The runner always creates a fresh database, never resets/drops an existing one. This session used PostgreSQL 18.6 extracted under `/tmp/cbc-postgres-runtime`, a cluster under `/tmp/cbc-activities-pgdata`, and a mode-700 Unix socket directory `/tmp/cbc-activities-socket`, with TCP listening disabled. It tests real PostgreSQL SQL/RLS, not a mock engine; hosted PostgreSQL 17/Supabase Auth/PostgREST integration still requires explicit review and verification.
 
 The local Supabase security advisor is run with an explicit socket DSN, never `--linked`. The existing timestamp helper's mutable-search-path warning is fixed additively in the Activities migration. The baseline `pgcrypto` extension-in-public warning is recorded for operator review; moving an existing extension is deliberately deferred from this local module slice. No new security-definer function is added by Activities.
+
+## Real Supabase integration readiness
+
+A separate native Supabase PostgreSQL 17.11/Auth/PostgREST environment is now verified. Canonical migrations remain unchanged; the demo's generated, ignored migration copies are history-managed and byte-checked. No proposal/test bootstrap enters the real default database. `node scripts/demo/verify-database.mjs` runs the 97 SQL assertions in a separate fresh database on that same PostgreSQL 17 server; real service integration is independently checked through Auth/PostgREST and browser workflows.
+
+Two migration/seed replays preserve history and named synthetic counts without manual schema edits. Fresh Supabase already has pgcrypto in extensions and advisors report zero findings; the prior public-schema warning described the bare PostgreSQL bootstrap and is not proof of hosted placement. Do not relocate an existing hosted extension based on that warning alone.
+
+Use [the readiness guide](../docs/delivery/hosted-integration-readiness.md) for complete commands, dependencies, credential boundaries and required hosted approvals. The existing hosted project was neither modified nor queried during this readiness task.

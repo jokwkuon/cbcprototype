@@ -72,3 +72,19 @@ Organization/contact details show linked activity history, Last Contact and the 
 Browser tests now run independently on app port **3130** and fixture API port **54339**, preserving a manually running demo on 3100/54329. The test command still builds with synthetic-only public configuration before starting the app. It covers all Activities fields, multiple participants/actions, editing, completion/reopening, linked histories, role controls, errors and existing CRM regressions. The SQL suite independently checks database enforcement.
 
 Hosted Supabase has not received this migration. Real hosted Auth/PostgREST end-to-end behavior and CBC acceptance remain pending. The browser fixture remains test-only and in-memory; use the existing two-terminal synthetic demo commands for local exploration, restarting the synthetic API after code updates if it was already running.
+
+## Real local Supabase demo
+
+A separate official native Supabase stack now provides actual PostgreSQL 17, Auth and PostgREST at localhost:54421/54422. This is distinct from the HTTP fixture. See [integration readiness and connection steps](../../docs/delivery/hosted-integration-readiness.md).
+
+From the repository root:
+
+```sh
+node scripts/demo/prepare.mjs
+node scripts/demo/stack.mjs start
+node scripts/demo/stack.mjs migrate
+node scripts/demo/seed.mjs
+node scripts/demo/run.mjs
+```
+
+Open http://localhost:3140/login. Generated account details are private in `.local/cbc-demo/accounts.json`; no password/key is committed or printed. The run helper supplies only the local API URL and public key and never overwrites your existing `.env.local`. `npm run test:integration` runs three real-Supabase browser scenarios using private reporting; `npm run test:e2e` remains the nine-scenario fixture regression suite. Run builds/suites sequentially from this checkout.
