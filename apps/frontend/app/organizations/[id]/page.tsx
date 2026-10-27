@@ -1,2 +1,25 @@
-import Link from "next/link"; import { notFound } from "next/navigation"; import { Shell } from "../../../components/shell"; import { createClient } from "../../../lib/supabase/server";
-export default async function Organization({params}:{params:Promise<{id:string}>}){const {id}=await params; const c=await createClient(); const {data:o}=await c.from("organizations").select("*").eq("id",id).single(); if(!o) notFound(); const {data:contacts}=await c.from("contacts").select("*").eq("organization_id",id).order("last_name"); return <Shell><div className="flex justify-between"><div><Link href="/organizations" className="text-purple text-sm">← Organizations</Link><h1 className="text-3xl font-bold mt-3">{o.name}</h1><p className="text-slate-500 mt-1">{o.organization_type??"Organization"} · {o.relationship_status}</p></div><Link href={`/organizations/${id}/edit`} className="border rounded-lg px-4 py-2.5 font-semibold bg-white">Edit</Link></div><div className="grid lg:grid-cols-3 gap-5 mt-7"><section className="bg-white border rounded-xl p-6 lg:col-span-2"><h2 className="font-bold text-lg">Relationship profile</h2><dl className="grid sm:grid-cols-2 gap-5 mt-5">{[["Industry",o.industry],["Website",o.website],["Strength",o.relationship_strength],["Priority",o.priority_level],["Potential",o.potential],["Notes",o.notes]].map(([a,b])=><div key={a}><dt className="text-xs uppercase text-slate-500">{a}</dt><dd className="mt-1">{b??"—"}</dd></div>)}</dl></section><section className="bg-white border rounded-xl p-6"><h2 className="font-bold text-lg">Contacts</h2><div className="mt-4 space-y-3">{contacts?.map(x=><div className="border-b pb-2" key={x.id}><div className="font-semibold">{x.first_name} {x.last_name}</div><div className="text-sm text-slate-500">{x.title??""}</div></div>)}{!contacts?.length&&<p className="text-slate-500">No linked contacts.</p>}</div><Link href="/contacts/new" className="text-purple text-sm font-semibold inline-block mt-5">+ Add contact</Link></section></div></Shell>}
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { Shell } from "../../../components/shell";
+import { DetailFields, PendingFields } from "../../../components/fields";
+import { organizationPending } from "../../../lib/crm-fields";
+import { crmContext, ownerLabel } from "../../../lib/crm-context";
+export default async function Organization({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const { client, canWrite } = await crmContext();
+  const { data: org, error } = await client.from("organizations").select("*").eq("id", id).maybeSingle();
+  if (error) throw new Error("Unable to load organization.");
+  if (!org) notFound();
+  const { data: contacts, error: contactError } = await client.from("contacts").select("*").eq("organization_id", id).order("last_name");
+  if (contactError) throw new Error("Unable to load linked contacts.");
+  const owner = await ownerLabel(client, org.relationship_owner);
+  const primary = contacts?.find(contact => contact.id === org.primary_contact_id);
+  return <Shell><div className="flex justify-between gap-4"><div><Link href="/organizations">← Organizations</Link><h1 className="mt-3 text-3xl font-bold">{org.name}</h1></div>{canWrite && <Link href={`/organizations/${id}/edit`}>Edit organization</Link>}</div>
+    <nav aria-label="Organization sections" className="mt-6 flex flex-wrap gap-4">{["Overview","Contacts","Giving History","Activities","Interests","Documents"].map(label=><a key={label} href={`#${label.toLowerCase().replaceAll(" ","-")}`}>{label}</a>)}</nav><div className="mt-6 grid gap-5 lg:grid-cols-3"><section id="overview" className="card p-6 lg:col-span-2"><h2 className="mb-5 font-bold">Relationship profile</h2><DetailFields fields={[
+      ["Organization Name", org.name], ["Organization Type", org.organization_type], ["Industry", org.industry], ["Website", org.website], ["Location", org.location],
+      ["Primary Contact", primary ? <Link href={`/contacts/${primary.id}`}>{primary.first_name} {primary.last_name}</Link> : "Not selected"],
+      ["Relationship Owner", owner], ["Relationship Status", org.relationship_status], ["Relationship Strength", org.relationship_strength], ["Priority Level", org.priority_level], ["Potential", org.potential], ["Estimated Opportunity", org.estimated_opportunity], ["Notes", org.notes],
+    ]}/></section><section id="contacts" className="card p-6"><h2 className="mb-4 font-bold">Contacts</h2>{contacts?.map(contact => <p key={contact.id}><Link href={`/contacts/${contact.id}`}>{contact.first_name} {contact.last_name}</Link></p>)}{!contacts?.length && <p>No linked contacts.</p>}{canWrite && <Link className="mt-5 inline-block" href="/contacts/new">+ Add contact</Link>}</section></div>
+    <PendingFields labels={organizationPending}/><div className="mt-5 grid gap-4 sm:grid-cols-2">{["Giving History","Activities","Interests","Documents"].map(label=><section key={label} id={label.toLowerCase().replaceAll(" ","-")} className="card p-6"><h2 className="font-bold">{label}</h2><p>Module pending — no related history is calculated yet.</p></section>)}</div>
+  </Shell>;
+}

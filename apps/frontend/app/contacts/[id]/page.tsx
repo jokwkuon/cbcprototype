@@ -1,2 +1,21 @@
-import Link from "next/link"; import { notFound } from "next/navigation"; import { Shell } from "../../../components/shell"; import { Card, PageHeader, Button } from "../../../components/ui"; import { createClient } from "../../../lib/supabase/server";
-export default async function Contact({params}:{params:Promise<{id:string}>}){const {id}=await params; const c=await createClient(); const {data:x}=await c.from("contacts").select("*, organization:organizations(id,name)").eq("id",id).single(); if(!x) notFound(); return <Shell><Link href="/contacts" className="text-sm font-bold text-[var(--cbc-primary)]">← Contacts</Link><PageHeader title={`${x.first_name} ${x.last_name}`} subtitle={x.title??"Contact"} action={<Link href={`/contacts/${id}/edit`}><Button variant="secondary">Edit contact</Button></Link>}/><Card className="max-w-2xl"><dl className="grid gap-5 sm:grid-cols-2">{[["Organization",x.organization?<Link className="text-[var(--cbc-primary)]" href={`/organizations/${x.organization.id}`}>{x.organization.name}</Link>:"Not linked"],["Email",x.email??"—"],["Phone",x.phone??"—"],["Title",x.title??"—"]].map(([label,value])=><div key={label}><dt className="text-xs font-bold uppercase tracking-wider text-[var(--cbc-muted)]">{label}</dt><dd className="mt-1">{value}</dd></div>)}</dl></Card></Shell>}
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { Shell } from "../../../components/shell";
+import { DetailFields, PendingFields } from "../../../components/fields";
+import { contactPending } from "../../../lib/crm-fields";
+import { crmContext, ownerLabel } from "../../../lib/crm-context";
+export default async function Contact({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const { client, canWrite } = await crmContext();
+  const { data: contact, error } = await client.from("contacts").select("*, organization:organizations(id,name,relationship_owner)").eq("id", id).maybeSingle();
+  if (error) throw new Error("Unable to load contact.");
+  if (!contact) notFound();
+  const owner = await ownerLabel(client, contact.organization?.relationship_owner ?? null);
+  return <Shell><Link href="/contacts">← Contacts</Link><div className="my-5 flex justify-between gap-4"><h1 className="text-3xl font-bold">{contact.first_name} {contact.last_name}</h1>{canWrite && <Link href={`/contacts/${id}/edit`}>Edit contact</Link>}</div>
+    <section className="card p-6"><DetailFields fields={[
+      ["First Name", contact.first_name], ["Last Name", contact.last_name], ["Title", contact.title],
+      ["Organization", contact.organization ? <Link href={`/organizations/${contact.organization.id}`}>{contact.organization.name}</Link> : "Not linked"],
+      ["Email", contact.email], ["Phone", contact.phone], ["Contact Type", contact.contact_type], ["Influence Level", contact.influence_level], ["Relationship Owner", owner], ["Interests", contact.interests], ["Notes", contact.notes],
+    ]}/></section><PendingFields labels={contactPending}/>
+  </Shell>;
+}

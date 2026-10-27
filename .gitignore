@@ -19,3 +19,9 @@ __pycache__/
 *.db
 *.sqlite
 .DS_Store
+
+# Local architecture reference and generated verification artifacts
+CBC Database Architecture 2026.pdf
+*.tsbuildinfo
+apps/frontend/test-results/
+apps/frontend/playwright-report/

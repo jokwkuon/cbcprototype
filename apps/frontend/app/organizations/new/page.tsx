@@ -1,2 +1,8 @@
-import { Shell } from "../../../components/shell"; import { createOrganization } from "../../actions";
-export default function New(){return <Shell><h1 className="text-3xl font-bold">Add organization</h1><form action={createOrganization} className="bg-white border rounded-xl p-6 mt-6 max-w-2xl space-y-4"><label className="block">Organization name<input required name="name" /></label><label className="block">Organization type<input name="organization_type" placeholder="Sponsor, Donor, Prospect…" /></label><label className="block">Industry<input name="industry" /></label><label className="block">Website<input name="website" placeholder="atb.com" /></label><div className="grid sm:grid-cols-2 gap-4"><label>Relationship status<select name="relationship_status" defaultValue="Prospect">{["Prospect","Cultivate","Proposal","Committed","Active","Lapsed"].map(x=><option key={x}>{x}</option>)}</select></label><label>Priority<select name="priority_level" defaultValue="Medium">{["High","Medium","Low"].map(x=><option key={x}>{x}</option>)}</select></label></div><label className="block">Notes<textarea name="notes" rows={4}/></label><button className="bg-purple text-white rounded-lg px-5 py-2.5 font-semibold">Create organization</button></form></Shell>}
+import { Shell } from "../../../components/shell";
+import { CrmForm } from "../../../components/crm-form";
+import { organizationFormData } from "../../../lib/crm-form-data";
+import { createOrganization } from "../../actions";
+export default async function New() {
+  const data = await organizationFormData();
+  return <Shell><h1 className="text-3xl font-bold">Add organization</h1><CrmForm action={createOrganization} {...data} cancelHref="/organizations"><p className="text-sm text-slate-500">Create the organization, add a linked contact, then select its Primary Contact from Edit.</p></CrmForm></Shell>;
+}

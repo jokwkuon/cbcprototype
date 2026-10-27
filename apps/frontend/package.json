@@ -6,7 +6,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "node --experimental-strip-types tests/validation.test.ts",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
     "@supabase/ssr": "latest",
@@ -18,6 +20,7 @@
     "tailwind-merge": "latest"
   },
   "devDependencies": {
+    "@playwright/test": "1.64.1",
     "@tailwindcss/postcss": "^4.3.3",
     "@types/node": "latest",
     "@types/react": "latest",

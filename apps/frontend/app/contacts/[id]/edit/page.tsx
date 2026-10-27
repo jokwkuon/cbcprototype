@@ -1,2 +1,9 @@
-import { Shell } from "../../../../components/shell"; import { createClient } from "../../../../lib/supabase/server"; import { updateContact } from "../../../actions"; import { Button } from "../../../../components/ui";
-export default async function Edit({params}:{params:Promise<{id:string}>}){const {id}=await params; const c=await createClient(); const [{data:x},{data:orgs}]=await Promise.all([c.from("contacts").select("*").eq("id",id).single(),c.from("organizations").select("id,name").order("name")]); if(!x) return null; return <Shell><h1 className="text-3xl font-extrabold">Edit contact</h1><form action={updateContact} className="card mt-6 max-w-2xl space-y-4 p-6"><input type="hidden" name="id" value={id}/><div className="grid gap-4 sm:grid-cols-2"><label>First name<input required name="first_name" defaultValue={x.first_name}/></label><label>Last name<input required name="last_name" defaultValue={x.last_name}/></label></div><label className="block">Title<input name="title" defaultValue={x.title??""}/></label><label className="block">Organization<select name="organization_id" defaultValue={x.organization_id??""}><option value="">Not linked</option>{orgs?.map(o=><option key={o.id} value={o.id}>{o.name}</option>)}</select></label><div className="grid gap-4 sm:grid-cols-2"><label>Email<input name="email" type="email" defaultValue={x.email??""}/></label><label>Phone<input name="phone" defaultValue={x.phone??""}/></label></div><Button>Save changes</Button></form></Shell>}
+import { Shell } from "../../../../components/shell";
+import { CrmForm } from "../../../../components/crm-form";
+import { contactFormData } from "../../../../lib/crm-form-data";
+import { updateContact } from "../../../actions";
+export default async function Edit({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const data = await contactFormData(id);
+  return <Shell><h1 className="text-3xl font-bold">Edit contact</h1><CrmForm action={updateContact} {...data} cancelHref="/contacts"/></Shell>;
+}

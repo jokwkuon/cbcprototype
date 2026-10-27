@@ -1,2 +1,9 @@
-import { Shell } from "../../../../components/shell"; import { createClient } from "../../../../lib/supabase/server"; import { updateOrganization } from "../../../actions";
-export default async function Edit({params}:{params:Promise<{id:string}>}){const {id}=await params; const c=await createClient(); const {data:o}=await c.from("organizations").select("*").eq("id",id).single(); if(!o) return null; return <Shell><h1 className="text-3xl font-bold">Edit organization</h1><form action={updateOrganization} className="bg-white border rounded-xl p-6 mt-6 max-w-2xl space-y-4"><input type="hidden" name="id" value={id}/><label className="block">Organization name<input required name="name" defaultValue={o.name}/></label><label className="block">Organization type<input name="organization_type" defaultValue={o.organization_type??""}/></label><label className="block">Industry<input name="industry" defaultValue={o.industry??""}/></label><label className="block">Website<input name="website" defaultValue={o.website??""}/></label><div className="grid sm:grid-cols-2 gap-4"><label>Relationship status<select name="relationship_status" defaultValue={o.relationship_status}>{["Prospect","Cultivate","Proposal","Committed","Active","Lapsed"].map(x=><option key={x}>{x}</option>)}</select></label><label>Priority<select name="priority_level" defaultValue={o.priority_level}>{["High","Medium","Low"].map(x=><option key={x}>{x}</option>)}</select></label></div><label className="block">Notes<textarea name="notes" rows={4} defaultValue={o.notes??""}/></label><button className="bg-purple text-white rounded-lg px-5 py-2.5 font-semibold">Save changes</button></form></Shell>}
+import { Shell } from "../../../../components/shell";
+import { CrmForm } from "../../../../components/crm-form";
+import { organizationFormData } from "../../../../lib/crm-form-data";
+import { updateOrganization } from "../../../actions";
+export default async function Edit({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const data = await organizationFormData(id);
+  return <Shell><h1 className="text-3xl font-bold">Edit organization</h1><CrmForm action={updateOrganization} {...data} cancelHref="/organizations"><p className="text-sm text-slate-500">Staff ownership is preserved on edit. Only Admin may change it.</p></CrmForm></Shell>;
+}
