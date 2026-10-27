@@ -7,7 +7,7 @@
     "start": "next start",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
-    "test": "node --experimental-strip-types tests/validation.test.ts && node --experimental-strip-types tests/activities.test.ts",
+    "test": "node --experimental-strip-types tests/validation.test.ts && node --experimental-strip-types tests/activities.test.ts && node --experimental-strip-types tests/giving.test.ts",
     "test:e2e": "playwright test",
     "test:integration": "playwright test --config playwright.integration.config.ts"
   },

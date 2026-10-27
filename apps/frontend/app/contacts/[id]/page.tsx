@@ -1,3 +1,4 @@
+import { GivingHistory } from "../../../components/giving";
 import { relatedHistory } from "../../../lib/activity-data";
 import { RelatedActivities } from "../../../components/activity-lists";
 import Link from "next/link";
@@ -19,6 +20,6 @@ export default async function Contact({ params }: { params: Promise<{ id: string
       ["First Name", contact.first_name], ["Last Name", contact.last_name], ["Title", contact.title],
       ["Organization", contact.organization ? <Link href={`/organizations/${contact.organization.id}`}>{contact.organization.name}</Link> : "Not linked"],
       ["Email", contact.email], ["Phone", contact.phone], ["Contact Type", contact.contact_type], ["Influence Level", contact.influence_level], ["Relationship Owner", owner], ["Interests", contact.interests], ["Notes", contact.notes],
-    ]}/></section><RelatedActivities history={history}/><PendingFields labels={contactPending.filter(label=>!["Last Contact","Next Action"].includes(label))}/>
+    ]}/></section><RelatedActivities history={history}/><GivingHistory contact={id}/><PendingFields labels={contactPending.filter(label=>!["Last Contact","Next Action","Giving History"].includes(label))}/>
   </Shell>;
 }

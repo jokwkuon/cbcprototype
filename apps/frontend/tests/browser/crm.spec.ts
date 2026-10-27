@@ -28,7 +28,7 @@ test("REQ-001/002: create, read, update, linked navigation and inline validation
   for (const label of ["Organization Name","Organization Type","Industry","Website","Primary Contact","Relationship Owner","Relationship Status","Relationship Strength","Priority Level","Potential","Estimated Opportunity","Notes"]) await expect(page.locator("dt").filter({hasText:new RegExp(`^${label}$`)})).toBeVisible();
   for (const value of ["Community Partner","Synthetic Industry","Demo City","1234.56","Cultivate","https://example.test/"]) await expect(page.getByText(value,{exact:true})).toBeVisible();
   const orgUrl=page.url(); await expect(page.getByText("Demo staff 2",{exact:true})).toBeVisible();
-  await expect(page.getByText("Definition pending",{exact:true})).toHaveCount(3);
+  await expect(page.locator("#giving-history")).toContainText("Giving history unavailable");
   await page.getByRole("link",{name:"Edit organization",exact:true}).click();
   await page.getByLabel("Potential",{exact:true}).selectOption("High");
   await page.getByLabel("Notes",{exact:true}).fill("Synthetic updated note");
@@ -46,7 +46,8 @@ test("REQ-001/002: create, read, update, linked navigation and inline validation
   await expect(page.getByText("Demo staff 2",{exact:true})).toBeVisible();
   for (const label of ["First Name","Last Name","Title","Organization","Email","Phone","Contact Type","Influence Level","Relationship Owner","Interests","Notes"]) await expect(page.locator("dt").filter({hasText:new RegExp(`^${label}$`)})).toBeVisible();
   for (const value of ["person@example.test","555-0100","Decision Maker","Synthetic contact note"]) await expect(page.getByText(value,{exact:true})).toBeVisible();
-  await expect(page.getByText("Definition pending",{exact:true})).toHaveCount(2);
+  await expect(page.getByText("Definition pending",{exact:true})).toHaveCount(1);
+  await expect(page.locator("#giving-history")).toContainText("Giving history unavailable");
   const contactUrl=page.url();
   await page.getByRole("link",{name:"Edit contact",exact:true}).click();await page.getByLabel("Title",{exact:true}).fill("Synthetic Director");
   await page.getByRole("button",{name:"Save record"}).click();await expect(page.getByText("Synthetic Director",{exact:true})).toBeVisible();
