@@ -12,7 +12,7 @@ else
   docker exec "$container" createdb -U postgres "$database_name"
   run_psql() { docker exec -i "$container" psql -X -U postgres -d "$database_name" -v ON_ERROR_STOP=1; }
 fi
-for sql_file in "$repo_root/database/tests/bootstrap.sql" "$repo_root"/database/migrations/*.sql "$repo_root"/database/proposals/*.sql "$repo_root/database/tests/fixtures.sql" "$repo_root/database/tests/ownership.sql" "$repo_root/database/tests/activities.sql"; do
+for sql_file in "$repo_root/database/tests/bootstrap.sql" "$repo_root"/database/migrations/*.sql "$repo_root"/database/proposals/*.sql "$repo_root/database/tests/fixtures.sql" "$repo_root/database/tests/ownership.sql" "$repo_root/database/tests/activities.sql" "$repo_root/database/tests/giving.sql"; do
   echo "Checking $(basename "$sql_file")"
   run_psql < "$sql_file"
 done
