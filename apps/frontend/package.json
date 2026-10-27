@@ -12,7 +12,7 @@
     "@supabase/ssr": "latest",
     "@supabase/supabase-js": "latest",
     "clsx": "latest",
-    "next": "latest",
+    "next": "16.4.3",
     "react": "latest",
     "react-dom": "latest",
     "tailwind-merge": "latest"

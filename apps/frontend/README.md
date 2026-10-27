@@ -12,3 +12,22 @@ The browser only receives the Supabase anon key. Never add a service-role key to
 ## Verification
 
 `npm run typecheck` and `npm run lint` are the local static checks. `npm run build` requires a compatible TypeScript/Next dependency install; use the lockfile and a network-enabled environment when dependency resolution is available.
+
+## Next.js security maintenance
+
+Next.js is pinned to 16.4.3 (upgraded from 16.4.0), with the npm lockfile updated
+and `experimental.agentUpgrade` set to `"security"`. Existing Server Actions
+origin configuration is preserved. This maintenance supports REQ-008 (Access);
+it does not establish approval of the proposed access rules.
+
+Verified with npm install, `npm exec -- next --version`, `npm run lint`,
+`npm run typecheck`, `NODE_ENV=production npm run build`, and `npm audit`
+(zero vulnerabilities). Use a standard `NODE_ENV`: the inherited nonstandard
+value caused a prerender failure that disappeared with `production`.
+The existing middleware deprecation warning remains.
+
+Demo verification: start the production build on localhost with synthetic
+configuration, open `/login` and confirm the sign-in form renders; unauthenticated
+requests to `/`, `/dashboard`, `/contacts`, and `/organizations` redirect to
+`/login`. These checks passed without live records or credentials. Authenticated
+workflows and relevant CBC approval remain pending.

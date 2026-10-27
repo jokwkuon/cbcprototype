@@ -9,6 +9,6 @@ if (process.env.NEXT_SERVER_ACTION_ALLOWED_ORIGINS) {
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
-  experimental: { serverActions: { allowedOrigins: [...allowedOrigins] } },
+  experimental: { agentUpgrade: "security", serverActions: { allowedOrigins: [...allowedOrigins] } },
 };
 export default nextConfig;
