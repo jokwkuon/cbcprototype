@@ -22,3 +22,15 @@ Authority: explicit repository-owner instruction in this session; REQ-001/002/00
 - Implementation defines active as `profiles.is_active`; existing profiles default true, preserving current accounts. Only trusted operators may change role/active state; browser profile writes remain denied. Deactivation removes selectable ownership but does not rewrite existing organization ownership. Non-ownership edits preserve historical assignments.
 - Existing nullable ownership remains supported. Staff deletion is disabled to prevent delete/reinsert ownership reassignment; admin deletion remains available through the database. No delete UI is added.
 - This authorizes the ownership slice, not unresolved finance/KPI formulas or production use. Existing stack is retained for the explicitly requested three-day synthetic demo; instructor/CBC broader stack and acceptance approvals remain open.
+
+## ADR-011 — Activities demo conventions (implemented; CBC review pending)
+
+REQ-005/008. The user explicitly requested the complete activity/follow-up workflow and overdue calculation. These are visible MVP implementation conventions, not approved KPI formulas:
+
+- Store interaction timestamps as timestamptz; forms explicitly accept UTC. Future timestamps represent planned activities and do not advance Last Contact.
+- Evaluate date-only deadlines in `America/Edmonton` (Calgary). Complete takes precedence; otherwise due before today = Overdue; today/future/no due date = Open. A follow-up may be completed and reopened explicitly.
+- An activity may have zero/many participants and zero/many follow-ups. Organization is optional for person-only interactions. Participants may belong to other organizations; log links are historical, not automatic changes to affiliations.
+- Reuse existing CRM access: active Admin/Staff create/edit, Finance/Viewer read only; anonymous/inactive denied. No delete workflow is introduced. Actions may select only owners visible through the existing restricted directory (Admin: active Staff; Staff: self), or be unassigned. Preserving an existing owner is allowed without exposing their profile. This does not modify organization ownership (ADR-010).
+- Last Contact is the latest nonfuture explicitly linked interaction. For an activity detail it covers the activity's organization and participant relationships; organization/contact pages use their specific links. Open next action sorts by due date (undated last), then task UUID. No scores/health metrics are implied.
+- Dashboard queue includes all overdue and today through six days ahead (seven Calgary calendar dates); show undated actions separately. The page's Due this week metric uses Monday–Sunday; Upcoming meetings counts future activities whose type is exactly Meeting (case-insensitive). Types remain free text with suggestions, not a new approved taxonomy.
+- Save activity plus participant replacement atomically. Follow-ups are separate records/forms so a validation error never leaves a partially created action. No financial/reporting KPI definitions are changed. Hosted rollout requires explicit review.

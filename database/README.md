@@ -20,3 +20,19 @@ bash database/tests/run.sh
 The container has no published ports or network. Each run creates a new database and applies the minimal auth contract, all migrations, locked entity proposals, synthetic identities and assertion suite. No existing database is reset/deleted. No real credentials, auth tokens or CBC records are used. The auth contract emulates `auth.users` and `auth.uid()` for PostgreSQL RLS tests; it does not verify Supabase Auth or hosted PostgREST deployment. Retained synthetic databases may be inspected with `docker exec`.
 
 `proposals/` is separate: 29 unexposed tables for future modules, all RLS enabled and with no client grants/policies. Only the isolated suite applies those files. Review model and domain decisions before promoting any slice into application migrations. No service-role key is required for any test or browser code.
+
+## Activities & Follow-Ups — REQ-005/008
+
+`20261027041158_activities_followups.sql` adds public activities, activity_contacts and tasks plus an RLS-respecting follow_ups view and invoker RPCs. Organization ownership policies and directory visibility are unchanged. Active Admin/Staff write; Finance/Viewer read; anonymous/inactive denied. Task owners must be selectable through the existing restricted directory; historical assignments can be preserved on edits. No task/activity deletion workflow is granted.
+
+Activity plus participant changes save atomically through `save_activity`; invalid links roll back the whole save. Tasks are separate records with one-to-many cardinality. Status is computed on query (not stored): Complete if completion exists, otherwise Overdue only before today's Calgary date, otherwise Open. No due date means Open. Last Contact ignores future activities. Calendar/selection conventions are recorded in ADR-011 for CBC review; no financial KPI formulas were introduced.
+
+The runner also supports an existing isolated local PostgreSQL installation when Docker is unavailable:
+
+```sh
+CBC_PG_BIN=/path/to/postgres/bin PGHOST=/private/socket/directory PGPORT=55439 PGUSER=your_local_user bash database/tests/run.sh
+```
+
+Use only a dedicated disposable server: the auth bootstrap creates test roles. The runner always creates a fresh database, never resets/drops an existing one. This session used PostgreSQL 18.6 extracted under `/tmp/cbc-postgres-runtime`, a cluster under `/tmp/cbc-activities-pgdata`, and a mode-700 Unix socket directory `/tmp/cbc-activities-socket`, with TCP listening disabled. It tests real PostgreSQL SQL/RLS, not a mock engine; hosted PostgreSQL 17/Supabase Auth/PostgREST integration still requires explicit review and verification.
+
+The local Supabase security advisor is run with an explicit socket DSN, never `--linked`. The existing timestamp helper's mutable-search-path warning is fixed additively in the Activities migration. The baseline `pgcrypto` extension-in-public warning is recorded for operator review; moving an existing extension is deliberately deferred from this local module slice. No new security-definer function is added by Activities.
