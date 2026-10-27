@@ -1,6 +1,6 @@
 # Board-demo checklist and acceptance tests
 
-Status: Day 1 local automated verification passed, 2026-10-26. Planned scenarios below are the full-demo target; executed subsets are recorded in the Day 1 evidence section. Extends [acceptance](acceptance.md) without claiming its gates passed. Field-level coverage is in the [matrix](../requirements/field-matrix.md); implementation order and evidence are in [progress](progress.md). Use synthetic people, organizations, transactions and files only.
+Status: Day 1 and Activities local automated verification; see executed evidence below, 2026-10-26. Planned scenarios below are the full-demo target; executed subsets are recorded in the Day 1 evidence section. Extends [acceptance](acceptance.md) without claiming its gates passed. Field-level coverage is in the [matrix](../requirements/field-matrix.md); implementation order and evidence are in [progress](progress.md). Use synthetic people, organizations, transactions and files only.
 
 ## Demo readiness
 
@@ -60,3 +60,18 @@ Record demo date, commit, environment, test IDs, actual results, limitations, re
 - [ ] Real Supabase Auth/PostgREST deployment flow and manual CBC demonstration/sign-off.
 
 Organizations/Contacts represent 33 detailed fields: 23 stored/linked displays and 10 explicitly pending calculated displays. Other 100 detailed fields and nine destinations remain Day 2 work. Browser tests use the real app/actions with a synthetic HTTP fixture; database tests independently execute real PostgreSQL RLS/triggers. This is not hosted end-to-end verification. See [progress](progress.md) and [frontend verification instructions](../../apps/frontend/README.md).
+
+## Activities & Follow-Ups evidence — REQ-005/008
+
+- [x] All 15 ACT fields represented in list/new/detail/edit and follow-up forms, with organization and multiple contact links.
+- [x] Atomic activity/participant saves and multiple follow-up records implemented; no partial write on invalid participant input.
+- [x] Completion/reopening, Calgary overdue boundaries, future exclusion from Last Contact, relationship histories and next-action ordering tested in PostgreSQL.
+- [x] 97 database assertions pass (46 ownership/CRM + 51 Activities); ADR-010 organization ownership remains enforced unchanged.
+- [x] Nine validation tests pass; typecheck/lint and production build passed.
+- [x] All nine browser scenarios passed, including explicit directory count assertions, lifecycle and existing CRM regressions.
+- [x] Local security advisor has no errors; timestamp search path fixed; inherited pgcrypto schema warning documented for rollout review.
+- [ ] Hosted Auth/PostgREST rollout/E2E, CBC operational-convention review and manual board acceptance.
+
+AT-06 now has local SQL and browser evidence for log/participants, multiple follow-ups, ownership/due dates, completion/reopening, overdue/Last Contact/next actions and dashboard queue. SQL fixtures include fixed-date, Calgary DST/midnight, atomic rollback, direct role denial and hidden/inactive owner scenarios. Browser tests use the real app against a synthetic HTTP fixture; SQL tests run on actual local PostgreSQL 18.6. Hosted Supabase remains untouched.
+
+Current total: **48/133 detailed fields represented**, 43 locally implemented and five explicit pending displays. Eight remaining navigation destinations/85 detailed fields are deferred. Activities search, status filter, due-week/overdue/upcoming panels, related histories and error states are included. Automated demonstration is not CBC sign-off.

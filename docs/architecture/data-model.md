@@ -61,3 +61,20 @@ REQ-001/002/008, ADR-010. The hosted schema was inspected through metadata only 
 Organization/contact forms, actions and detail views now cover all 33 detailed fields, including 10 read-only pending definitions. Shared form/field definitions and parsers replace duplicated create/edit markup. Contact ownership is inherited from its linked organization. Page-only location is persisted; source tabs/history panels are represented with pending-module states. Multi-type organization tags remain a single free-text field pending taxonomy/cardinality approval.
 
 The 29-table proposal in `database/proposals/` is intentionally separate, unexposed and denied to clients. It contains manual data/link candidates for remaining domains, not approved workflow/calculation implementations. The proposal and both migrations were applied only in disposable PostgreSQL tests. Browser tests separately exercise the real application against an in-memory synthetic Supabase HTTP contract; hosted Auth/PostgREST integration remains unverified. See delivery progress for executed results and remaining gaps.
+
+## Activities implementation — REQ-005/008
+
+The baseline sections are historical; `20261027041158_activities_followups.sql` is the latest local-only implementation. It creates:
+
+- `public.activities`: optional organization FK, required finite timestamptz and nonblank free-text type, location/purpose/discussion/sponsor-needs/opportunity/outcome, timestamps.
+- `public.activity_contacts`: composite activity/contact key with FKs; zero-to-many participants, explicit historical associations independent of current contact affiliations.
+- `public.tasks`: activity FK, nonblank description, optional profile owner and finite due date, completion/timestamps. Multiple actions per activity; no duplicated organization/contact relationship columns that could drift.
+- `public.follow_ups`: security-invoker view joining activity/organization data and only directory-visible owner names; status is computed on SELECT. No mutable status column or broader profile grant.
+
+`save_activity` is an invoker RPC that atomically inserts/updates the log and replaces participants. Invalid links roll back all changes. `activity_last_contact` is an invoker aggregate over eligible linked activities; future timestamps are excluded. `activity_today` uses Calgary time and `follow_up_status` gives completion precedence over date-only overdue logic. All API functions have explicit execution grants; no new security-definer function is added. The existing timestamp trigger helper is hardened with an empty search path.
+
+Active Admin/Staff can create/update; Finance/Viewer can read; anonymous/inactive users cannot access the rows. Participant replacement has narrowly granted delete access; no activity/task delete workflow is granted. A private task trigger validates changed owners against the existing restricted directory. Task identity/activity cannot be silently changed; unchanged historical owner assignments remain valid after deactivation. ADR-010 organization ownership and directory/profile permissions are unchanged.
+
+Organization and contact details query actual linked histories, display nonfuture Last Contact, and select the next incomplete action by due date (undated last) then UUID. The action queue shows all overdue plus today through day six, excludes completed actions and counts undated actions separately. Monday–Sunday due-week and exact Meeting-type future counts are explicit demo conventions in ADR-011; no relationship-health score or financial KPI is fabricated.
+
+The locked `cbc_demo_draft` activity/task candidates remain historical proposals and are not copied into the public API automatically. Public tables above are the implementation. All migrations and assertions ran on a disposable user-local PostgreSQL 18.6 server because Docker was unavailable; hosted Supabase PostgreSQL 17 and hosted Auth/PostgREST behavior remain unverified. The local security advisor reports the inherited `pgcrypto`-in-public warning; extension relocation is deferred to reviewed rollout. No hosted SQL changes were applied.

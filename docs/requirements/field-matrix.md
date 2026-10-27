@@ -1,6 +1,6 @@
 # Architecture field matrix
 
-Baseline audit and Day 1 update: 2026-10-26, branch `feature/mvp-foundation`. Source: safe local copy of *CBC Database Architecture 2026.pdf*, 20 physical PDF pages. Page numbers below are **physical pages**, not the illustrated footer or database-page number. No source examples or personal records are reproduced.
+Baseline audit, Day 1 and Activities update: 2026-10-26, branch `feature/mvp-foundation`. Source: safe local copy of *CBC Database Architecture 2026.pdf*, 20 physical PDF pages. Page numbers below are **physical pages**, not the illustrated footer or database-page number. No source examples or personal records are reproduced.
 
 This is a field-level inventory and proposed design, not an approved schema. [Register](register.csv) and [decisions](../project/decisions.md) remain authoritative for approval. The requested board demo represents every source page/field; modules marked LATER in the register need scope reconciliation before operational implementation.
 
@@ -27,9 +27,9 @@ Validation legend (proposed unless explicitly marked existing): **T** trim text;
 | ORG-11 | Estimated Opportunity | 2 | decimal / currency | M | organizations.estimated_opportunity | /organizations detail/form | Finite numeric parser + DB check; currency rules pending | Local DB + browser fixture |
 | ORG-12 | Current Contribution | 2 | money aggregate | A | giving.current_period (proposed) | /organizations detail: Definition pending | C; no formula implemented | Represented / pending |
 | ORG-13 | Lifetime Giving | 2 | money aggregate | A | giving.lifetime (proposed) | /organizations detail: Definition pending | C; no formula implemented | Represented / pending |
-| ORG-14 | Last Contact | 2 | timestamp | A | activities.latest (proposed) | /organizations detail: Definition pending | C; no formula implemented | Represented / pending |
-| ORG-15 | Next Action | 2 | task reference | A | tasks.next (proposed) | /organizations detail: Definition pending | C; no formula implemented | Represented / pending |
-| ORG-16 | Next Action Date | 2 | date | A | tasks.next.due_date (proposed) | /organizations detail: Definition pending | C; no formula implemented | Represented / pending |
+| ORG-14 | Last Contact | 2 | timestamp | A | activity_last_contact(...) | /organizations detail: related history | Latest nonfuture linked timestamp | Local DB + browser fixture |
+| ORG-15 | Next Action | 2 | task reference | A | tasks.description via linked activity | /organizations detail: related history | First incomplete action by due date (undated last), then UUID | Local DB + browser fixture |
+| ORG-16 | Next Action Date | 2 | date | A | tasks.due_date | /organizations detail: related history | First incomplete action by due date (undated last), then UUID | Local DB + browser fixture |
 | ORG-17 | Renewal Date | 2 | date | A | agreements.renewal_date (proposed) | /organizations detail: Definition pending | C; no formula implemented | Represented / pending |
 | ORG-18 | Notes | 2 | text | M | organizations.notes | /organizations detail/form | T | Local DB + browser fixture |
 
@@ -46,8 +46,8 @@ Validation legend (proposed unless explicitly marked existing): **T** trim text;
 | CON-07 | Contact Type | 4 | lookup | M | contacts.contact_type | /contacts detail/form | Free text; controlled taxonomy pending | Local DB + browser fixture |
 | CON-08 | Influence Level | 4 | enum | M | contacts.influence_level | /contacts detail/form | Nullable H/M/L parser + DB check | Local DB + browser fixture |
 | CON-09 | Relationship Owner | 4 | user reference | A | organizations.relationship_owner | /contacts detail: inherited owner label | Linked organization; restricted directory visibility | Local DB + browser fixture |
-| CON-10 | Last Contact | 4 | timestamp | A | activities.latest (proposed) | /contacts detail: Definition pending | C; no formula implemented | Represented / pending |
-| CON-11 | Next Action | 4 | task reference | A | tasks.next (proposed) | /contacts detail: Definition pending | C; no formula implemented | Represented / pending |
+| CON-10 | Last Contact | 4 | timestamp | A | activity_last_contact(...) | /contacts detail: related history | Latest nonfuture linked timestamp | Local DB + browser fixture |
+| CON-11 | Next Action | 4 | task reference | A | tasks.description via linked activity | /contacts detail: related history | First incomplete action by due date (undated last), then UUID | Local DB + browser fixture |
 | CON-12 | Events Attended | 4 | count / history | A | contacts.attendance (proposed) | /contacts detail: Definition pending | C; no formula implemented | Represented / pending |
 | CON-13 | Giving History | 4 | contribution history | A | contacts.contributions (proposed) | /contacts detail: Definition pending | C; no formula implemented | Represented / pending |
 | CON-14 | Interests | 4 | text / links | M | contacts.interests | /contacts detail/form | T | Local DB + browser fixture |
@@ -78,21 +78,21 @@ Validation legend (proposed unless explicitly marked existing): **T** trim text;
 
 | ID | Field | Source p. | Type | M/A | Database mapping | UI location | Validation | Status |
 |---|---|---|---|---|---|---|---|---|
-| ACT-01 | Date / Time | 8 | timestamp | M | cbc_demo_draft.activities.occurred_at | /activities detail/form | D | Draft DB only; UI missing |
-| ACT-02 | Activity Type | 8 | lookup | M | cbc_demo_draft.activities.activity_type | /activities detail/form | E | Draft DB only; UI missing |
-| ACT-03 | Organization | 8 | organization reference | M | cbc_demo_draft.activities.organization_id | /activities detail/form | R | Draft DB only; UI missing |
-| ACT-04 | Contact(s) | 8 | contact references | M | cbc_demo_draft.activity_contacts.contact_id | /activities detail/form | R | Draft DB only; UI missing |
-| ACT-05 | Location | 8 | text | M | cbc_demo_draft.activities.location | /activities detail/form | T | Draft DB only; UI missing |
-| ACT-06 | Purpose | 8 | text | M | cbc_demo_draft.activities.purpose | /activities detail/form | T | Draft DB only; UI missing |
-| ACT-07 | Key Discussion | 8 | text | M | cbc_demo_draft.activities.key_discussion | /activities detail/form | T | Draft DB only; UI missing |
-| ACT-08 | Sponsor Needs | 8 | text | M | cbc_demo_draft.activities.sponsor_needs | /activities detail/form | T | Draft DB only; UI missing |
-| ACT-09 | CBC Opportunity | 8 | text | M | cbc_demo_draft.activities.cbc_opportunity | /activities detail/form | T | Draft DB only; UI missing |
-| ACT-10 | Outcome | 8 | text | M | cbc_demo_draft.activities.outcome | /activities detail/form | T | Draft DB only; UI missing |
-| ACT-11 | Next Action | 8 | text | M | cbc_demo_draft.tasks.description | /activities detail/form | T | Draft DB only; UI missing |
-| ACT-12 | Action Owner | 8 | user reference | M | cbc_demo_draft.tasks.owner_id | /activities detail/form | R | Draft DB only; UI missing |
-| ACT-13 | Due Date | 8 | date | M | cbc_demo_draft.tasks.due_date | /activities detail/form | D | Draft DB only; UI missing |
-| ACT-14 | Status | 8 | enum | A | tasks.status (proposed) | /activities detail (read-only) | C | Missing |
-| ACT-15 | Last Contact | 8 | timestamp | A | activities.latest (proposed) | /activities detail (read-only) | C | Missing |
+| ACT-01 | Date / Time | 8 | timestamp | M | activities.occurred_at | /activities create/edit/detail | Required finite timestamptz; UTC input; strict calendar/parser validation | Local DB + browser fixture |
+| ACT-02 | Activity Type | 8 | text | M | activities.activity_type | /activities create/edit/detail | Required nonblank; free text with source examples | Local DB + browser fixture |
+| ACT-03 | Organization | 8 | organization reference | M | activities.organization_id | /activities create/edit/detail | Optional organization FK; read/write access checked | Local DB + browser fixture |
+| ACT-04 | Contact(s) | 8 | contact references | M | activity_contacts.contact_id | /activities create/edit/detail | FK + composite PK; atomic participant replacement; multi-select | Local DB + browser fixture |
+| ACT-05 | Location | 8 | text | M | activities.location | /activities create/edit/detail | Trimmed optional text; persisted through invoker RPC | Local DB + browser fixture |
+| ACT-06 | Purpose | 8 | text | M | activities.purpose | /activities create/edit/detail | Trimmed optional text; persisted through invoker RPC | Local DB + browser fixture |
+| ACT-07 | Key Discussion | 8 | text | M | activities.key_discussion | /activities create/edit/detail | Trimmed optional text; persisted through invoker RPC | Local DB + browser fixture |
+| ACT-08 | Sponsor Needs | 8 | text | M | activities.sponsor_needs | /activities create/edit/detail | Trimmed optional text; persisted through invoker RPC | Local DB + browser fixture |
+| ACT-09 | CBC Opportunity | 8 | text | M | activities.cbc_opportunity | /activities create/edit/detail | Trimmed optional text; persisted through invoker RPC | Local DB + browser fixture |
+| ACT-10 | Outcome | 8 | text | M | activities.outcome | /activities create/edit/detail | Trimmed optional text; persisted through invoker RPC | Local DB + browser fixture |
+| ACT-11 | Next Action | 8 | text | M | tasks.description | /activities detail + follow-up create/edit | Nonblank description; multiple follow-ups per activity | Local DB + browser fixture |
+| ACT-12 | Action Owner | 8 | user reference | M | tasks.owner_id | /activities detail + follow-up create/edit | Restricted directory; DB validation; inactive/hidden target rejected | Local DB + browser fixture |
+| ACT-13 | Due Date | 8 | date | M | tasks.due_date | /activities detail + follow-up create/edit | Optional finite calendar date; Calgary timezone | Local DB + browser fixture |
+| ACT-14 | Status | 8 | enum | A | follow_ups.status / follow_up_status(...) | /activities detail/list; dashboard queue | Computed on SELECT: Complete precedes Overdue; before Calgary today only | Local DB + browser fixture |
+| ACT-15 | Last Contact | 8 | timestamp | A | activity_last_contact(...) | /activities detail; organization/contact histories | Invoker RPC; latest nonfuture linked timestamp | Local DB + browser fixture |
 
 ## Sponsor Interests — REQ-003 (extension; no dedicated ID)
 
@@ -205,8 +205,8 @@ These entries supplement the field guides; aliases reuse their field rows rather
 | 3 Contacts | Contact; Title; Organization; Type; Influence; Last Contact | aliases / M or A per CON rows | CON-01/02/03/04/07/08/10 | Contacts directory | Per referenced rows | Day 1: first five in directory; Last Contact explicitly pending |
 | 5 Giving | Revenue YTD; Committed; Outstanding | money / A | receipts YTD; commitments; outstanding query | Giving KPIs | C + N | Missing |
 | 5 Giving | Date; Organization; Amount; Level; Program / Event; Status | aliases / M | GIV-03/01/04/06/07/08 | Giving directory | Per referenced rows | Missing |
-| 7 Activities | Date; Type; Organization; Purpose; Next Action; Owner | aliases / M | ACT-01/02/03/06/11/12 | Activities directory | Per referenced rows | Missing |
-| 7 Activities | Due this week; Overdue; Upcoming meetings | integer / A | tasks due; overdue; activities scheduled | Open actions panel | C; timezone/week/future rules | Missing |
+| 7 Activities | Date; Type; Organization; Purpose; Next Action; Owner | aliases / M | ACT-01/02/03/06/11/12 | Activities directory | Per referenced rows; restricted owner display | Local DB + browser fixture |
+| 7 Activities | Due this week; Overdue; Upcoming meetings | integer / A | follow_ups; activities | Open actions panel | ADR-011: Calgary Mon–Sun; incomplete overdue; future exact Meeting type | Local DB + browser fixture; CBC convention review pending |
 | 9 Interests | Organization; Interest; Strength; Program Alignment; Owner | aliases / M or A | INT-01/03/04/05/09 | Interests directory | Per referenced rows | Missing |
 | 9 Interests | Opportunity (amount) | money / A | opportunities.estimated_amount | Interests directory | C + N; distinct from opportunity link | Missing |
 | 11 Programs | Participants; Scholarships | integer / A | enrollments eligible participants; awards count | Programs KPIs | C; count persons vs enrollments | Missing |
@@ -251,7 +251,7 @@ All mappings below are proposed queries/configuration; every display is missing 
 | Relationships: Active; Prospects; Proposal; At Risk | integers / A | organizations + approved risk query | relationships panel | C; first three status counts exist in code, At Risk missing |
 | Raised; goal; percent funded; remaining | money; money; percent; money / A | receipts + funding_targets | financial health | C; missing; goal input source/owner not specified |
 | Pipeline; Outstanding; Event ROI | money; money; ratio / A | opportunities; commitments/receipts; event revenue/costs | financial health | C; missing |
-| Action priority; organization; action; due date (next 7 days) | enum; reference; text; date / A | tasks + organizations | action queue | C; missing; interval boundaries/timezone TBD |
+| Action priority; organization; action; due date (next 7 days) | enum; reference; text; date / A | follow_ups + activities + organizations | action queue | Overdue + Calgary today through day 6 implemented; undated separate; priority remains unspecified |
 | Awarded; Funds; Graduation; Field | integer; money; percent; percent / A | awards + approved outcome queries | education impact | C; missing; clarify Field as employment or alignment |
 | Awards; Engaged alumni | integer / A | awards; alumni engagement query | education impact | C; missing; Awards may alias Awarded |
 | Graduation; employment; field alignment; alumni contribution tracking | percent/classification/money / A | outcomes + alumni giving | education impact detail | C; missing; no precise additional layout specified |
@@ -263,12 +263,20 @@ All mappings below are proposed queries/configuration; every display is missing 
 
 ## Navigation and controls
 
-Physical pages 1,3–20 show Dashboard, Organizations, Contacts, Giving, Activities, Interests, Programs, Mentorship, Membership, Documents, Reports and Settings. Only the first three have working link targets in source; nine are inert “Soon” labels. Settings has **no field specification**: user/role and lookup editors are proposals requiring REQ-008 and CBC definition, not inferred PDF requirements. Proposed `/settings` must show this limitation.
+Physical pages 1,3–20 show Dashboard, Organizations, Contacts, Giving, Activities, Interests, Programs, Mentorship, Membership, Documents, Reports and Settings. Dashboard, Organizations, Contacts and Activities & Follow-Ups now have routes; eight other destinations remain inert “Soon” labels. Settings has **no field specification**: user/role and lookup editors are proposals requiring REQ-008 and CBC definition, not inferred PDF requirements. Proposed `/settings` must show this limitation.
 
-Directory illustrations include Search and Add New. Organizations/Contacts have code for local directory search and create; global header search is now disabled and labeled unavailable. Other directory searches/forms are missing. Reports' Add New meaning is undefined. Dashboard Export Report is absent and needs format/access approval. No invented Settings fields or KPI formulas are approved by this inventory.
+Directory illustrations include Search and Add New. Organizations/Contacts have code for local directory search and create; global header search is now disabled and labeled unavailable. Activities has purpose/type/organization search, status filtering and forms; other module searches/forms remain missing. Reports' Add New meaning is undefined. Dashboard Export Report is absent and needs format/access approval. No invented Settings fields or KPI formulas are approved by this inventory.
 
 ## Day 1 verification boundary
 
 REQ-001/002/008: Organizations and Contacts represent **33 of 133** detailed fields: 23 stored/linked fields and 10 explicitly pending displays. Location from p.1 is additional. The remaining 100 detailed fields have no module UI yet. Metadata inspection found hosted baseline columns/policies matching the initial migration but no hosted migration history. Hosted data was not queried and no hosted migration was applied.
 
 New manual fields and ownership rules are in the two incremental migration files. Actual SQL verification uses disposable PostgreSQL with a minimal Supabase auth contract; browser verification uses the real app/actions against a test-only in-memory HTTP fixture. Neither alone establishes hosted Supabase E2E behavior. The 29-entity draft in `database/proposals/` prepares missing relationships under an inaccessible schema; it is not an implemented workflow or an approved finance model. See [progress](../delivery/progress.md) for final executed results.
+
+## Activities implementation update — REQ-005/008
+
+All 15 ACT fields from physical pp.7–8 are implemented locally. Activity listing/new/detail/edit routes support organizations, multiple contacts and complete discussion fields. Follow-ups are separate one-to-many records with their own add/edit forms, action owners, due dates, completion/reopening and database-derived status. Organization/contact details now calculate Last Contact and next open action.
+
+Coverage is **48/133 detailed fields represented**: 43 stored/linked/calculated fields locally implemented and five explicit pending displays (organization current/lifetime giving and renewal; contact events/giving). The other 85 fields remain future-module work. Day 1 counts above are retained as historical evidence; this section supersedes them.
+
+The additive Activities migration remains local-only. Actual RLS/RPC/constraint assertions run on isolated PostgreSQL 18.6; the real app/actions run against a test-only HTTP fixture in Chromium. No hosted migration, Auth/PostgREST integration or CBC acceptance is claimed. Operational date/count conventions are explicit in ADR-011 and remain subject to CBC review, not presented as approved KPIs. See progress for executed verification totals.
