@@ -1,5 +1,5 @@
 import { levels, relationshipStatuses } from "./crm-validation";
-export type FieldDefinition = { name: string; label: string; type?: "text" | "email" | "number" | "textarea" | "select"; required?: boolean; options?: { id: string; name: string }[]; hint?: string };
+export type FieldDefinition = { name: string; label: string; type?: "text" | "email" | "number" | "textarea" | "select" | "date" | "datetime-local" | "multiselect"; required?: boolean; options?: { id: string; name: string }[]; hint?: string };
 const options = (values: string[]) => values.map(value => ({ id: value, name: value }));
 export const organizationFields: FieldDefinition[] = [
   { name: "name", label: "Organization Name", required: true },

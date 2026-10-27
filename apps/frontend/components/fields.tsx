@@ -1,9 +1,9 @@
 import type { FieldDefinition } from "../lib/crm-fields";
-export function FormField({ field, value, error }: { field: FieldDefinition; value?: string | number | null; error?: string }) {
+export function FormField({ field, value, error }: { field: FieldDefinition; value?: string | number | string[] | null; error?: string }) {
   const id = `field-${field.name}`;
   const shared = { id, name: field.name, required: field.required, defaultValue: value ?? "", "aria-invalid": !!error, "aria-describedby": `${id}-hint ${id}-error` };
   return <div><label className="block text-sm font-semibold" htmlFor={id}>{field.label}{field.required && <span aria-hidden="true"> *</span>}</label>
-    {field.type === "textarea" ? <textarea {...shared} rows={4}/> : field.type === "select" ? <select {...shared}>{field.options?.map(option => <option key={option.id} value={option.id}>{option.name}</option>)}</select> : <input {...shared} type={field.type ?? "text"} step={field.type === "number" ? "any" : undefined}/>}
+    {field.type === "textarea" ? <textarea {...shared} rows={4}/> : (field.type === "select" || field.type === "multiselect") ? <select {...shared} multiple={field.type === "multiselect"}>{field.options?.map(option => <option key={option.id} value={option.id}>{option.name}</option>)}</select> : <input {...shared} type={field.type ?? "text"} step={field.type === "number" ? "any" : undefined}/>}
     <p id={`${id}-hint`} className="text-xs text-slate-500">{field.hint}</p><p id={`${id}-error`} className="text-sm text-red-700">{error}</p>
   </div>;
 }

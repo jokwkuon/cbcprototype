@@ -6,7 +6,7 @@ import type { FieldDefinition } from "../lib/crm-fields";
 import type { FormState } from "../lib/crm-validation";
 export function CrmForm({ action, fields, values = {}, cancelHref, children }: {
   action: (state: FormState, form: FormData) => Promise<FormState>;
-  fields: FieldDefinition[]; values?: Record<string, string | number | null>; cancelHref: string; children?: React.ReactNode;
+  fields: FieldDefinition[]; values?: Record<string, string | number | string[] | null>; cancelHref: string; children?: React.ReactNode;
 }) {
   const [state, submit, pending] = useActionState(action, {});
   const displayed = { ...values, ...state.values };

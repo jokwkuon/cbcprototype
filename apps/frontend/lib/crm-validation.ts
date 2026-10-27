@@ -1,6 +1,6 @@
 export const levels = ["High", "Medium", "Low"];
 export const relationshipStatuses = ["Prospect", "Cultivate", "Proposal", "Committed", "Active", "Lapsed"];
-export type FormState = { errors?: Record<string, string>; message?: string; values?: Record<string, string> };
+export type FormState = { errors?: Record<string, string>; message?: string; values?: Record<string, string | string[]> };
 export class ValidationError extends Error {
   errors: Record<string, string>;
   constructor(errors: Record<string, string>) { super("Please correct the highlighted fields."); this.errors = errors; }

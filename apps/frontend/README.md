@@ -62,3 +62,13 @@ LD_LIBRARY_PATH=/tmp/cbc-browser-libs/usr/lib/x86_64-linux-gnu PLAYWRIGHT_BROWSE
 ```
 
 Those `/tmp` paths are environment-specific and are not repository dependencies. Test screenshots/traces are disabled; synthetic failure artifacts and build metadata are ignored. The existing Next.js middleware deprecation warning remains; migrating authentication conventions is outside this slice.
+
+## Activities & Follow-Ups (REQ-005/008)
+
+The synthetic demo now supports `/activities`, `/activities/new`, `/activities/[id]`, `/activities/[id]/edit` and follow-up editing under each activity. Log UTC date/time, free-text type, organization, multiple participants, location, purpose, discussion, sponsor needs, CBC opportunity and outcome. Then add any number of follow-ups with an owner, optional Calgary due date, and Open/Complete selection. Overdue is calculated automatically; completion can be reopened.
+
+Organization/contact details show linked activity history, Last Contact and the next open action. The dashboard shows overdue and seven-day follow-ups, with a separate undated count and explicit query-error state. All date conventions are documented in ADR-011. Activity timestamps accept UTC; edit values normalize database offsets to UTC. No organization ownership policy or profile-directory grants have changed.
+
+Browser tests now run independently on app port **3130** and fixture API port **54339**, preserving a manually running demo on 3100/54329. The test command still builds with synthetic-only public configuration before starting the app. It covers all Activities fields, multiple participants/actions, editing, completion/reopening, linked histories, role controls, errors and existing CRM regressions. The SQL suite independently checks database enforcement.
+
+Hosted Supabase has not received this migration. Real hosted Auth/PostgREST end-to-end behavior and CBC acceptance remain pending. The browser fixture remains test-only and in-memory; use the existing two-terminal synthetic demo commands for local exploration, restarting the synthetic API after code updates if it was already running.
