@@ -1,0 +1,10 @@
+import {readFileSync} from "node:fs";
+import {resolve} from "node:path";
+import {local} from "./prepare.mjs";
+import {check,privateWrite} from "./client.mjs";
+const raw=readFileSync(resolve(local,"audit.log"),"utf8"),start=raw.indexOf('{'),end=raw.lastIndexOf('}');
+const result=JSON.parse(raw.slice(start,end+1));
+const findings=(result.results??[]).map(({name,level})=>({name,level}));
+check(!findings.some(item=>item.level==='ERROR'),"Local security advisor reports errors.");
+privateWrite("security-verification.json",{findings});
+console.log(JSON.stringify({localSecurityAdvisorFindings:findings}));

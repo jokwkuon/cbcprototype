@@ -8,7 +8,8 @@
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "test": "node --experimental-strip-types tests/validation.test.ts && node --experimental-strip-types tests/activities.test.ts",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "test:integration": "playwright test --config playwright.integration.config.ts"
   },
   "dependencies": {
     "@supabase/ssr": "latest",
@@ -29,7 +30,7 @@
     "eslint": "latest",
     "eslint-config-next": "latest",
     "postcss": "latest",
-    "supabase": "^2.120.0",
+    "supabase": "2.120.0",
     "tailwindcss": "latest",
     "typescript": "5.9.3"
   }

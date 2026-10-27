@@ -1,0 +1,10 @@
+import { spawn,spawnSync } from "node:child_process";
+import { resolve } from "node:path";
+import { root,readStatus } from "./prepare.mjs";
+const {env}=readStatus(),cwd=resolve(root,"apps/frontend");
+const frontendEnv={...process.env,NODE_ENV:"production",NEXT_PUBLIC_SUPABASE_URL:env.API_URL,NEXT_PUBLIC_SUPABASE_ANON_KEY:env.ANON_KEY};
+const build=spawnSync("npm",["run","build"],{cwd,stdio:"inherit",env:frontendEnv});
+if(build.status!==0)process.exit(build.status??1);
+console.log("Real local Supabase demo: http://localhost:3140/login. Read generated account details from the private .local/cbc-demo/accounts.json file.");
+const child=spawn("npm",["run","start","--","--hostname","127.0.0.1","--port","3140"],{cwd,stdio:"inherit",env:frontendEnv});
+child.on("exit",code=>process.exit(code??1));
