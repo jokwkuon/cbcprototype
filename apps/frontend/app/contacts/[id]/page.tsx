@@ -9,7 +9,7 @@ import { crmContext, ownerLabel } from "../../../lib/crm-context";
 export default async function Contact({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const { client, canWrite } = await crmContext();
-  const { data: contact, error } = await client.from("contacts").select("*, organization:organizations(id,name,relationship_owner)").eq("id", id).maybeSingle();
+  const { data: contact, error } = await client.from("contacts").select("*, organization:organizations!contacts_organization_id_fkey(id,name,relationship_owner)").eq("id", id).maybeSingle();
   if (error) throw new Error("Unable to load contact.");
   if (!contact) notFound();
   const owner = await ownerLabel(client, contact.organization?.relationship_owner ?? null);
