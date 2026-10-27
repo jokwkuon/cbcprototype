@@ -10,7 +10,7 @@ test("REQ-008: demo helpers reject remote and wrong-port endpoints",()=>{
  assert.equal(requireLocalUrl("http://127.0.0.1:54421",54421).hostname,"127.0.0.1");
 });
 test("REQ-008: generated migration copies match canonical files and exclude proposals",()=>{
- const manifest=prepare();assert.equal(manifest.length,4);assert.equal(manifest[0].name,"202610130001_initial_crm.sql");
+ const manifest=prepare();assert.equal(manifest.length,5);assert.equal(manifest[0].name,"202610130001_initial_crm.sql");
  for(const item of manifest){const copy=readFileSync(resolve(root,"environments/demo/supabase/migrations",item.name));assert.equal(createHash("sha256").update(copy).digest("hex"),item.sha256);assert.ok(!item.name.includes("draft"));}
 });
 test("REQ-008: runtime keys, passwords and generated artifacts remain ignored and private",()=>{

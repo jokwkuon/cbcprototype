@@ -1,6 +1,6 @@
 # Board-demo progress and prioritized plan
 
-Updated 2026-10-26 on `feature/mvp-foundation`. Organizations, Contacts and Activities & Follow-Ups now have implementations verified against a separate real local Supabase environment. **The complete board demo is not ready:** 48/133 detailed fields are represented; eight remaining destinations and 85 detailed fields still need UI representation. Source examples and live CBC records are not used.
+Updated 2026-10-26 on `feature/mvp-foundation`. Organizations, Contacts, Activities & Follow-Ups and Sponsorship & Giving have local implementations. **The complete board demo is not ready:** 64/133 detailed fields are represented; seven remaining destinations and 69 detailed fields still need UI representation. Giving verification evidence is recorded at the end of this document. Source examples and live CBC records are not used.
 
 ## Implemented scope and evidence boundaries
 
@@ -15,7 +15,7 @@ Updated 2026-10-26 on `feature/mvp-foundation`. Organizations, Contacts and Acti
 | Shared UI/actions | Reusable validated forms, fields, detail/pending displays, inline errors preserving values, role-aware create/edit controls, mobile navigation and disabled unavailable global search | Activities reuses these components, including dates and multi-select participants; remaining modules and global search are not implemented |
 | Incremental schema | Three incremental migrations cover ownership/manual CRM fields and the new activities/participants/tasks, invoker RPCs/status view and timestamp-helper hardening | All four canonical migrations applied on a fresh real local Supabase PostgreSQL 17 stack; no hosted project changed |
 | Remaining CRM entities | 29-table relational proposal in `database/proposals/`, under unexposed schema, RLS enabled, no client grants/policies | Review-only; not app migrations or working CRUD; future domain policies and definitions required |
-| Giving / Opportunities — REQ-003/004 | Locked relational draft only | All screens/workflows/calculations missing; Finance model, currency, in-kind and period rules remain open |
+| Giving / Opportunities — REQ-003/004 | Giving list/create/detail/edit, typed references, dated receipts, voids, donor histories and SQL financial summaries; approved synthetic rules ADR-012 | Full opportunities pipeline, automatic renewal, refunds/reconciliation/audit history and production finance approval deferred |
 | Activities — REQ-005/008 | Listing/new/detail/edit; atomic participant links; multiple add/edit follow-ups; completion/reopen; computed overdue/Last Contact; related histories and dashboard queue | Real local integration passed; cloud deployment and CBC review of ADR-011 still pending; no email/calendar sync or recurrence |
 | Interests — REQ-003 extension | Locked interest/link drafts | Page/workflow and dedicated requirement ID still missing |
 | Programs / Mentorship / Membership — REQ-010/011/009 | Locked program/cohort/enrollment/pair/check-in/feedback/member drafts | Missing pages and workflows; pending outcome, health, retention/renewal/risk rules |
@@ -58,7 +58,7 @@ Chromium runtime was unavailable initially. A pinned current Playwright version,
 | Day 3 | Reconcile migration baseline in an approved synthetic deployment, run real Auth/PostgREST allow/deny flows, rehearse every page/report and reconcile approved metrics | AT-08–16 where implemented; mark pending behavior plainly; no live CBC data |
 | Final gate | Documentation, reproducible setup, test evidence, board walkthrough and named CBC sign-offs | Definition of done = implementation + automated verification + demo + documentation + relevant CBC approval |
 
-ADR-007 finance model, outcome denominators, health/risk rubrics, report/export definitions and unspecified Settings fields remain open. Activities conventions are now explicit in ADR-011, implemented for the demo and pending CBC review. Keep those fields represented as Definition pending; do not manufacture approved rules to meet the deadline. Sponsor Interests/shared evidence still need dedicated requirement IDs. No microservices or production integrations are introduced.
+ADR-007 is resolved for the synthetic MVP by ADR-012; production finance rules, outcome denominators, health/risk rubrics, report/export definitions and unspecified Settings fields remain open. Activities conventions are now explicit in ADR-011, implemented for the demo and pending CBC review. Keep those fields represented as Definition pending; do not manufacture approved rules to meet the deadline. Sponsor Interests/shared evidence still need dedicated requirement IDs. No microservices or production integrations are introduced.
 
 ## Git and publication status
 
@@ -98,4 +98,29 @@ After readiness: **Sponsorship & Giving**, then **Sponsor Interests**. Keep fina
 
 ## Next smallest task
 
-Represent the Sponsorship & Giving page and all 16 GIV fields using shared components. Keep finance aggregates Definition pending until ADR-007, currency/in-kind and recognition/commitment rules are reviewed. Do not wire the locked financial drafts or claim revenue/outstanding totals before those definitions are approved.
+Implement the Sponsor Interests listing and record forms from physical pages 9–10, starting with the explicit field mappings and a dedicated requirement reference. Preserve financial and ownership permissions. No hosted rollout is authorized.
+
+## Sponsorship & Giving implementation — REQ-003/004/006/008
+
+ADR-012 records explicit user approval of CAD, calendar-year dated cash reporting, partial receipts separate from pledges, separate in-kind and Admin/Finance writes with Staff/Viewer reads. All 16 GIV fields now have UI/database representation. Contribution list/new/detail/edit, receipt add/edit/void, funding reference creation, document reference entry, organization/contact histories and dashboard financial summaries reuse shared forms/fields. Renewal is manually entered despite the source AUTO label; no automatic formula is claimed. The program/event lookup does not implement full domain modules. Financial totals are queried from PostgreSQL; API monetary values remain exact decimal text. Query failures show unavailable, never false zero revenue.
+
+`20261027060754_sponsorship_giving.sql` adds four RLS tables, invoker views/RPC, numeric/date/FK checks and receipt/type validation. It is applied **only to the existing isolated local Supabase demo**. Fresh-database assertions apply all five canonical migrations in order. Organization ownership/profile/directory policies are unchanged.
+
+| Check | Giving increment evidence |
+|---|---|
+| Database assertions | PASS: 134 assertions on fresh local PostgreSQL 17 (97 regressions + 37 Giving); role denial, exact decimals, partial/void/overpaid/cancelled cash, in-kind isolation, annual/lifetime/YoY/zero baseline, typed links and chronology |
+| Actual Auth/PostgREST | PASS: 39 Giving checks + 20 existing CRM checks; Admin/Finance allowed, Staff/Viewer direct writes denied, anonymous denied, Finance ownership unchanged |
+| Repeatability / guards | PASS: two migration/seed replays and three readiness guards; five canonical versions, stable named five-contribution/four-receipt fixtures; no manual schema edits |
+| Security advisor | PASS: zero findings locally; pgcrypto stays in extensions; no hosted changes |
+| Validation / static | PASS: 13 validation tests; final typecheck/lint passed; production build passed within the real-browser suite (existing middleware warning remains) |
+| Real browser | PASS: all six actual Auth/PostgREST Chromium scenarios, including Finance contribution create/edit, partial receipt/void validation, document reference, organization/contact history, dashboard summary and Staff/Viewer read-only controls |
+| Fixture regressions | PASS: all nine Chromium scenarios and production rebuild; explicit unavailable Giving history asserted because this fixture does not implement Giving |
+| CBC / cloud | Not performed; manual board walkthrough and production finance approval pending; no cloud resources or hosted migrations |
+
+Coverage is 64/133 represented: 63 locally implemented and CON-12 Events Attended explicitly pending. Previous coverage totals are historical. GIV-11 automatic scheduling remains deferred; GIV-16 represents links only. Remaining domains include Sponsor Interests, Programs/Recipients, Mentorship, Membership, Documents, Reports and Settings; seven missing destinations and 69 fields. Open scope/student deliverable/CBC acceptance questions are unchanged.
+
+Deferred Giving functionality: refunds/negative receipts, accounting reconciliation, immutable audit history, automatic renewals, approved sponsorship tier taxonomy, uploads/external document permissions, full program/event workflows, FX/in-kind valuation and production approval. No PDF/data/key is included; the staged architecture PDF removal remains preserved and excluded from these commits. The untracked generated frontend AGENTS.md is left untouched.
+
+Final checks: all six real integration and nine fixture browser scenarios passed. Initial Giving browser runs exposed test locator/navigation-wait issues; these were corrected before the passing run. No application change was needed for those failures. A sandbox child-process restriction initially blocked the readiness guard; its authorized rerun passed all three tests.
+
+Reviewable Giving commits: `15a7428` adds database enforcement/37 SQL assertions and ADR-012; `a91966e` adds the Giving UI and browser/validation coverage. Local fixture/verifier and delivery updates follow separately. The demo production server was restored at http://localhost:3140/login after verification.

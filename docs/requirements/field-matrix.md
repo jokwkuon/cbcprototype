@@ -25,12 +25,12 @@ Validation legend (proposed unless explicitly marked existing): **T** trim text;
 | ORG-09 | Priority Level | 2 | enum | M | organizations.priority_level | /organizations detail/form | Existing enum/check; CBC approval pending | Local DB + browser fixture |
 | ORG-10 | Potential | 2 | enum | M | organizations.potential | /organizations create/edit + detail | Existing H/M/L checks + shared parser | Local DB + browser fixture |
 | ORG-11 | Estimated Opportunity | 2 | decimal / currency | M | organizations.estimated_opportunity | /organizations detail/form | Finite numeric parser + DB check; currency rules pending | Local DB + browser fixture |
-| ORG-12 | Current Contribution | 2 | money aggregate | A | giving.current_period (proposed) | /organizations detail: Definition pending | C; no formula implemented | Represented / pending |
-| ORG-13 | Lifetime Giving | 2 | money aggregate | A | giving.lifetime (proposed) | /organizations detail: Definition pending | C; no formula implemented | Represented / pending |
+| ORG-12 | Current Contribution | 2 | money aggregate | A | contribution_details + giving_summary by organization | /organizations detail Giving History | ADR-012: active cash commitments / balances; no single-period assumption | Local DB + real Supabase API/browser |
+| ORG-13 | Lifetime Giving | 2 | money aggregate | A | giving_summary(...).lifetime_cash | /organizations detail Giving History | Nonvoid cash through today; never pledge sum | Local DB + real Supabase API/browser |
 | ORG-14 | Last Contact | 2 | timestamp | A | activity_last_contact(...) | /organizations detail: related history | Latest nonfuture linked timestamp | Local DB + browser fixture |
 | ORG-15 | Next Action | 2 | task reference | A | tasks.description via linked activity | /organizations detail: related history | First incomplete action by due date (undated last), then UUID | Local DB + browser fixture |
 | ORG-16 | Next Action Date | 2 | date | A | tasks.due_date | /organizations detail: related history | First incomplete action by due date (undated last), then UUID | Local DB + browser fixture |
-| ORG-17 | Renewal Date | 2 | date | A | agreements.renewal_date (proposed) | /organizations detail: Definition pending | C; no formula implemented | Represented / pending |
+| ORG-17 | Renewal Date | 2 | date | A linked; M scheduling | contributions.renewal_date | /organizations detail Giving History; per-contribution edit | No earliest/next automatic rule assumed; show each agreement date | Local DB + real Supabase API/browser |
 | ORG-18 | Notes | 2 | text | M | organizations.notes | /organizations detail/form | T | Local Supabase E2E (selected flow) |
 
 ## Contacts — REQ-002
@@ -49,7 +49,7 @@ Validation legend (proposed unless explicitly marked existing): **T** trim text;
 | CON-10 | Last Contact | 4 | timestamp | A | activity_last_contact(...) | /contacts detail: related history | Latest nonfuture linked timestamp | Local Supabase E2E (selected flow) |
 | CON-11 | Next Action | 4 | task reference | A | tasks.description via linked activity | /contacts detail: related history | First incomplete action by due date (undated last), then UUID | Local DB + browser fixture |
 | CON-12 | Events Attended | 4 | count / history | A | contacts.attendance (proposed) | /contacts detail: Definition pending | C; no formula implemented | Represented / pending |
-| CON-13 | Giving History | 4 | contribution history | A | contacts.contributions (proposed) | /contacts detail: Definition pending | C; no formula implemented | Represented / pending |
+| CON-13 | Giving History | 4 | linked contributions | A | contributions.contact_id + giving_summary by contact | /contacts detail Giving History | Directly linked contact only; donor-scoped nonvoid cash | Local DB + real Supabase API/browser |
 | CON-14 | Interests | 4 | text / links | M | contacts.interests | /contacts detail/form | T | Local DB + browser fixture |
 | CON-15 | Notes | 4 | text | M | contacts.notes | /contacts detail/form | T | Local DB + browser fixture |
 
@@ -57,22 +57,22 @@ Validation legend (proposed unless explicitly marked existing): **T** trim text;
 
 | ID | Field | Source p. | Type | M/A | Database mapping | UI location | Validation | Status |
 |---|---|---|---|---|---|---|---|---|
-| GIV-01 | Organization | 6 | organization reference | M | cbc_demo_draft.contributions.organization_id | /giving detail/form | R | Draft DB only; UI missing |
-| GIV-02 | Contact | 6 | contact reference | M | cbc_demo_draft.contributions.contact_id | /giving detail/form | R | Draft DB only; UI missing |
-| GIV-03 | Contribution Date | 6 | date | M | cbc_demo_draft.contributions.contribution_date | /giving detail/form | D | Draft DB only; UI missing |
-| GIV-04 | Amount | 6 | decimal / currency | M | cbc_demo_draft.contributions.amount | /giving detail/form | N | Draft DB only; UI missing |
-| GIV-05 | Contribution Type | 6 | lookup | M | cbc_demo_draft.contributions.contribution_type | /giving detail/form | E | Draft DB only; UI missing |
-| GIV-06 | Sponsorship Level | 6 | lookup | M | cbc_demo_draft.contributions.sponsorship_level | /giving detail/form | E | Draft DB only; UI missing |
-| GIV-07 | Program / Event | 6 | initiative reference | M | cbc_demo_draft.contributions.program_id / event_id | /giving detail/form | R | Draft DB only; UI missing |
-| GIV-08 | Funding Status | 6 | lookup | M | cbc_demo_draft.contributions.funding_status | /giving detail/form | E | Draft DB only; UI missing |
-| GIV-09 | Agreement Start | 6 | date | M | cbc_demo_draft.agreements.start_date | /giving detail/form | D | Draft DB only; UI missing |
-| GIV-10 | Agreement End | 6 | date | M | cbc_demo_draft.agreements.end_date | /giving detail/form | D | Draft DB only; UI missing |
-| GIV-11 | Renewal Date | 6 | date | A | agreements.renewal_date (proposed) | /giving detail (read-only) | C | Missing |
-| GIV-12 | Current-Year Giving | 6 | money aggregate | A | giving.current_year (proposed) | /giving detail (read-only) | C | Missing |
-| GIV-13 | Lifetime Giving | 6 | money aggregate | A | giving.lifetime (proposed) | /giving detail (read-only) | C | Missing |
-| GIV-14 | YoY Change | 6 | decimal / percent | A | giving.yoy (proposed) | /giving detail (read-only) | C | Missing |
-| GIV-15 | Outstanding Commitment | 6 | money aggregate | A | giving.outstanding (proposed) | /giving detail (read-only) | C | Missing |
-| GIV-16 | Documents | 6 | document links | A | contributions.document_links (proposed) | /giving detail (read-only) | C | Missing |
+| GIV-01 | Organization | 6 | organization reference | M | contributions.organization_id | /giving list/detail/form | Optional FK; active financial writer | Local DB + real Supabase API/browser; see Giving evidence |
+| GIV-02 | Contact | 6 | contact reference | M | contributions.contact_id | /giving list/detail/form | Optional FK; no donor double counting | Local DB + real Supabase API/browser; see Giving evidence |
+| GIV-03 | Contribution Date | 6 | date | M | contributions.contribution_date | /giving list/detail/form | Required finite calendar date | Local DB + real Supabase API/browser; see Giving evidence |
+| GIV-04 | Amount | 6 | decimal / currency | M | contributions.amount / currency | /giving list/detail/form | CAD; nonnegative exact decimal, max two decimals; pledge, never cash | Local DB + real Supabase API/browser; see Giving evidence |
+| GIV-05 | Contribution Type | 6 | lookup | M | contributions.contribution_type | /giving list/detail/form | Cash / In-Kind; cash history prevents type conversion | Local DB + real Supabase API/browser; see Giving evidence |
+| GIV-06 | Sponsorship Level | 6 | lookup | M | contributions.sponsorship_level | /giving list/detail/form | Manual text; controlled tier taxonomy pending | Local DB + real Supabase API/browser; see Giving evidence |
+| GIV-07 | Program / Event | 6 | initiative reference | M | contributions.program_id / event_id → funding_initiatives | /giving list/detail/form | Typed FK Program/Event; minimal funding lookup | Local DB + real Supabase API/browser; see Giving evidence |
+| GIV-08 | Funding Status | 6 | lookup | M | contributions.funding_status; contribution_details.payment_status | /giving list/detail/form | ADR-012 planning stages; payment calculated from receipts | Local DB + real Supabase API/browser; see Giving evidence |
+| GIV-09 | Agreement Start | 6 | date | M | contributions.agreement_start | /giving list/detail/form | Optional finite date | Local DB + real Supabase API/browser; see Giving evidence |
+| GIV-10 | Agreement End | 6 | date | M | contributions.agreement_end | /giving list/detail/form | Optional finite date; end >= start | Local DB + real Supabase API/browser; see Giving evidence |
+| GIV-11 | Renewal Date | 6 | date | A source; M MVP (ADR-012) | contributions.renewal_date | /giving list/detail/form | Manual finite date; automatic renewal scheduling deferred | Local DB + real Supabase API/browser; see Giving evidence |
+| GIV-12 | Current-Year Giving | 6 | money aggregate | A | giving_summary(...).annual_cash | /giving list/detail/form and dashboard/history (read-only totals) | ADR-012: nonvoid dated cash in calendar year / current YTD | Local DB + real Supabase API/browser; see Giving evidence |
+| GIV-13 | Lifetime Giving | 6 | money aggregate | A | giving_summary(...).lifetime_cash | /giving list/detail/form and dashboard/history (read-only totals) | Nonvoid dated cash through Calgary today; linked donor scope | Local DB + real Supabase API/browser; see Giving evidence |
+| GIV-14 | YoY Change | 6 | decimal / percent | A | giving_summary(...).yoy_delta / yoy_percent | /giving list/detail/form and dashboard/history (read-only totals) | Comparable YTD / full historical years; zero baseline → no percent | Local DB + real Supabase API/browser; see Giving evidence |
+| GIV-15 | Outstanding Commitment | 6 | money aggregate | A | contribution_details.outstanding; giving_summary(...).outstanding | /giving list/detail/form and dashboard/history (read-only totals) | Active cash commitment minus receipts, floor zero; all-time balance | Local DB + real Supabase API/browser; see Giving evidence |
+| GIV-16 | Documents | 6 | document links | A linked display; M reference entry | giving_document_links → contributions | /giving list/detail/form | HTTP(S), nonblank label; reference only; no uploads | Local DB + real Supabase API/browser; see Giving evidence |
 
 ## Activities & Follow-Ups — REQ-005
 
@@ -203,8 +203,8 @@ These entries supplement the field guides; aliases reuse their field rows rather
 | 3 Contacts | Total Contacts | integer / A | contacts count | Contacts KPI | Exact count query; respects existing read policy | Code + browser directory render; no approved segmentation formula |
 | 3 Contacts | Decision Makers; Recently Contacted | integer / A | contacts.contact_type; activities within approved window | Contacts KPIs | C; define classification/window | Represented / pending |
 | 3 Contacts | Contact; Title; Organization; Type; Influence; Last Contact | aliases / M or A per CON rows | CON-01/02/03/04/07/08/10 | Contacts directory | Per referenced rows | Day 1: first five in directory; Last Contact explicitly pending |
-| 5 Giving | Revenue YTD; Committed; Outstanding | money / A | receipts YTD; commitments; outstanding query | Giving KPIs | C + N | Missing |
-| 5 Giving | Date; Organization; Amount; Level; Program / Event; Status | aliases / M | GIV-03/01/04/06/07/08 | Giving directory | Per referenced rows | Missing |
+| 5 Giving | Revenue YTD; Committed; Outstanding | money / A | giving_summary annual_cash / pledged / outstanding | Giving summary and dashboard | ADR-012; period cash vs all-time commitment balances explicitly labeled | Local DB + real Supabase API/browser |
+| 5 Giving | Date; Organization; Amount; Level; Program / Event; Status | aliases / M | GIV-03/01/04/06/07/08 | Giving directory | Per referenced rows | Local DB + real Supabase API/browser |
 | 7 Activities | Date; Type; Organization; Purpose; Next Action; Owner | aliases / M | ACT-01/02/03/06/11/12 | Activities directory | Per referenced rows; restricted owner display | Local DB + browser fixture |
 | 7 Activities | Due this week; Overdue; Upcoming meetings | integer / A | follow_ups; activities | Open actions panel | ADR-011: Calgary Mon–Sun; incomplete overdue; future exact Meeting type | Local DB + browser fixture; CBC convention review pending |
 | 9 Interests | Organization; Interest; Strength; Program Alignment; Owner | aliases / M or A | INT-01/03/04/05/09 | Interests directory | Per referenced rows | Missing |
@@ -263,7 +263,7 @@ All mappings below are proposed queries/configuration; every display is missing 
 
 ## Navigation and controls
 
-Physical pages 1,3–20 show Dashboard, Organizations, Contacts, Giving, Activities, Interests, Programs, Mentorship, Membership, Documents, Reports and Settings. Dashboard, Organizations, Contacts and Activities & Follow-Ups now have routes; eight other destinations remain inert “Soon” labels. Settings has **no field specification**: user/role and lookup editors are proposals requiring REQ-008 and CBC definition, not inferred PDF requirements. Proposed `/settings` must show this limitation.
+Physical pages 1,3–20 show Dashboard, Organizations, Contacts, Giving, Activities, Interests, Programs, Mentorship, Membership, Documents, Reports and Settings. Dashboard, Organizations, Contacts, Activities & Follow-Ups and Sponsorship & Giving now have routes; seven other destinations remain inert “Soon” labels. Settings has **no field specification**: user/role and lookup editors are proposals requiring REQ-008 and CBC definition, not inferred PDF requirements. Proposed `/settings` must show this limitation.
 
 Directory illustrations include Search and Add New. Organizations/Contacts have code for local directory search and create; global header search is now disabled and labeled unavailable. Activities has purpose/type/organization search, status filtering and forms; other module searches/forms remain missing. Reports' Add New meaning is undefined. Dashboard Export Report is absent and needs format/access approval. No invented Settings fields or KPI formulas are approved by this inventory.
 
@@ -288,3 +288,11 @@ A fresh **real local Supabase PostgreSQL 17 + Auth + PostgREST** environment now
 The contact organization embed needed an explicit FK hint after the composite primary-contact FK introduced a second relationship; both affected queries are fixed and verified against actual PostgREST. All 97 SQL assertions also pass on a fresh PostgreSQL 17 database. Fresh official Supabase places pgcrypto in extensions and reports zero local security-advisor findings; the existing hosted project's placement remains unverified.
 
 Coverage remains 48/133 represented (43 locally implemented, five pending), with no new financial/KPI definitions. Exact connection steps, private credential handling and required cloud approvals are in [hosted integration readiness](../delivery/hosted-integration-readiness.md). Next: Sponsorship & Giving, then Sponsor Interests.
+
+## Sponsorship & Giving evidence — REQ-003/004/006/008
+
+ADR-012 records the user's approved synthetic MVP finance rules. All 16 GIV fields now have database/UI mappings. Renewal is manually scheduled despite the source AUTO label; automatic scheduling remains deferred. Documents are manually entered links with automatic related display, not a document-management implementation. Full Program/Event workflows remain deferred; typed funding references are implemented.
+
+Current coverage: **64/133 detailed fields represented**. Of these, 63 have local implementations, including 16 Giving fields and four previously pending organization/contact giving fields. CON-12 Events Attended remains explicitly pending. The other 69 fields and seven navigation destinations remain missing. This section supersedes historical coverage totals above; source page numbers/133 IDs are unchanged. Local tests and CBC approval are distinct; see progress for exact verified checks.
+
+Cash receipt records are additional implementation support fields: received_on (finite nonfuture date), amount (positive exact CAD decimal), reference (manual optional text), is_void (manual disposition), void_reason (required if void). Admin/Finance write, Staff/Viewer read; anonymous/inactive denied. No delete grants. Read-only financial views use security_invoker and the aggregate RPC uses security invoker; no service key is supplied to UI/actions.

@@ -31,3 +31,5 @@ for(let index=0;index<taskNames.length;index++){
 }
 privateWrite("records.json",{organizationId:orgId,contactIds,activityId:activity.data,taskCount:6,calendarDate:calendar.data});
 console.log("Seeded five real local Auth accounts, one organization, two contacts, one activity and six follow-ups. Passwords are private; no hosted data touched.");
+await (await import('./seed-giving.mjs')).seedGiving();
+console.log('Seeded five contributions, four receipt records, two typed initiative references and one synthetic document link.');

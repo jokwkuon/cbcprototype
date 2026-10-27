@@ -86,3 +86,22 @@ The four existing migration files were kept unchanged and applied through actual
 The composite organization primary-contact FK makes an unqualified PostgREST contacts-to-organizations embed ambiguous. Application queries now explicitly name `contacts_organization_id_fkey`, selecting affiliation rather than inverse primary-contact linkage. This is an API query correction, not a cardinality/schema/policy change. Real API/browser tests confirm the relationship, actions and calculated values.
 
 Fresh Supabase installs pgcrypto in extensions, so `CREATE EXTENSION IF NOT EXISTS` preserves the correct location and local advisors report zero findings. The earlier public-schema warning arose on bare PostgreSQL tests; existing hosted placement is not established by that evidence. No extension relocation was performed. Full audit, private seed tooling, environment boundaries and hosted approval gates are documented in [integration readiness](../delivery/hosted-integration-readiness.md).
+
+## Giving implementation — ADR-012, REQ-003/004/006/008
+
+The historical baseline/proposals above are superseded for Giving by additive migration `20261027060754_sponsorship_giving.sql`. The locked `cbc_demo_draft` proposal is not promoted or exposed. The approved synthetic MVP uses four small public tables:
+
+| Table | Relationships and validation | Access |
+|---|---|---|
+| contributions | Optional organization/contact FKs; finite contribution/agreement/renewal dates; ordered agreement dates; CAD amount exact numeric >=0 with max two decimals; Cash/In-Kind; manual sponsorship level and planning stage | Active Admin/Finance insert/update; all four active roles select |
+| funding_initiatives | Program/Event typed lookup; composite FKs prevent using an Event as a Program | Same financial policy; full program/event operations deferred |
+| cash_receipts | Immutable identity/parent; Cash parent only; positive exact numeric; nonfuture received date; void requires reason; parent lock serializes type changes | Same financial policy; no delete grants |
+| giving_document_links | Contribution FK; nonblank label; HTTP(S) URL; references only | Same financial policy; no uploaded files or external permissions |
+
+Every table enables RLS with explicit grants; anonymous/inactive denied. No client delete rights. Existing organization ownership/profile/directory policies remain unchanged. Validation triggers run as invoker with empty search_path; no privileged finance RPC bypass is introduced.
+
+`giving_receipts` and `contribution_details` are security-invoker views. Monetary fields are text in API results to retain PostgreSQL decimal precision; forms submit exact decimal strings. `giving_summary(year, organization?, contact?)` is an invoker RPC aggregating nonvoid actual receipts. Annual/lifetime cash, prior comparable cash, delta/percentage, all-time active pledged/outstanding and separately declared in-kind are queried from the database. Current-year comparisons are YTD through Calgary today against the same prior cutoff; completed years use full calendar years. Zero prior baseline yields null percentage. Pledge stage changes never create revenue or erase receipts. Outstanding floors at zero; overpayments remain cash. The minimum RPC year is 2 to support prior-year comparison.
+
+Organization/contact histories use explicit donor links. A contribution linked to both is one financial identity, never counted twice in global totals. Detail donor totals use organization if linked, otherwise contact; unlinked contributions retain global and record totals but explicitly lack donor totals. Renewal is manual planning metadata and shown per contribution; no next-renewal formula is assumed. Documents require manual reference entry, then display as linked records.
+
+Deferred: refunds/negative cash, reconciliation, immutable finance audit history, automatic renewal scheduling, approved tier taxonomy, currency conversion, in-kind valuation and production accounting approval. Finance access is approved only for this synthetic MVP (ADR-012).

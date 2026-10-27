@@ -91,3 +91,17 @@ Current total: **48/133 detailed fields represented**, 43 locally implemented an
 - [ ] Cloud-specific API/browser verification and CBC acceptance.
 
 Local integration is now verified rather than inferred from a mock API. Earlier hosted/local-auth deferrals are superseded only for this separate local stack; cloud deployment and CBC review remain pending. See [readiness and connection guide](hosted-integration-readiness.md). Next implementation: Sponsorship & Giving, followed by Sponsor Interests.
+
+## Sponsorship & Giving acceptance — REQ-003/004/006/008
+
+ADR-012 approves CAD, calendar-year cash reporting, separate partial receipts, separate in-kind and Admin/Finance writes with Staff/Viewer reads for the synthetic MVP.
+
+- [x] AT-05a: fresh migration adds contributions, typed program/event references, cash receipts and document links with RLS; existing ownership tests remain unchanged.
+- [x] AT-05b: real Auth/PostgREST verifies Admin/Finance writes, Staff/Viewer denial, anonymous denial, exact 0.10+0.20, receipt void correction, invalid amounts/dates/type/links and unchanged Finance ownership restrictions.
+- [x] AT-05c: 37 new SQL assertions verify receipt-vs-pledge balances, zero baseline, YoY, donor filtering, overpayments/cancellation, in-kind isolation, no deletes, inactive denial and database validation. Total 134 assertions pass on fresh PostgreSQL 17.
+- [x] AT-05d: six real-browser scenarios pass, including create/edit/contribution/partial receipt/void/document/history/dashboard flow and Staff/Viewer reader controls.
+- [x] AT-16: final typecheck/lint, production builds, 13 validation tests, six real integration and nine fixture browser scenarios passed.
+- [x] Two local migration and named seed replays preserve history and fixture counts. Five contributions, four receipt records (one void), two initiative references and one document link use synthetic data only.
+- [ ] Manual CBC board walkthrough, financial policy acceptance for production and hosted rollout.
+
+Current coverage is 64/133 detailed fields represented, 63 locally implemented and CON-12 Events Attended pending. All 16 GIV fields are represented; GIV-11 automatic scheduling is deferred in favor of explicit manual renewal dates, and GIV-16 is reference links only. Seven remaining destinations/69 fields remain outside completed scope. Sponsor Interests is next. Historical totals above describe earlier checkpoints.

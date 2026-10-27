@@ -88,3 +88,9 @@ node scripts/demo/run.mjs
 ```
 
 Open http://localhost:3140/login. Generated account details are private in `.local/cbc-demo/accounts.json`; no password/key is committed or printed. The run helper supplies only the local API URL and public key and never overwrites your existing `.env.local`. `npm run test:integration` runs three real-Supabase browser scenarios using private reporting; `npm run test:e2e` remains the nine-scenario fixture regression suite. Run builds/suites sequentially from this checkout.
+
+### Sponsorship & Giving (REQ-004/006/008)
+
+Real local demo: run the root `scripts/demo/prepare.mjs`, `stack.mjs migrate`, then `seed.mjs` before `run.mjs`. Open `/giving`; Admin/Finance create contributions and dated cash receipts; Staff/Viewer read. Program/Event selectors use minimal typed funding references; create them from Add contribution. Actual receipts, voids and partial payments determine cash and outstanding balances. Pledges never count as received revenue. ADR-012 records CAD/calendar-year/in-kind conventions. Renewal scheduling is manual and document references do not upload files.
+
+Additional checks: `node scripts/demo/verify-giving.mjs` from the repository root and `npm run test:integration` from this directory. The fixture browser API intentionally lacks Giving endpoints; regression tests verify explicit unavailable history rather than fabricated zero balances. Giving behavior is verified against real local Supabase, not that fixture.

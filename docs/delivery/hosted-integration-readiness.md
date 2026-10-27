@@ -65,6 +65,7 @@ node scripts/demo/seed.mjs
 node scripts/demo/verify-database.mjs
 node scripts/demo/check-repeatability.mjs
 node scripts/demo/verify-api.mjs
+node scripts/demo/verify-giving.mjs
 node scripts/demo/stack.mjs audit
 node scripts/demo/audit.mjs
 node scripts/demo/readiness.test.mjs
@@ -105,7 +106,7 @@ node scripts/demo/stack.mjs stop
 Local integration readiness is complete for the tested scope. There is no approval to create cloud resources or apply hosted migrations. Before a separate hosted demo:
 
 1. Approve a **new** demo project with owner/organization, region, cost limit and synthetic-only scope. Do not reuse or modify the existing hosted project.
-2. Record and independently verify its project reference and empty-schema/migration baseline. Approve applying the four checksum-reviewed migrations to that new target and creating synthetic Auth users/data.
+2. Record and independently verify its project reference and empty-schema/migration baseline. Approve applying the five checksum-reviewed migrations to that new target and creating synthetic Auth users/data.
 3. Provision keys through the approved secure configuration mechanism. Browser receives only project URL/public key; keep admin keys/DB credentials server-side. Do not copy `.local` runtime files or local signing keys into the hosted project.
 4. Apply pending migrations through versioned history, run advisors, seed synthetic accounts/records and rerun real API/browser allow/deny checks against the explicitly approved new environment. Current helpers intentionally refuse remote URLs; hosted support requires a separate reviewed target guard.
 5. Approve deployment URL, Auth redirect settings, operator access, rollback/backup approach and CBC demonstration/sign-off. Existing hosted history reconciliation is outside this separate-environment task.
@@ -113,3 +114,8 @@ Local integration readiness is complete for the tested scope. There is no approv
 Native runtime is experimental; the current verified CLI/config/manifest are reproducible evidence, not a production guarantee. CBC review of ADR-011 date/count conventions and the remaining business definitions is still pending.
 
 Next implementation priorities: **Sponsorship & Giving**, then **Sponsor Interests**. Finance recognition/commitment/in-kind/currency/KPI rules remain open; represent undefined calculations honestly instead of inventing approved formulas.
+
+
+## Giving increment
+
+Five canonical migrations now include `20261027060754_sponsorship_giving.sql`, validated locally only. The seed helper additionally signs in as Finance and creates five contributions, four receipts (including a void), two typed funding references and a synthetic document link. `verify-giving.mjs` checks real financial permissions and balances separately from the existing CRM API checks. ADR-012 supplies approved synthetic finance conventions; production accounting approval is still pending. No hosted resources/migrations are authorized by this increment. The next module is Sponsor Interests.
