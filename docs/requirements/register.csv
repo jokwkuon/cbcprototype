@@ -12,3 +12,4 @@ REQ-010,Programs,Track participants and outcomes,LATER,PROPOSED,Programs lead,Ap
 REQ-011,Mentorship,Manage pairs and check-ins,LATER,PROPOSED,Mentorship lead,Check-in history and rules verified
 REQ-012,Documents,Manage linked file records,LATER,PROPOSED,CBC admin,Files protected by approved access rules
 REQ-013,Reports,Provide six functional report categories,LATER,PROPOSED,Leadership,Reports match approved examples
+REQ-014,Sponsor Interests,Represent sponsor priorities and explicit program discussion opportunity and follow-up links,MUST,PROVISIONAL_MVP,Partnerships,AT-07 AT-14 AT-15 and AT-16 verified locally under ADR-013; CBC approval pending

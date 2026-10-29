@@ -18,7 +18,7 @@ async function save(kind:"contribution"|"receipt"|"initiative"|"document",editin
   if(error||!data) throw new Error("Unable to save. Check access, linked records, cash type, dates and amount, then try again.");
   target=parent?`/giving/${parent}`:kind==="contribution"?`/giving/${data.id}`:"/giving/new";
  } catch(error) {return {values:formValues(form),errors:error instanceof ValidationError?error.errors:undefined,message:error instanceof Error?error.message:"Unable to save giving record."};}
- for(const path of ["/giving","/organizations","/contacts"]) revalidatePath(path,"layout");revalidatePath("/dashboard");redirect(target);
+ for(const path of ["/giving","/organizations","/contacts","/interests"]) revalidatePath(path,"layout");revalidatePath("/dashboard");redirect(target);
 }
 export async function createContribution(_state:FormState,form:FormData){return save("contribution",false,null,form);}
 export async function updateContribution(_state:FormState,form:FormData){return save("contribution",true,null,form);}

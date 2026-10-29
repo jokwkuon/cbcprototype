@@ -1,3 +1,4 @@
+import { OrganizationInterests } from "../../../components/interests";
 import { GivingHistory } from "../../../components/giving";
 import { relatedHistory } from "../../../lib/activity-data";
 import { RelatedActivities } from "../../../components/activity-lists";
@@ -23,6 +24,6 @@ export default async function Organization({ params }: { params: Promise<{ id: s
       ["Primary Contact", primary ? <Link href={`/contacts/${primary.id}`}>{primary.first_name} {primary.last_name}</Link> : "Not selected"],
       ["Relationship Owner", owner], ["Relationship Status", org.relationship_status], ["Relationship Strength", org.relationship_strength], ["Priority Level", org.priority_level], ["Potential", org.potential], ["Estimated Opportunity", org.estimated_opportunity], ["Notes", org.notes],
     ]}/></section><section id="contacts" className="card p-6"><h2 className="mb-4 font-bold">Contacts</h2>{contacts?.map(contact => <p key={contact.id}><Link href={`/contacts/${contact.id}`}>{contact.first_name} {contact.last_name}</Link></p>)}{!contacts?.length && <p>No linked contacts.</p>}{canWrite && <Link className="mt-5 inline-block" href="/contacts/new">+ Add contact</Link>}</section></div>
-    <RelatedActivities history={history}/><GivingHistory organization={id}/><div className="mt-5 grid gap-4 sm:grid-cols-2">{["Interests","Documents"].map(label=><section key={label} id={label.toLowerCase().replaceAll(" ","-")} className="card p-6"><h2 className="font-bold">{label}</h2><p>Module pending — no related history is calculated yet.</p></section>)}</div>
+    <RelatedActivities history={history}/><GivingHistory organization={id}/><OrganizationInterests organization={id}/><div className="mt-5 grid gap-4 sm:grid-cols-2">{["Documents"].map(label=><section key={label} id={label.toLowerCase().replaceAll(" ","-")} className="card p-6"><h2 className="font-bold">{label}</h2><p>Module pending — no related history is calculated yet.</p></section>)}</div>
   </Shell>;
 }

@@ -33,3 +33,5 @@ privateWrite("records.json",{organizationId:orgId,contactIds,activityId:activity
 console.log("Seeded five real local Auth accounts, one organization, two contacts, one activity and six follow-ups. Passwords are private; no hosted data touched.");
 await (await import('./seed-giving.mjs')).seedGiving();
 console.log('Seeded five contributions, four receipt records, two typed initiative references and one synthetic document link.');
+await (await import('./seed-interests.mjs')).seedInterests();
+console.log('Seeded one Sponsor Interest, a distinct opportunity reference, two linked discussions, one program alignment and three existing follow-up links.');

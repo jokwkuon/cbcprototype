@@ -1,6 +1,6 @@
 # Board-demo progress and prioritized plan
 
-Updated 2026-10-26 on `feature/mvp-foundation`. Organizations, Contacts, Activities & Follow-Ups and Sponsorship & Giving have local implementations. **The complete board demo is not ready:** 64/133 detailed fields are represented; seven remaining destinations and 69 detailed fields still need UI representation. Giving verification evidence is recorded at the end of this document. Source examples and live CBC records are not used.
+Updated 2026-10-28 on `feature/mvp-foundation`. Organizations, Contacts, Activities & Follow-Ups, Sponsorship & Giving and Sponsor Interests have local implementations. **The complete board demo is not ready:** 75/133 detailed fields are represented; six destinations and 58 detailed fields still need UI representation. Latest Sponsor Interests verification and provisional CBC approval status are recorded at the end of this document. Source examples and live CBC records are not used.
 
 ## Implemented scope and evidence boundaries
 
@@ -8,22 +8,24 @@ Updated 2026-10-26 on `feature/mvp-foundation`. Organizations, Contacts, Activit
 
 | Area | Current implementation | Remaining gap |
 |---|---|---|
-| Organizations — REQ-001 | Owner, strength, potential, primary-contact selection, estimate, location and existing manual fields in shared forms/actions/detail; source section links and pending history panels | Last Contact and next open action/date are calculated from linked activities/tasks; three giving/renewal fields remain Definition pending; single free-text type rather than approved multi-tag taxonomy |
-| Contacts — REQ-002 | Names/title/email/phone/organization plus type, influence, interests, notes and inherited restricted owner display; directory type/influence/contact count | Last Contact/next open action work on detail; Events Attended/Giving History and directory Decision Makers/Recently Contacted/Last Contact remain explicitly pending |
+| Organizations — REQ-001 | Owner, strength, potential, primary-contact selection, estimate, location and existing manual fields in shared forms/actions/detail; source section links and pending history panels | Last Contact and next open action/date are calculated from linked activities/tasks; Giving/renewal displays now implemented through the Giving slice; single free-text type rather than approved multi-tag taxonomy |
+| Contacts — REQ-002 | Names/title/email/phone/organization plus type, influence, interests, notes and inherited restricted owner display; directory type/influence/contact count | Last Contact/next open action work on detail; Giving History now implemented; Events Attended and directory Decision Makers/Recently Contacted/Last Contact remain explicitly pending |
 | Ownership — REQ-008, ADR-010 | RLS gates actors; private trigger compares OLD/NEW and rejects inactive/non-staff owners and staff reassignment; ID immutable; delete/reinsert bypass denied to staff | Real local Auth/PostgREST verified; cloud-hosted deployment still pending; no browser role/active administration |
 | Restricted directory | ID/display-name projection only, synchronized from active Staff; Admin sees active Staff, Staff sees self, Finance/Viewer see none | Historical owner labels remain generic for users without directory access; no broader profile access granted |
 | Shared UI/actions | Reusable validated forms, fields, detail/pending displays, inline errors preserving values, role-aware create/edit controls, mobile navigation and disabled unavailable global search | Activities reuses these components, including dates and multi-select participants; remaining modules and global search are not implemented |
-| Incremental schema | Three incremental migrations cover ownership/manual CRM fields and the new activities/participants/tasks, invoker RPCs/status view and timestamp-helper hardening | All four canonical migrations applied on a fresh real local Supabase PostgreSQL 17 stack; no hosted project changed |
+| Incremental schema | Five increments cover ownership/manual CRM fields, Activities/tasks, Giving and Sponsor Interests, invoker calculations and metadata enforcement | All six canonical migrations applied on real local Supabase PostgreSQL 17; no hosted project changed |
 | Remaining CRM entities | 29-table relational proposal in `database/proposals/`, under unexposed schema, RLS enabled, no client grants/policies | Review-only; not app migrations or working CRUD; future domain policies and definitions required |
 | Giving / Opportunities — REQ-003/004 | Giving list/create/detail/edit, typed references, dated receipts, voids, donor histories and SQL financial summaries; approved synthetic rules ADR-012 | Full opportunities pipeline, automatic renewal, refunds/reconciliation/audit history and production finance approval deferred |
 | Activities — REQ-005/008 | Listing/new/detail/edit; atomic participant links; multiple add/edit follow-ups; completion/reopen; computed overdue/Last Contact; related histories and dashboard queue | Real local integration passed; cloud deployment and CBC review of ADR-011 still pending; no email/calendar sync or recurrence |
-| Interests — REQ-003 extension | Locked interest/link drafts | Page/workflow and dedicated requirement ID still missing |
+| Sponsor Interests — REQ-014/003/005/008 | List/create/detail/edit, organization history, explicit Program/discussion/opportunity/task links, inherited restricted owner, manual strength, Admin archive/restore | ADR-013 provisional pending CBC approval; currency definition for manual opportunity estimates, full pipeline/Programs workflows and audit history deferred |
 | Programs / Mentorship / Membership — REQ-010/011/009 | Locked program/cohort/enrollment/pair/check-in/feedback/member drafts | Missing pages and workflows; pending outcome, health, retention/renewal/risk rules |
 | Documents / Settings — REQ-012/008 | Locked document/link/version proposals; existing profile permissions retained | Missing pages; no Settings field guide, file storage decision or approved module access policy |
 | Reports / Dashboard — REQ-013/006 | Existing basic organization/contact/status/recent-record dashboard remains | Six report pages/topics and p.20 domain panels/period/export missing; no invented KPI formulas |
 | Import — REQ-007 | Existing synthetic sample/mapping templates | No importer; outside board demo unless separately approved |
 
-## Database inspection and verification
+## Database inspection and verification — historical Activities checkpoint
+
+The table below records the Activities checkpoint. Giving and Sponsor Interests evidence at the end supersedes its suite counts and field totals.
 
 During Day 1, hosted metadata was inspected read-only: public profiles/organizations/contacts columns and RLS policies matched the baseline migration; migration history was empty. No hosted business records were queried and no remote changes were made. The empty history must be reconciled by the operator before deployment; do not replay initial DDL or reset existing data.
 
@@ -58,11 +60,11 @@ Chromium runtime was unavailable initially. A pinned current Playwright version,
 | Day 3 | Reconcile migration baseline in an approved synthetic deployment, run real Auth/PostgREST allow/deny flows, rehearse every page/report and reconcile approved metrics | AT-08–16 where implemented; mark pending behavior plainly; no live CBC data |
 | Final gate | Documentation, reproducible setup, test evidence, board walkthrough and named CBC sign-offs | Definition of done = implementation + automated verification + demo + documentation + relevant CBC approval |
 
-ADR-007 is resolved for the synthetic MVP by ADR-012; production finance rules, outcome denominators, health/risk rubrics, report/export definitions and unspecified Settings fields remain open. Activities conventions are now explicit in ADR-011, implemented for the demo and pending CBC review. Keep those fields represented as Definition pending; do not manufacture approved rules to meet the deadline. Sponsor Interests/shared evidence still need dedicated requirement IDs. No microservices or production integrations are introduced.
+ADR-007 is resolved for the synthetic MVP by ADR-012; production finance rules, outcome denominators, health/risk rubrics, report/export definitions and unspecified Settings fields remain open. Activities conventions are now explicit in ADR-011, implemented for the demo and pending CBC review. Keep those fields represented as Definition pending; do not manufacture approved rules to meet the deadline. Sponsor Interests now has REQ-014; shared evidence still needs dedicated requirement references. No microservices or production integrations are introduced.
 
 ## Git and publication status
 
-The existing staged PDF removal is preserved. The local PDF is ignored; it is not added to any implementation commit. No source extraction, confidential records, credentials or service-role keys are committed. Existing Git history exposure is not remediated by staging removal; history cleanup remains a repository-owner decision before publication. No history rewrite or push is performed.
+Commit `b26f884` removed the PDF from the current tree; its ignore rule remains. No PDF is added to this implementation. No source extraction, confidential records, credentials or service-role keys are committed. Existing Git history exposure is not remediated by current-tree removal; history cleanup remains a repository-owner decision before publication. No history rewrite or push is performed.
 
 Reviewable commits:
 
@@ -98,7 +100,7 @@ After readiness: **Sponsorship & Giving**, then **Sponsor Interests**. Keep fina
 
 ## Next smallest task
 
-Implement the Sponsor Interests listing and record forms from physical pages 9–10, starting with the explicit field mappings and a dedicated requirement reference. Preserve financial and ownership permissions. No hosted rollout is authorized.
+Sponsor Interests is implemented and verified locally under provisional ADR-013 (see latest evidence below). Next delivery gate is a synthetic manual walkthrough and CBC review of those conventions. The wider Day 2 plan still requires six missing destinations/58 fields, with Programs next in navigation order; define its operational slice before promoting draft tables. No hosted rollout is authorized.
 
 ## Sponsorship & Giving implementation — REQ-003/004/006/008
 
@@ -124,3 +126,45 @@ Deferred Giving functionality: refunds/negative receipts, accounting reconciliat
 Final checks: all six real integration and nine fixture browser scenarios passed. Initial Giving browser runs exposed test locator/navigation-wait issues; these were corrected before the passing run. No application change was needed for those failures. A sandbox child-process restriction initially blocked the readiness guard; its authorized rerun passed all three tests.
 
 Reviewable Giving commits: `15a7428` adds database enforcement/37 SQL assertions and ADR-012; `a91966e` adds the Giving UI and browser/validation coverage. Local fixture/verifier and delivery updates follow separately. The demo production server was restored at http://localhost:3140/login after verification.
+
+## Session resumed — planning checkpoint, 2026-10-27, REQ-014
+
+The clean repository checkpoint includes completed local Giving verification and commit `b26f884`, which removes the architecture PDF from the current tree. Historical exposure remains an owner decision; no history rewrite or publication occurred.
+
+Started the recorded next task with planning only: assigned Sponsor Interests REQ-014, expanded its module worksheet with all eleven INT mappings and six directory columns, and aligned field-matrix/data-model/AT-07 references. No application code, migrations or hosted resources changed; coverage remains 64/133. The PDF was not reopened.
+
+Before mutation implementation, settle interest role permissions, category/strength values, program/opportunity identities, contact inheritance and explicit discussion/task selection. Existing activity and financial permissions do not establish interest permissions. Undefined calculations remain Definition pending. Next implementation follows the proposed slice in the Sponsor Interests worksheet; automated runtime verification, demo and CBC approval remain separate requirements.
+
+## Sponsor Interests implementation and verification — 2026-10-28
+
+REQ-014/003/005/008; **ADR-013 is provisional pending CBC approval**. The user authorized Admin/Staff edits, authenticated reads, Admin-only archive, mandatory organization, affiliated optional contact/opportunity, optional programs, inherited ownership, manual strength, existing follow-ups and preserved timestamps. The worksheet/decision log records the additional provisional link-selection conventions. Full audit history is deferred. No new scoring, matching, automatic finance recognition or approved KPI formula is claimed.
+
+All eleven INT fields are represented in list/create/detail/edit and organization history. The directory has all six source columns, search and Include archived. Small opportunity create/detail reference screens keep estimates distinct from contributions; currency definition remains explicitly pending. Program alignment reuses existing typed Program references without changing Giving permissions. Explicit discussion links select one latest nonfuture activity (timestamp then UUID); explicit existing-task links select one incomplete action (due date, undated last, UUID). Completed tasks remain linked history. Organization owner labels retain restricted directory behavior. Shared CRM/Activities/Giving saves refresh interest displays.
+
+`20261028015014_sponsor_interests.sql` is the sixth canonical migration, applied only to the isolated local Supabase stack. Composite FKs enforce contact/opportunity organization membership and prevent target reparenting. RLS and private metadata validation enforce active-role access, Admin-only archive/restoration, immutable identity, preserved creation and server-generated update/archive times. There are no interest/opportunity hard-delete grants. Atomic invoker saves lock the parent and replace all selected links; invalid links roll back scalar changes and prior link removal. The detail view uses security_invoker. Locked proposals remain unexposed and unchanged.
+
+| Check | Executed result / evidence boundary |
+|---|---|
+| Database assertions | PASS: 172 assertions on a fresh disposable database using real local Supabase PostgreSQL 17.11 (134 prior + 38 Interests). Includes affiliation/reparenting, required fields, typed Program links, future/unrelated/tied discussion selection, completed/undated/tied actions, timestamps, archive bypass prevention, atomic rollback and role denial |
+| Actual Auth/PostgREST | PASS: 59 Interests checks plus 20 CRM and 39 Giving regressions. Real Auth users and public API under actual RLS; anonymous/inactive/Finance/Viewer mutation denial, restricted owner labels, Admin archive/restore and Staff saves verified |
+| Migration/seed repeatability | PASS: two no-op migration/seed replays preserve six-version history and named baseline counts. Interests fixture: one interest, two organization-bound opportunity references, two linked discussions, one Program link and three existing-task links, plus affiliation-negative organization/contact targets |
+| Security/readiness | PASS: zero local security-advisor findings; all public base tables have RLS; pgcrypto remains in extensions; three endpoint/checksum/ignore/permission guards pass |
+| Validation/static | PASS: 16 parser/validation tests; final typecheck and lint pass |
+| Production build | PASS: browser suites build the production app with explicit synthetic/local public settings. Existing middleware deprecation and Node module-type warnings remain |
+| Real browser | PASS: 11 real-Supabase Chromium scenarios (six prior + five Interests): full Staff form workflow/affiliation feedback/multi-link preservation/all INT displays/edit/history/search, Admin opportunity reference and archive/restore, optional links/mobile navigation, Finance/Viewer read-only and anonymous redirect |
+| Fixture browser regressions | PASS: all nine existing Chromium scenarios with production rebuild. Fixture does not implement Interests; organization history displays unavailable there instead of a false empty history |
+| Documentation | Field matrix retains 133 unique detailed IDs; all eleven INT mappings and six directory labels updated. Decision/specification, requirement register, data model, module matrix, setup and acceptance evidence align with provisional scope |
+| Manual CBC demo / approval | NOT performed. Automated browser walkthrough is not CBC sign-off. Instructor/stack and wider board-demo approval gates remain open |
+| Hosted / confidential source | No hosted project queried or changed, no publication/push/history rewrite, no PDF reopened or added, no live CBC records or private credentials in source changes |
+
+Coverage is now **75/133 detailed fields represented**: 74 locally implemented, CON-12 Events Attended explicitly pending; six destinations and 58 detailed fields remain missing. Overall board-demo completion is not claimed.
+
+The first SQL attempt exposed a synthetic test-actor setup error, corrected before the passing run. Initial writer-browser failures were required-label selector mismatches, corrected to accessible role selectors. No screenshots, video or traces were captured. Browser binaries/runtime libraries were restored under `/tmp`; generated keys, passwords and diagnostic reports stay ignored/private under `.local/cbc-demo`. No system library installation or real data was used.
+
+Review/reproduce with `node scripts/demo/verify-database.mjs`, `node scripts/demo/verify-interests.mjs`, existing API verifiers, `node scripts/demo/check-repeatability.mjs`, local advisors/readiness guards and frontend test/typecheck/lint/browser commands in the setup guides. Next gate is the manual synthetic walkthrough and CBC review; remaining module implementations follow the wider prioritized plan separately.
+
+Final review: production demo rebuilt and started successfully at http://localhost:3140/login against the real local API. Fourteen built browser JavaScript assets contain no generated service-role key or synthetic-account password. Final field/register/link checks and `git diff --check` pass. Source changes remain uncommitted for review; no push/publication occurred.
+
+## Sponsor Interests pre-commit review — 2026-10-28
+
+Reviewed implementation/migration/test/documentation paths and shared cache refreshes; no unrelated edits or confidential/token artifacts found. `git diff --check`, 172 SQL assertions, 59 real local Interests API checks, 16 validation tests, typecheck/lint and three readiness guards passed again. The real-local 11-scenario browser suite/production build was rerun before committing; the first launch was blocked by the existing demo listener, which was stopped for the isolated suite. The PDF removal is already recorded in `b26f884`; no PDF deletion is currently staged. The ignored local PDF and Git history remain untouched by the implementation commit.

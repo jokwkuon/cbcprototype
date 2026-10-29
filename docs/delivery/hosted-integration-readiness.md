@@ -119,3 +119,9 @@ Next implementation priorities: **Sponsorship & Giving**, then **Sponsor Interes
 ## Giving increment
 
 Five canonical migrations now include `20261027060754_sponsorship_giving.sql`, validated locally only. The seed helper additionally signs in as Finance and creates five contributions, four receipts (including a void), two typed funding references and a synthetic document link. `verify-giving.mjs` checks real financial permissions and balances separately from the existing CRM API checks. ADR-012 supplies approved synthetic finance conventions; production accounting approval is still pending. No hosted resources/migrations are authorized by this increment. The next module is Sponsor Interests.
+
+## Sponsor Interests increment — REQ-014/003/005/008
+
+The sixth canonical migration is `20261028015014_sponsor_interests.sql`, dependent on existing organization/contact ownership, Activities/tasks and Giving Program references. Only the isolated local target is changed. ADR-013 is provisional pending CBC approval. Interest mutations require Admin/Staff, archiving/restoration Admin; all active roles read. No hard deletion or widened financial/profile permissions.
+
+`node scripts/demo/seed.mjs` now includes the named interest fixture and affiliation-negative targets. Run `node scripts/demo/verify-interests.mjs` after seeding. Repeatability asserts the interest, two opportunity references and exact program/discussion/task join counts as well as the earlier baseline. The database runner includes 38 new Sponsor Interests assertions (172 total), independently of actual Auth/PostgREST/API/browser integration. Current results and remaining approvals are in progress. Earlier four/five-migration counts are historical; a future hosted proposal must review all six current checksum-verified migrations against its explicitly approved target.

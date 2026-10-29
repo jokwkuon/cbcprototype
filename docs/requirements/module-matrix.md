@@ -5,7 +5,7 @@
 | Contacts | directory, profile | contacts, organizations, latest activity | MVP |
 | Sponsorship & Giving | opportunities, contributions | commitments, payments, giving totals, renewals | MVP subset |
 | Activities & Follow-Ups | interaction log, task queue | activities, due dates, owners, overdue status | MVP |
-| Sponsor Interests | alignment list | interests linked to programs and opportunities | Later |
+| Sponsor Interests — REQ-014 | list/create/detail/edit and archive filter | explicit programs/discussions/opportunity/follow-up links; organization history | Local provisional MVP; CBC approval pending |
 | Programs & Recipients | cohorts, recipient outcomes | education and employment KPIs | Later |
 | Mentorship | pairing and check-in view | pair health, check-ins, satisfaction | Later |
 | Membership | members, renewals | membership status and engagement | Later |

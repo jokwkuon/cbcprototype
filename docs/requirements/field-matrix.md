@@ -94,21 +94,21 @@ Validation legend (proposed unless explicitly marked existing): **T** trim text;
 | ACT-14 | Status | 8 | enum | A | follow_ups.status / follow_up_status(...) | /activities detail/list; dashboard queue | Computed on SELECT: Complete precedes Overdue; before Calgary today only | Local Supabase E2E (selected flow) |
 | ACT-15 | Last Contact | 8 | timestamp | A | activity_last_contact(...) | /activities detail; organization/contact histories | Invoker RPC; latest nonfuture linked timestamp | Local Supabase E2E (selected flow) |
 
-## Sponsor Interests — REQ-003 (extension; no dedicated ID)
+## Sponsor Interests — REQ-014 (related pipeline scope: REQ-003)
 
 | ID | Field | Source p. | Type | M/A | Database mapping | UI location | Validation | Status |
 |---|---|---|---|---|---|---|---|---|
-| INT-01 | Organization | 10 | organization reference | M | cbc_demo_draft.sponsor_interests.organization_id | /interests detail/form | R | Draft DB only; UI missing |
-| INT-02 | Primary Contact | 10 | contact reference | A | sponsor_interests.primary_contact_id (proposed) | /interests detail (read-only) | C | Missing |
-| INT-03 | Interest Category | 10 | lookup | M | cbc_demo_draft.sponsor_interests.category | /interests detail/form | E | Draft DB only; UI missing |
-| INT-04 | Interest Strength | 10 | enum | M | cbc_demo_draft.sponsor_interests.strength | /interests detail/form | E | Draft DB only; UI missing |
-| INT-05 | Program Alignment | 10 | program references | M | cbc_demo_draft.interest_programs.program_id | /interests detail/form | R | Draft DB only; UI missing |
-| INT-06 | Last Discussed | 10 | timestamp | A | interest_activities.latest_date (proposed) | /interests detail (read-only) | C | Missing |
-| INT-07 | Last Discussion | 10 | activity reference | A | interest_activities.latest (proposed) | /interests detail (read-only) | C | Missing |
-| INT-08 | Related Opportunity | 10 | opportunity reference | A | sponsor_interests.opportunity_id (proposed) | /interests detail (read-only) | C | Missing |
-| INT-09 | Relationship Owner | 10 | user reference | A | organizations.relationship_owner (proposed) | /interests detail (read-only) | C | Missing |
-| INT-10 | Next Action | 10 | task reference | A | tasks.next (proposed) | /interests detail (read-only) | C | Missing |
-| INT-11 | Notes | 10 | text | M | cbc_demo_draft.sponsor_interests.notes | /interests detail/form | T | Draft DB only; UI missing |
+| INT-01 | Organization | 10 | organization reference | M | sponsor_interests.organization_id | /interests list/form/detail; organization history | Required FK; provisional ADR-013 | Local Supabase E2E (selected flow) |
+| INT-02 | Primary Contact | 10 | contact reference | A | sponsor_interests.primary_contact_id | /interests form; linked detail | Optional explicit association; same-organization composite FK; provisional ADR-013 | Local Supabase E2E (selected flow) |
+| INT-03 | Interest Category | 10 | text (source lookup) | M | sponsor_interests.category | /interests list/form/detail | Required nonblank manual label; provisional taxonomy; provisional ADR-013 | Local Supabase E2E (selected flow) |
+| INT-04 | Interest Strength | 10 | text (source enum) | M | sponsor_interests.strength | /interests list/form/detail | Optional manual text; no scoring; provisional ADR-013 | Local Supabase E2E (selected flow) |
+| INT-05 | Program Alignment | 10 | program references | M | interest_programs → funding_initiatives (Program) | /interests list/form/detail | Optional multi-links; typed FK rejects Events; provisional ADR-013 | Local Supabase E2E (selected flow) |
+| INT-06 | Last Discussed | 10 | timestamp | A | interest_details.last_discussed | /interests detail (read-only) | Explicit past discussions; timestamp descending then UUID; provisional ADR-013 | Local Supabase E2E (selected flow) |
+| INT-07 | Last Discussion | 10 | activity reference | A | interest_details.last_discussion_id | /interests detail (read-only) | Same selected activity as INT-06; provisional ADR-013 | Local Supabase E2E (selected flow) |
+| INT-08 | Related Opportunity | 10 | opportunity reference | A | sponsor_interests.opportunity_id → opportunities | /interests form; linked detail | Optional same-organization composite FK; independent of Giving; provisional ADR-013 | Local Supabase E2E (selected flow) |
+| INT-09 | Relationship Owner | 10 | user reference | A | organizations.relationship_owner → restricted staff_directory | /interests list/detail (read-only) | Live inheritance; ADR-010 directory restrictions; provisional ADR-013 | Local Supabase E2E (selected flow) |
+| INT-10 | Next Action | 10 | task reference | A | interest_tasks → tasks; interest_details.next_task_id | /interests detail (read-only); explicit link form | Existing incomplete task; due date then UUID; undated last; provisional ADR-013 | Local Supabase E2E (selected flow) |
+| INT-11 | Notes | 10 | text | M | sponsor_interests.notes | /interests detail/form | Optional trimmed text; provisional ADR-013 | Local Supabase E2E (selected flow) |
 
 ## Programs & Recipients — REQ-010
 
@@ -207,8 +207,8 @@ These entries supplement the field guides; aliases reuse their field rows rather
 | 5 Giving | Date; Organization; Amount; Level; Program / Event; Status | aliases / M | GIV-03/01/04/06/07/08 | Giving directory | Per referenced rows | Local DB + real Supabase API/browser |
 | 7 Activities | Date; Type; Organization; Purpose; Next Action; Owner | aliases / M | ACT-01/02/03/06/11/12 | Activities directory | Per referenced rows; restricted owner display | Local DB + browser fixture |
 | 7 Activities | Due this week; Overdue; Upcoming meetings | integer / A | follow_ups; activities | Open actions panel | ADR-011: Calgary Mon–Sun; incomplete overdue; future exact Meeting type | Local DB + browser fixture; CBC convention review pending |
-| 9 Interests | Organization; Interest; Strength; Program Alignment; Owner | aliases / M or A | INT-01/03/04/05/09 | Interests directory | Per referenced rows | Missing |
-| 9 Interests | Opportunity (amount) | money / A | opportunities.estimated_amount | Interests directory | C + N; distinct from opportunity link | Missing |
+| 9 Interests | Organization; Interest; Strength; Program Alignment; Owner | aliases / M or A | INT-01/03/04/05/09 | Interests directory | Per referenced rows; provisional ADR-013 | List/search and organization history implemented locally |
+| 9 Interests | Opportunity (amount) | money / A | opportunities.estimated_amount | Interests directory | Manual exact estimate; currency definition pending; distinct from link | Local reference display; excluded from Giving totals |
 | 11 Programs | Participants; Scholarships | integer / A | enrollments eligible participants; awards count | Programs KPIs | C; count persons vs enrollments | Missing |
 | 11 Programs | Graduation Rate; Employed in Field | percent / A | approved outcome queries | Programs KPIs | C; denominators/cohorts | Missing |
 | 11 Programs | Recipient; Program; Cohort; Level; Field | aliases / M | PRO-02/01/03/05/07 | Programs directory | Per referenced rows | Missing |
@@ -263,9 +263,9 @@ All mappings below are proposed queries/configuration; every display is missing 
 
 ## Navigation and controls
 
-Physical pages 1,3–20 show Dashboard, Organizations, Contacts, Giving, Activities, Interests, Programs, Mentorship, Membership, Documents, Reports and Settings. Dashboard, Organizations, Contacts, Activities & Follow-Ups and Sponsorship & Giving now have routes; seven other destinations remain inert “Soon” labels. Settings has **no field specification**: user/role and lookup editors are proposals requiring REQ-008 and CBC definition, not inferred PDF requirements. Proposed `/settings` must show this limitation.
+Physical pages 1,3–20 show Dashboard, Organizations, Contacts, Giving, Activities, Interests, Programs, Mentorship, Membership, Documents, Reports and Settings. Dashboard, Organizations, Contacts, Activities & Follow-Ups, Sponsorship & Giving and Sponsor Interests now have routes; six other destinations remain inert “Soon” labels. Settings has **no field specification**: user/role and lookup editors are proposals requiring REQ-008 and CBC definition, not inferred PDF requirements. Proposed `/settings` must show this limitation.
 
-Directory illustrations include Search and Add New. Organizations/Contacts have code for local directory search and create; global header search is now disabled and labeled unavailable. Activities has purpose/type/organization search, status filtering and forms; other module searches/forms remain missing. Reports' Add New meaning is undefined. Dashboard Export Report is absent and needs format/access approval. No invented Settings fields or KPI formulas are approved by this inventory.
+Directory illustrations include Search and Add New. Organizations/Contacts have code for local directory search and create; global header search is now disabled and labeled unavailable. Activities has purpose/type/organization search, status filtering and forms. Giving and Sponsor Interests have list/create/detail/edit; Interests adds search and an archive filter. Other module searches/forms remain missing. Reports' Add New meaning is undefined. Dashboard Export Report is absent and needs format/access approval. No invented Settings fields or KPI formulas are approved by this inventory.
 
 ## Day 1 verification boundary
 
@@ -296,3 +296,10 @@ ADR-012 records the user's approved synthetic MVP finance rules. All 16 GIV fiel
 Current coverage: **64/133 detailed fields represented**. Of these, 63 have local implementations, including 16 Giving fields and four previously pending organization/contact giving fields. CON-12 Events Attended remains explicitly pending. The other 69 fields and seven navigation destinations remain missing. This section supersedes historical coverage totals above; source page numbers/133 IDs are unchanged. Local tests and CBC approval are distinct; see progress for exact verified checks.
 
 Cash receipt records are additional implementation support fields: received_on (finite nonfuture date), amount (positive exact CAD decimal), reference (manual optional text), is_void (manual disposition), void_reason (required if void). Admin/Finance write, Staff/Viewer read; anonymous/inactive denied. No delete grants. Read-only financial views use security_invoker and the aggregate RPC uses security invoker; no service key is supplied to UI/actions.
+
+
+## Sponsor Interests implementation — REQ-014/003/005/008
+
+ADR-013 records provisional owner-authorized rules, pending CBC approval. All eleven INT fields have local schema/UI representation with explicit contact/opportunity/program/discussion/task links, inherited restricted ownership, manual strength, atomic saves and Admin-only archiving/restoration. No interest hard deletion, automatic scoring or matching is implemented. Last-discussion and next-action selection conventions are provisional; query errors remain unavailable.
+
+Current coverage is **75/133 detailed fields represented**: 74 locally implemented and CON-12 Events Attended explicitly pending. Six navigation destinations and 58 detailed fields remain missing. This supersedes historical totals above. The opportunity directory amount is a manual estimate with currency definition pending, not approved finance revenue. Manual CBC demonstration/sign-off and hosted rollout remain unperformed. See progress for actual verification evidence.

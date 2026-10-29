@@ -46,3 +46,11 @@ Two migration/seed replays preserve history and named synthetic counts without m
 Use [the readiness guide](../docs/delivery/hosted-integration-readiness.md) for complete commands, dependencies, credential boundaries and required hosted approvals. The existing hosted project was neither modified nor queried during this readiness task.
 
 Giving migration `20261027060754_sponsorship_giving.sql` is additive and local-demo validated (REQ-003/004/006/008, ADR-012). It adds financial writer RLS for Admin/Finance, read-only Staff/Viewer, invoker views/RPC and exact numeric receipt accounting. Run all 134 assertions through `node scripts/demo/verify-database.mjs` in the real local stack; the default Supabase Auth database must never receive the synthetic test bootstrap/proposals. Migration replay uses history, not raw SQL replay. No hosted target is approved.
+
+## Sponsor Interests — REQ-014/003/005/008
+
+`20261028015014_sponsor_interests.sql` adds interests, small organization-bound opportunity references and explicit Program/activity/task joins. It does not expose draft tables. Contact/opportunity composite FKs enforce affiliation; Program alignment rejects Event references. Active roles read, Admin/Staff write, Admin alone archives/restores, no interest hard deletion. Organization ownership and Giving policies remain unchanged. ADR-013 records these provisional conventions pending CBC approval.
+
+`save_interest` atomically replaces links with invoker permissions and a row lock. `interest_details` uses `security_invoker` and selects latest explicitly linked past discussion plus earliest explicitly linked incomplete task. Private metadata triggers preserve creation timestamps and immutable IDs; updates/archive times are server-generated. Full audit history is deferred.
+
+Run `node scripts/demo/verify-database.mjs` for all 172 assertions in a new disposable PostgreSQL 17 database. Run `node scripts/demo/seed.mjs`, then `node scripts/demo/verify-interests.mjs` for real local Auth/PostgREST verification. Seeding includes two named interest organizations/contacts/opportunities, one interest, two linked discussions, a Program and three existing follow-up links. Replays use stable IDs; no reset/hard deletion. Existing account credentials remain private and ignored. Hosted rollout is not authorized.
