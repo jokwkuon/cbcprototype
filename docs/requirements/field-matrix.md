@@ -1,6 +1,6 @@
 # Architecture field matrix
 
-Baseline audit, Day 1 and Activities update: 2026-10-26, branch `feature/mvp-foundation`. Source: safe local copy of *CBC Database Architecture 2026.pdf*, 20 physical PDF pages. Page numbers below are **physical pages**, not the illustrated footer or database-page number. No source examples or personal records are reproduced.
+Current field audit: 2026-11-01 (earlier rows retain their evidence granularity), branch `feature/mvp-foundation`. Source: safe local copy of *CBC Database Architecture 2026.pdf*, 20 physical PDF pages. Page numbers below are **physical pages**, not the illustrated footer or database-page number. No source examples or personal records are reproduced.
 
 This is a field-level inventory and proposed design, not an approved schema. [Register](register.csv) and [decisions](../project/decisions.md) remain authoritative for approval. The requested board demo represents every source page/field; modules marked LATER in the register need scope reconciliation before operational implementation.
 
@@ -9,6 +9,8 @@ M = manual; A = source AUTO (linked, system-populated or calculated, not necessa
 Status: **Code** = migration + read/write UI/action inspected, runtime unverified; **Partial** = migration exists but editor or display absent; **Missing** = required mapping/UI absent. Day 1 adds **Local DB + browser fixture** (isolated PostgreSQL assertions and browser coverage against a synthetic Supabase HTTP fixture), **Represented / pending** (read-only label exists, no calculation), and **Draft only** (locked entity proposal, no module UI). A later readiness pass adds **Local Supabase E2E (selected flow)** for rows exercised in real local Auth/PostgREST browser workflows. Neither local status means cloud-hosted deployment or CBC acceptance.
 
 Validation legend (proposed unless explicitly marked existing): **T** trim text; requiredness/length need CBC review. **R** valid existing referenced record and authorized selection, relationship cardinality needs review. **D** valid date/time, chronology and timezone rules need approval. **N** decimal precision/currency/sign and aggregation rules need approval. **E** approved controlled values; do not infer exhaustive enums from examples. **C** source linkage, null/tie/period/eligibility rules and reconciliation example required; show “Definition pending” until approved. Existing names have nonblank DB/action checks; email has action regex + HTML validation; FK integrity exists for contact organization and organization owner. Existing status enum and High/Medium/Low checks are in the migration; their business approval is unverified. Day 1 parser validates HTTP(S) URLs without embedded credentials, finite estimated amounts, enums, identifiers and email. Incremental DB constraints cover finite amounts, email/URL syntax and same-organization primary contact; historical URL/email checks use NOT VALID to avoid forced data cleanup. See ADR-010 for ownership and active status.
+
+Current totals and all 133 independently classified rows are in [field coverage](../delivery/field-coverage.csv); see [counting definitions and verification](../delivery/progress.md#current-field-audit). Source AUTO labels do not establish implemented calculations.
 
 ## Organizations — REQ-001
 
@@ -114,21 +116,21 @@ Validation legend (proposed unless explicitly marked existing): **T** trim text;
 
 | ID | Field | Source p. | Type | M/A | Database mapping | UI location | Validation | Status |
 |---|---|---|---|---|---|---|---|---|
-| PRO-01 | Program | 12 | program reference | M | cbc_demo_draft.cohorts.program_id via enrollments.cohort_id | /programs detail/form | R | Draft DB only; UI missing |
-| PRO-02 | Recipient / Participant | 12 | person reference | M | cbc_demo_draft.enrollments.participant_id | /programs detail/form | R | Draft DB only; UI missing |
-| PRO-03 | Cohort / Year | 12 | cohort reference | M | cbc_demo_draft.enrollments.cohort_id | /programs detail/form | R | Draft DB only; UI missing |
-| PRO-04 | Award / Support Amount | 12 | decimal / currency | M | cbc_demo_draft.enrollments.support_amount | /programs detail/form | N | Draft DB only; UI missing |
-| PRO-05 | Education Level | 12 | lookup | M | cbc_demo_draft.enrollments.education_level | /programs detail/form | E | Draft DB only; UI missing |
-| PRO-06 | Institution | 12 | text / reference | M | cbc_demo_draft.enrollments.institution | /programs detail/form | R | Draft DB only; UI missing |
-| PRO-07 | Field of Study | 12 | lookup | M | cbc_demo_draft.enrollments.field_of_study | /programs detail/form | E | Draft DB only; UI missing |
-| PRO-08 | Graduation Status | 12 | lookup | M | cbc_demo_draft.enrollments.graduation_status | /programs detail/form | E | Draft DB only; UI missing |
-| PRO-09 | Graduation Date | 12 | date | M | cbc_demo_draft.enrollments.graduation_date | /programs detail/form | D | Draft DB only; UI missing |
-| PRO-10 | Employment Status | 12 | lookup | M | cbc_demo_draft.enrollments.employment_status | /programs detail/form | E | Draft DB only; UI missing |
-| PRO-11 | Employment Field | 12 | lookup | M | cbc_demo_draft.enrollments.employment_field | /programs detail/form | E | Draft DB only; UI missing |
-| PRO-12 | Field Alignment | 12 | boolean / classification | A | outcomes.field_alignment (proposed) | /programs detail (read-only) | C | Missing |
-| PRO-13 | CBC Engagement | 12 | activity history | A | enrollments.engagement (proposed) | /programs detail (read-only) | C | Missing |
-| PRO-14 | Alumni Giving | 12 | money aggregate | A | giving.alumni (proposed) | /programs detail (read-only) | C | Missing |
-| PRO-15 | Last Contact | 12 | timestamp | A | activities.latest (proposed) | /programs detail (read-only) | C | Missing |
+| PRO-01 | Program | 12 | program reference | M | program_enrollments.program_id | /programs/enrollments detail/form | ADR-014; exact/nullable support, manual outcomes, explicit identity/cohort integrity | Local DB + real Supabase API/browser |
+| PRO-02 | Recipient / Participant | 12 | person reference | M | program_enrollments.recipient_id | /programs/enrollments detail/form | ADR-014; exact/nullable support, manual outcomes, explicit identity/cohort integrity | Local DB + real Supabase API/browser |
+| PRO-03 | Cohort / Year | 12 | cohort reference | M | program_enrollments.cohort_id | /programs/enrollments detail/form | ADR-014; exact/nullable support, manual outcomes, explicit identity/cohort integrity | Local DB + real Supabase API/browser |
+| PRO-04 | Award / Support Amount | 12 | decimal / currency | M | program_enrollments.support_amount | /programs/enrollments detail/form | ADR-014; exact/nullable support, manual outcomes, explicit identity/cohort integrity | Local DB + real Supabase API/browser |
+| PRO-05 | Education Level | 12 | lookup | M | program_enrollments.education_level | /programs/enrollments detail/form | ADR-014; exact/nullable support, manual outcomes, explicit identity/cohort integrity | Local DB + real Supabase API/browser |
+| PRO-06 | Institution | 12 | text / reference | M | program_enrollments.institution | /programs/enrollments detail/form | ADR-014; exact/nullable support, manual outcomes, explicit identity/cohort integrity | Local DB + real Supabase API/browser |
+| PRO-07 | Field of Study | 12 | lookup | M | program_enrollments.field_of_study | /programs/enrollments detail/form | ADR-014; exact/nullable support, manual outcomes, explicit identity/cohort integrity | Local DB + real Supabase API/browser |
+| PRO-08 | Graduation Status | 12 | lookup | M | program_enrollments.graduation_status | /programs/enrollments detail/form | ADR-014; exact/nullable support, manual outcomes, explicit identity/cohort integrity | Local DB + real Supabase API/browser |
+| PRO-09 | Graduation Date | 12 | date | M | program_enrollments.graduation_date | /programs/enrollments detail/form | ADR-014; exact/nullable support, manual outcomes, explicit identity/cohort integrity | Local DB + real Supabase API/browser |
+| PRO-10 | Employment Status | 12 | lookup | M | program_enrollments.employment_status | /programs/enrollments detail/form | ADR-014; exact/nullable support, manual outcomes, explicit identity/cohort integrity | Local DB + real Supabase API/browser |
+| PRO-11 | Employment Field | 12 | lookup | M | program_enrollments.employment_field | /programs/enrollments detail/form | ADR-014; exact/nullable support, manual outcomes, explicit identity/cohort integrity | Local DB + real Supabase API/browser |
+| PRO-12 | Field Alignment | 12 | boolean / classification | A | No approved mapping; pending rubric | /programs/enrollments and recipient detail (read-only) | Definition pending; no inferred discipline matching | Represented / pending |
+| PRO-13 | CBC Engagement | 12 | activity history | A | program_recipient_details.recorded_interactions | /programs/enrollments and recipient detail (read-only) | Linked-contact nonfuture interactions only; broader classification pending | Partial functional: recorded interactions; classification deferred |
+| PRO-14 | Alumni Giving | 12 | money aggregate | A | program_recipient_details.alumni_cash | /programs/enrollments and recipient detail (read-only) | Explicit alumni date/contact; nonvoid cash; person-wide, not program attribution | Local DB + real Supabase API/browser |
+| PRO-15 | Last Contact | 12 | timestamp | A | program_recipient_details.last_contact | /programs/enrollments and recipient detail (read-only) | Latest nonfuture contact-linked activity; unavailable without contact | Local DB + real Supabase API/browser |
 
 ## Mentorship — REQ-011
 
@@ -209,10 +211,10 @@ These entries supplement the field guides; aliases reuse their field rows rather
 | 7 Activities | Due this week; Overdue; Upcoming meetings | integer / A | follow_ups; activities | Open actions panel | ADR-011: Calgary Mon–Sun; incomplete overdue; future exact Meeting type | Local DB + browser fixture; CBC convention review pending |
 | 9 Interests | Organization; Interest; Strength; Program Alignment; Owner | aliases / M or A | INT-01/03/04/05/09 | Interests directory | Per referenced rows; provisional ADR-013 | List/search and organization history implemented locally |
 | 9 Interests | Opportunity (amount) | money / A | opportunities.estimated_amount | Interests directory | Manual exact estimate; currency definition pending; distinct from link | Local reference display; excluded from Giving totals |
-| 11 Programs | Participants; Scholarships | integer / A | enrollments eligible participants; awards count | Programs KPIs | C; count persons vs enrollments | Missing |
-| 11 Programs | Graduation Rate; Employed in Field | percent / A | approved outcome queries | Programs KPIs | C; denominators/cohorts | Missing |
-| 11 Programs | Recipient; Program; Cohort; Level; Field | aliases / M | PRO-02/01/03/05/07 | Programs directory | Per referenced rows | Missing |
-| 11 Programs | Outcome | classification / A (proposal; source unspecified) | enrollment outcome query | Programs directory | C; reconcile graduation/employment labels | Missing |
+| 11 Programs | Participants; Scholarships | integer / A | program_summary participants; no award-count mapping | Programs KPIs | ADR-014 distinct recipient IDs; scholarship classification pending | Participants functional locally; Scholarships represented / pending |
+| 11 Programs | Graduation Rate; Employed in Field | percent / A | approved outcome queries | Programs KPIs | C; denominators/cohorts | Represented / pending; no approved denominators/rubric |
+| 11 Programs | Recipient; Program; Cohort; Level; Field | aliases / M | PRO-02/01/03/05/07 | Programs directory | Per referenced rows | Local DB + real Supabase API/browser |
+| 11 Programs | Outcome | classification / A (proposal; source unspecified) | program_enrollment_details graduation_status / employment_status | Programs directory | Manual labels; unknown explicit; no synthesized outcome | Local DB + real Supabase API/browser |
 | 13 Mentorship | Active Pairs; Check-ins This Month | integer / A | pairs eligible status; checkins month | Mentorship KPIs | C | Missing |
 | 13 Mentorship | Pair Health (aggregate) | percent / A | approved health aggregation | Mentorship KPI | C; separate from per-pair label | Missing |
 | 13 Mentorship | Mentor; Mentee; Status; Frequency; Last Check-In; Pair Health | aliases / M or A | MEN-01/02/06/07/08/10 | Mentorship directory | Per referenced rows | Missing |
@@ -303,3 +305,8 @@ Cash receipt records are additional implementation support fields: received_on (
 ADR-013 records provisional owner-authorized rules, pending CBC approval. All eleven INT fields have local schema/UI representation with explicit contact/opportunity/program/discussion/task links, inherited restricted ownership, manual strength, atomic saves and Admin-only archiving/restoration. No interest hard deletion, automatic scoring or matching is implemented. Last-discussion and next-action selection conventions are provisional; query errors remain unavailable.
 
 Current coverage is **75/133 detailed fields represented**: 74 locally implemented and CON-12 Events Attended explicitly pending. Six navigation destinations and 58 detailed fields remain missing. This supersedes historical totals above. The opportunity directory amount is a manual estimate with currency definition pending, not approved finance revenue. Manual CBC demonstration/sign-off and hosted rollout remain unperformed. See progress for actual verification evidence.
+
+
+## Current Programs and review audit — 2026-11-01
+
+Earlier checkpoint totals in this document are historical. The [current 133-row audit](../delivery/field-coverage.csv) supersedes them: 90 represented, 88 with working local demo behavior (87 complete within demo scope plus one partial), 19 calculated as an overlapping subset, and 46 with deferred whole-field behavior. See [definitions and executed evidence](../delivery/progress.md#current-field-audit). PRO-01–15 and the Programs directory/KPI rows above now reflect the operational schema/UI; no source PDF was reopened for this reconciliation. Page-only/report/dashboard completion is separate from the 133 denominator.

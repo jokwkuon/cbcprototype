@@ -1,5 +1,7 @@
 # CBC CRM frontend
 
+**Current verification: 2026-11-01.** The historical setup/checkpoint sections below retain earlier counts and limitations; use the guarded real local Supabase setup and [current delivery evidence](../../docs/delivery/progress.md#current-field-audit) for current commands/results. Seven canonical migrations and Programs & Recipients are verified locally. Do not treat the original baseline-only setup as a migration plan for an existing hosted project.
+
 ## Local setup
 
 1. Copy `.env.example` to `.env.local` and add the Supabase project URL and anon key.
@@ -100,3 +102,10 @@ Additional checks: `node scripts/demo/verify-giving.mjs` from the repository roo
 Provisional ADR-013 supplies list/create/detail/edit, organization history, optional affiliated contact/opportunity, Program alignment, explicit discussion/follow-up selections and Admin archive/restore. Category/strength are manual; owner inherits the organization's restricted label. Opportunity estimates are reference data with currency definition pending, excluded from Giving totals. No interest hard deletion or automatic scoring/matching.
 
 Apply the sixth canonical migration only to the local demo using the guarded helpers, then rerun `node scripts/demo/seed.mjs` from the repository root. `node scripts/demo/verify-interests.mjs` checks actual local Auth/PostgREST. `npm run test:integration` includes five interest scenarios in addition to six existing CRM/Giving scenarios and builds the production app against real local Supabase. `npm test` includes three additional interest/reference validation tests (16 total). No screenshots/traces/videos are captured; credential-sensitive failures remain private. CBC approval/manual board demonstration and hosted rollout remain pending.
+
+
+## Programs & Recipients and review regressions — REQ-010/002/006/008
+
+The existing Programs slice provides programs, cohorts, recipients and enrollments, with shared forms, role restrictions, manual outcomes, exact support and linked-contact evidence under provisional ADR-014. Run `node scripts/demo/verify-programs.mjs` from the root for 68 real local API checks. The complete integration browser suite now has 17 scenarios, including program-switch/cohort-reset and direct-URL normalization. Fixture regressions have 15 scenarios, including independent CRM query failures, successful empty data, recovery and zero cash versus failed financial summary. `npm test` has 19 validation tests.
+
+Apply/seed only the guarded isolated local environment before running these suites. The source-only fixtures lack Programs endpoints; Programs workflows use real local Auth/PostgREST. Runtime tools under `/tmp` may need restoration after a session reset; run browser suites sequentially. Manual CBC demonstration, provisional-rule approval, full audit history, absent modules and hosted rollout remain pending.

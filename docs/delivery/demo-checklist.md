@@ -1,6 +1,6 @@
 # Board-demo checklist and acceptance tests
 
-Status: local automated verification now includes Sponsor Interests (2026-10-28); see each executed evidence section below. Planned scenarios are the full-demo target; manual CBC demonstration/acceptance remains pending. Extends [acceptance](acceptance.md) without claiming its gates passed. Field-level coverage is in the [matrix](../requirements/field-matrix.md); implementation order and evidence are in [progress](progress.md). Use synthetic people, organizations, transactions and files only.
+Status: local automated verification now includes Programs & Recipients and review regressions (2026-11-01); see each executed evidence section below. Planned scenarios are the full-demo target; manual CBC demonstration/acceptance remains pending. Extends [acceptance](acceptance.md) without claiming its gates passed. Field-level coverage is in the [matrix](../requirements/field-matrix.md); implementation order and evidence are in [progress](progress.md). Use synthetic people, organizations, transactions and files only.
 
 ## Demo readiness
 
@@ -121,3 +121,19 @@ Current coverage is 64/133 detailed fields represented, 63 locally implemented a
 Suggested manual walkthrough: use synthetic Staff to add/edit an interest with two linked discussions, a Program, an affiliated contact/opportunity and an existing follow-up; show inherited owner and organization history. Try an incompatible organization/contact association and confirm preserved selections/error. Use Admin to archive and restore, then Finance/Viewer to demonstrate read-only controls and restricted owner labels. Show the separate manual estimate, timestamp metadata, pending currency definition and deferred audit history. Record reviewer, date, commit/environment, actual results and approval reference; automated results alone do not check this manual gate.
 
 Current field coverage: **75/133**, including all eleven INT fields. Six missing destinations/58 fields and overall CBC acceptance remain outstanding. No hosted changes or source PDF publication occurred.
+
+
+## Programs and review acceptance evidence — 2026-11-01
+
+REQ-010/002/006/008; provisional ADR-014, CBC approval pending. [Current evidence and coverage definitions](progress.md#current-field-audit) supersede earlier totals.
+
+- [x] AT-08/14: repeated recipient identities across cohorts/programs, manual education/support/outcomes, exact sums/unknowns, alumni/contact evidence, negative affiliations, metadata and role denial verified by 45 new SQL assertions and 68 real local API checks.
+- [x] AT-08/15: all fifteen PRO labels represented; thirteen complete demo fields, one partial engagement classification and one Field Alignment placeholder. Directory raw outcomes and pending scholarship/outcome rates verified in real Chromium.
+- [x] AT-08: program switch clears incompatible cohort before submission; direct incompatible/unknown/malformed URL filters normalize; visible values, summaries and enrollments agree; valid cohort-only URL works.
+- [x] AT-12 subset: all four basic CRM dashboard queries independently fail into unavailable UI; successful empty counts remain zero; recovery works; successful zero cash differs from failed financial RPC. Existing action-queue error coverage retained.
+- [x] AT-16: 217 SQL assertions; 186 API checks; 19 validation tests; 17 real integration and 15 fixture browser scenarios; typecheck/lint/production builds; three readiness guards; two migration/seed replays; zero local advisor findings.
+- [ ] AT-15 whole-board coverage: five destinations, 43 detailed fields and additional page-only/report/dashboard displays still absent; two field placeholders and one partial classification remain.
+- [ ] Manual synthetic CBC walkthrough and named approval of provisional rules. Automated browser execution is not this manual gate.
+- [ ] Any separately authorized hosted deployment and instructor/production approvals.
+
+Suggested Programs walkthrough: use synthetic Staff to create/edit a program/cohort/recipient/enrollment; show repeated cohorts, unknown support and manual outcomes; switch program after selecting a cohort and show the cleared filter and matching summary; open an incompatible direct URL; show linked contact interactions and explicit person-wide alumni cash; demonstrate Finance/Viewer read-only behavior and the pending alignment/rate labels. Record reviewer/date/commit/environment/results/approval reference. Nothing here authorizes hosted changes or source-document publication.

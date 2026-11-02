@@ -1,6 +1,75 @@
 # Board-demo progress and prioritized plan
 
-Updated 2026-10-28 on `feature/mvp-foundation`. Organizations, Contacts, Activities & Follow-Ups, Sponsorship & Giving and Sponsor Interests have local implementations. **The complete board demo is not ready:** 75/133 detailed fields are represented; six destinations and 58 detailed fields still need UI representation. Latest Sponsor Interests verification and provisional CBC approval status are recorded at the end of this document. Source examples and live CBC records are not used.
+Updated 2026-11-01 on `feature/mvp-foundation`. Programs & Recipients is now included in locally verified scope. **The complete board demo is not ready:** 90/133 detailed fields are represented; five navigation destinations and 43 detailed fields still lack module UI. See the current audit below; all earlier checkpoints and totals are historical. Source examples and live CBC records are not used.
+
+<a id="current-field-audit"></a>
+## Current review fixes and field audit — 2026-11-01
+
+REQ-010/002/006/008. The checkout already contained an uncommitted Programs foundation (operational migration, UI, shared revalidation, SQL/API/browser tests and provisional ADR-014). This pass inspected and verified it alongside the review fixes; it does not claim it was absent before this review. No new business module or formula was added. All earlier checkpoints below retain historical evidence, not current totals.
+
+### Review fixes and dashboard loading audit
+
+- Programs: program changes clear incompatible cohorts immediately. The server first loads authorized program/cohort options, validates membership and compatibility, then redirects unknown/malformed/incompatible selections to a normalized URL **before** querying enrollments or summaries. The normalized URL, visible selectors and database filters agree. A valid cohort-only URL remains supported. Text search narrows rows, not summaries, as explicitly labeled.
+- Dashboard: organization count, contact count, relationship-status rows and recent organizations previously ignored their query errors and fell back to zero/empty. Their results are now checked as one CRM snapshot; a failure replaces that snapshot with an explicit unavailable panel. Other dashboard sections remain independent. Successful zero counts and empty lists are unchanged.
+- Action Queue audit: `followUps` checks its query error; `businessToday` checks RPC error/missing date; the component already catches failures into “Action Queue unavailable.” No change required.
+- Giving summary audit: date and `givingSummary` RPC failures already produce “Financial summary unavailable”; no unverified totals render. Successful zero cash is still CAD 0.00. Authentication/profile errors use the existing error boundary rather than financial zeroes. No change to financial calculations, RLS or ownership policies.
+- Regression evidence: real browser program A/cohort A → program B checks cohort reset and nonzero B summaries; direct incompatible, malformed, unknown and cohort-only URLs check normalized selectors and results. Fixture browser tests independently fail each of the four CRM queries, distinguish successful empty data, check recovery, and distinguish successful zero cash from a failed financial RPC. Existing action-queue failure coverage remains.
+
+### Detailed field coverage
+
+All 133 unique detailed IDs were reclassified against their matrix mappings, implementation, migrations and automated evidence. [field-coverage.csv](field-coverage.csv) contains every ID, separate flags, mapping, implementation/evidence paths and limitations. Evidence paths identify suites/selected flows, **not** a claim that every field has its own isolated end-to-end assertion. Manual fields are also exercised through shared form/validation flows. Locked proposal tables do not count as functional fields.
+
+Definitions: **represented** means an actual module UI displays the field, including explicit pending labels; **functional** means a demonstrated local demo behavior exists; **fully functional in demo** excludes the partial CBC Engagement classification; **calculated** means a working aggregate, date/status calculation or deterministic latest/next selection (not merely a source AUTO label, explicit link or inherited owner). Calculated is an overlapping subset of functional. **Deferred field** counts absent fields, placeholder fields and the one partial field; it does not count every deferred enhancement on otherwise working fields. Nothing here establishes production policy or CBC acceptance.
+
+| Module | Detailed IDs | Represented | Functional, including partial | Fully functional in demo | Calculated subset | Deferred fields |
+|---|---:|---:|---:|---:|---:|---:|
+| Organizations | 18 | 18 | 18 | 18 | 5 | 0 |
+| Contacts | 15 | 15 | 14 | 14 | 2 | 1 |
+| Giving | 16 | 16 | 16 | 16 | 4 | 0 |
+| Activities | 15 | 15 | 15 | 15 | 2 | 0 |
+| Sponsor Interests | 11 | 11 | 11 | 11 | 3 | 0 |
+| Programs & Recipients | 15 | 15 | 14 | 13 | 3 | 2 |
+| Mentorship | 15 | 0 | 0 | 0 | 0 | 15 |
+| Membership | 15 | 0 | 0 | 0 | 0 | 15 |
+| Documents | 13 | 0 | 0 | 0 | 0 | 13 |
+| **Total** | **133** | **90** | **88** | **87** | **19** | **46** |
+
+Exclusive partition: **87 fully functional + 1 partial + 2 represented placeholders + 43 absent = 133**. The 19 calculated fields include PRO-13's working interaction count; 18 are in fully functional fields. CON-12 Events Attended and PRO-12 Field Alignment are placeholders. PRO-13 CBC Engagement shows recorded contact interactions but defers broader membership/volunteer/mentor/donor classification. PRO-14's alumni cash requires an explicit contact/alumni date and is person-wide, never allocated or summed across programs. GIV-11 remains manual renewal scheduling; GIV-16 supports links, not file storage/access management. Manual taxonomies, estimate currency and provisional conventions retain their documented approval limits.
+
+The 133 denominator excludes directory-only metrics, six report categories, p.20 dashboard panels and unspecified Settings fields. Program Participants, Enrollments and known/missing support sums work; Scholarships, Graduation Rate and Employed in Field remain pending. Five missing navigation destinations are Mentorship, Membership, Documents, Reports and Settings. A partial dashboard and disabled global search remain; **90/133 does not mean 68% of the complete board demo is operational**.
+
+Reviewed code commit: `1d859ab` (includes the pre-existing Programs foundation and the review corrections). Documentation is committed separately.
+
+### Executed verification
+
+All records are synthetic. Local Supabase runs on loopback 54421/54422; no hosted command or mutation was performed. The SQL runner creates a fresh disposable database, preserving existing demo records. Canonical migration checksums/history cover seven migrations. Browser screenshots/traces/videos remain disabled.
+
+| Check | Exact current result |
+|---|---|
+| Frontend `npm test` | PASS: 19 tests (5 CRM, 4 Activities, 4 Giving, 3 Interests, 3 Programs); 0 failures |
+| `npm run typecheck`; `npm run lint` | PASS |
+| Production build | PASS in both browser suites with explicit synthetic/local public configuration |
+| `node scripts/demo/verify-database.mjs` | PASS: 217 SQL assertions (172 existing + 45 Programs), fresh PostgreSQL 17 database; canonical checksums/history, RLS and extension audit |
+| `node scripts/demo/verify-api.mjs` | PASS: 20 actual local Auth/PostgREST CRM/Activities checks |
+| `node scripts/demo/verify-giving.mjs` | PASS: 39 actual local Giving checks |
+| `node scripts/demo/verify-interests.mjs` | PASS: 59 actual local Interests checks |
+| `node scripts/demo/verify-programs.mjs` | PASS: 68 actual local Programs checks; total API checks **186** |
+| `npm run test:integration` | PASS: 17 real-Supabase Chromium scenarios (11 existing + 5 Programs workflows/roles + 1 filter/direct-URL regression) |
+| `npm run test:e2e` | PASS: 15 fixture Chromium scenarios (9 existing + 6 dashboard empty/error/recovery/financial-zero regressions) |
+| `node --test scripts/demo/readiness.test.mjs` | PASS: 3 endpoint/manifest/private-artifact guards |
+| `node scripts/demo/check-repeatability.mjs` | PASS: 2 no-op migration replays and 2 seed replays; stable history and named synthetic counts |
+| `node scripts/demo/stack.mjs audit` | PASS: zero local security-advisor findings |
+| Manual board demo / CBC approval / hosted rollout | NOT performed; pending separately |
+
+Environment recovery: initial sandbox localhost/process restrictions required authorized local verification outside the sandbox. The first API attempt encountered stale “Due today” fixture dates from an earlier session; the documented named synthetic seed refresh restored date-relative fixtures, then all API checks passed. Initial Chromium attempts could not launch due to missing runtime libraries; pinned browser files and extracted Ubuntu runtime libraries were restored under `/tmp`, without sudo/system package installation, then browser suites passed. Existing Next middleware deprecation and Node module-type warnings remain. No failed attempt is counted as passing evidence.
+
+To reproduce browser checks here, use `LD_LIBRARY_PATH=/tmp/cbc-browser-libs/usr/lib/x86_64-linux-gnu PLAYWRIGHT_BROWSERS_PATH=/tmp/cbc-playwright` before each frontend browser command. Those paths are environment-specific. Run suites sequentially because both rebuild `.next`. Private generated diagnostics live only in ignored `.local/cbc-demo`; refresh named synthetic fixtures when dates change.
+
+### Remaining gates and smallest next slice
+
+Full board completion still needs the 43 absent detailed fields, two placeholders, one partial classification, remaining page-only/dashboard/report displays, runtime verification and a synthetic manual board walkthrough. CBC approval of ADR-011/013/014 and production finance/outcome/access conventions remains separate from code. Scope/stack/student requirements, deployment decisions, audit history, imports/integrations and repository-owner resolution of historical PDF exposure remain open. No hosted changes, confidential publication or Git history rewrite occurred.
+
+**Recommended next slice: a read-only Reports landing page plus the Financial report, reusing the already verified Giving summary.** Represent the six report categories as reachable destinations with honest readiness states; implement only received cash, commitments, outstanding and giving history from existing queries for a selected calendar year. Label event ROI and unsupported topics Definition pending; defer export until format/access is approved. This closes a missing destination with no schema/RLS expansion or invented KPI rules. It is a recommendation, not implemented or approved scope. Mentorship and Membership operations should wait for workflow/permission decisions rather than promoting locked drafts automatically.
 
 ## Implemented scope and evidence boundaries
 
