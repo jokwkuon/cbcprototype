@@ -16,8 +16,8 @@ for(const [name,role] of [["admin","admin"],["staff-a","staff"],["staff-b","staf
 }
 const admin=await login("admin"),staff=result.filter(a=>a.role==="staff");
 const orgId="60000000-0000-4000-8000-000000000001",contactIds=["61000000-0000-4000-8000-000000000001","61000000-0000-4000-8000-000000000002"];
-const org=await admin.from("organizations").upsert({id:orgId,name:"Synthetic Demo Community Partner",organization_type:"Community Partner",industry:"Synthetic services",website:"https://example.test/",location:"Demo City",relationship_owner:staff[0].id,relationship_status:"Active",relationship_strength:"High",priority_level:"High",potential:"Medium",estimated_opportunity:1000,notes:"Synthetic demonstration only; no CBC records."});check(!org.error,"Organization seed failed.");
-for(const [index,id] of contactIds.entries()){const c=await admin.from("contacts").upsert({id,organization_id:orgId,first_name:"Synthetic",last_name:`Participant ${index+1}`,title:"Demo contact",email:`participant-${index+1}@example.test`,phone:"555-0100",contact_type:"Relationship Contact",influence_level:"Medium",interests:"Demo programs",notes:"Synthetic only"});check(!c.error,"Contact seed failed.");}
+const org=await admin.from("organizations").upsert({id:orgId,name:"Prairie Lantern Ventures",organization_type:"Community Partner",industry:"Professional services",website:"https://example.test/",location:"Calgary",relationship_owner:staff[0].id,relationship_status:"Active",relationship_strength:"High",priority_level:"High",potential:"Medium",estimated_opportunity:1000,notes:"Synthetic demonstration only; no CBC records."});check(!org.error,"Organization seed failed.");
+for(const [index,id] of contactIds.entries()){const c=await admin.from("contacts").upsert({id,organization_id:orgId,first_name:["Amara","Daniel"][index],last_name:["Okafor","Mensah"][index],title:["Community Partnerships Director","Business Development Lead"][index],email:["amara.okafor@example.test","daniel.mensah@example.test"][index],phone:"555-0100",contact_type:"Relationship Contact",influence_level:"Medium",interests:"Demo programs",notes:"Synthetic only"});check(!c.error,"Contact seed failed.");}
 check(!(await admin.from("organizations").update({primary_contact_id:contactIds[0]}).eq("id",orgId)).error,"Primary contact seed failed.");
 const existing=await admin.from("activities").select("id").eq("organization_id",orgId).eq("purpose","Synthetic Demo Check-in").maybeSingle();check(!existing.error,"Seed activity lookup failed.");
 const values={organization_id:orgId,occurred_at:"2020-07-15T14:30:00Z",activity_type:"Meeting",location:"Synthetic room",purpose:"Synthetic Demo Check-in",key_discussion:"Demo discussion",sponsor_needs:"Demo needs",cbc_opportunity:"Demo opportunity",outcome:"Demo follow-up agreed"};
@@ -37,3 +37,10 @@ await (await import('./seed-interests.mjs')).seedInterests();
 console.log('Seeded one Sponsor Interest, a distinct opportunity reference, two linked discussions, one program alignment and three existing follow-up links.');
 await (await import('./seed-programs.mjs')).seedPrograms();
 console.log('Seeded two operational programs, three cohorts, two recipients and four enrollments with repeated identity, unknown support and unknown outcomes.');
+
+await (await import('./seed-membership.mjs')).seedMembership();
+console.log('Seeded three synthetic membership terms.');
+await (await import('./seed-mentorship.mjs')).seedMentorship();
+console.log('Seeded a synthetic mentorship pair and check-in.');
+await (await import('./seed-documents.mjs')).seedDocuments();
+console.log('Seeded two synthetic document metadata records; no binary files.');

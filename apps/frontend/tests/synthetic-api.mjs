@@ -4,7 +4,7 @@ import http from "node:http";
 import { randomUUID } from "node:crypto";
 const id = n => `10000000-0000-4000-8000-${String(n).padStart(12,"0")}`;
 const profiles = ["admin","staff","staff","finance","viewer"].map((role,i)=>({id:id(i+1),role,is_active:true,full_name:`Demo ${role} ${i+1}`}));
-const emptyTables=()=>({organizations:[],contacts:[],activities:[],activity_contacts:[],tasks:[]});
+const emptyTables=()=>({organizations:[],contacts:[],activities:[],activity_contacts:[],tasks:[],programs:[],program_cohorts:[],program_enrollments:[],program_enrollment_details:[],membership_details:[],mentorship_details:[],sponsor_interests:[],documents:[]});
 let tables=emptyTables();
 let failActivities=false;
 let failDashboard="";
@@ -38,14 +38,15 @@ const server=http.createServer(async(req,res)=>{
   if(url.pathname==="/auth/v1/logout")return send(200,{});
   if(!profile)return send(401,{message:"Sign in"});
   const table=url.pathname.split("/").at(-1);
-  const dashboardQuery=table==="contacts"&&req.method==="HEAD"?"contacts":table==="organizations"?(req.method==="HEAD"?"organizations":url.searchParams.get("select")==="relationship_status"?"statuses":url.searchParams.get("limit")==="5"?"recent":""):"";
+  const dashboardQuery=table==="contacts"&&req.method==="HEAD"?"contacts":table==="organizations"?(req.method==="HEAD"?"organizations":["relationship_status","id,relationship_status"].includes(url.searchParams.get("select"))?"statuses":url.searchParams.get("limit")==="5"?"recent":""):"";
   if(failDashboard&&dashboardQuery===failDashboard)return send(500,{message:"Synthetic dashboard failure"});
   if(failActivities&&(["activities","activity_contacts","tasks","follow_ups","activity_today","activity_last_contact","save_activity"].includes(table)))return send(500,{message:"Synthetic activity query failure"});
-  if(reportFixture?.failure===table)return send(500,{message:"Synthetic report query failed"});
-  if(reportFixture&&["giving_summary","contribution_details","giving_receipts","opportunities"].includes(table)){
-    if(table==="giving_summary"&&reportFixture.delay)await new Promise(resolve=>setTimeout(resolve,reportFixture.delay));
-    if(reportFixture.failure===table)return send(500,{message:"Synthetic report query failed"});
-    if(table==="giving_summary")return send(200,{year:body.p_year,as_of:today(),period_end:`${body.p_year}-12-31`<today()?`${body.p_year}-12-31`:today(),prior_period_end:`${body.p_year-1}-12-31`,comparison_basis:"Synthetic empty period",annual_cash:reportFixture.mismatch?"1":"0",lifetime_cash:"0",prior_cash:"0",pledged:"0",outstanding:"0",in_kind_declared:"0",yoy_delta:"0",yoy_percent:null});
+  const activeReport=reportFixture;
+  if(activeReport?.failure===table)return send(500,{message:"Synthetic report query failed"});
+  if(activeReport&&["giving_summary","contribution_details","giving_receipts","opportunities"].includes(table)){
+    if(table==="giving_summary"&&activeReport.delay)await new Promise(resolve=>setTimeout(resolve,activeReport.delay));
+    if(activeReport.failure===table)return send(500,{message:"Synthetic report query failed"});
+    if(table==="giving_summary")return send(200,{year:body.p_year,as_of:today(),period_end:`${body.p_year}-12-31`<today()?`${body.p_year}-12-31`:today(),prior_period_end:`${body.p_year-1}-12-31`,comparison_basis:"Synthetic empty period",annual_cash:activeReport.mismatch?"1":"0",lifetime_cash:"0",prior_cash:"0",pledged:"0",outstanding:"0",in_kind_declared:"0",yoy_delta:"0",yoy_percent:null});
     res.setHeader("Content-Range","*/0");return send(200,[]);
   }
   if(url.pathname.includes("/rpc/")){

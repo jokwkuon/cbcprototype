@@ -28,3 +28,7 @@ test('REQ-006/004: successful zero financial summary differs from failed RPC',as
  await expect(summary).toHaveCount(0);
  await expect(page.getByText('Total organizations',{exact:true})).toBeVisible();
 });
+
+for(const [table,label] of [['membership_details','Membership'],['mentorship_details','Mentorship'],['sponsor_interests','Sponsor interests'],['program_enrollments','Programs'],['activities','Recent interactions']])test(`REQ-006 ${label} failure is unavailable and recovers`,async({page,request})=>{
+ await login(page);await request.post(`${api}/__report-fixture`,{data:{failure:table}});await page.reload();await expect(page.getByRole('alert').filter({hasText:`${label} unavailable.`})).toBeVisible();await request.post(`${api}/__report-fixture`,{data:{}});await page.reload();await expect(page.getByRole('alert').filter({hasText:`${label} unavailable.`})).toHaveCount(0);
+});

@@ -23,8 +23,8 @@ test.beforeAll(async()=>{
 });
 test('REQ-013: six report categories navigate; Financial report reconciles periods, balances and Giving links',async({page})=>{
  await login(page,'finance');await page.setViewportSize({width:390,height:844});await page.getByRole('navigation',{name:'Mobile navigation'}).getByRole('link',{name:'Reports',exact:true}).click();
- for(const title of ['Executive Performance','Sponsor Relationship','Scholarship Impact','Mentorship','Membership','Financial Performance'])await expect(page.getByRole('link',{name:title,exact:true})).toBeVisible();
- for(const slug of ['executive','scholarship','mentorship','membership']){await page.goto(`/reports/${slug}`);await expect(page.getByRole('heading',{name:'Definition pending',exact:true})).toBeVisible();await expect(page.getByRole('region',{name:'Financial summary'})).toHaveCount(0);}
+ for(const title of ['Executive Performance','Sponsor Relationship','Scholarship Impact','Mentorship','Membership','Financial Performance'])await expect(page.locator('main').getByRole('link',{name:title,exact:true})).toBeVisible();
+ for(const slug of ['executive','scholarship','mentorship','membership']){await page.goto(`/reports/${slug}`);await expect(page.getByRole('heading',{name:'Verified record summary',exact:true})).toBeVisible();await expect(page.getByRole('alert').filter({hasText:'Report unavailable'})).toHaveCount(0);}
  await page.goto(`/reports/financial?year=2025&organization=${organization}`);
  for(const [label,amount] of [['Selected-period cash received','CAD 200.20'],['Lifetime Giving / cash received','CAD 300.30'],['Prior comparable cash','CAD 100.10'],['Pledged (all-time active cash commitments)','CAD 1,000.30'],['Outstanding Commitment (all-time)','CAD 700.00'],['In-kind declared value (separate)','CAD 500.00']])await expect(value(page,label)).toHaveText(amount);
  await expect(page.getByLabel('Reporting year',{exact:true})).toHaveValue('2025');await expect(page.getByLabel('Report organization',{exact:true})).toHaveValue(organization);
