@@ -1,0 +1,4 @@
+import {test} from 'node:test';import assert from 'node:assert/strict';import {parseDocument} from '../lib/document-validation.ts';import {csv} from '../lib/csv.ts';
+function form(v:Record<string,string>){const f=new FormData();for(const [k,x]of Object.entries(v))f.set(k,x);return f;}
+test('REQ-012 classification, dates and referenced IDs validate',()=>{assert.equal(parseDocument(form({name:'Synthetic',access_level:'Internal'})).name,'Synthetic');for(const v of [{access_level:'Public'},{effective_date:'2026-01-01',expiry_date:'2025-01-01'},{contact_id:'invalid'}] as Record<string,string>[])assert.throws(()=>parseDocument(form({name:'Synthetic',access_level:'Internal',...v})));});
+test('REQ-013 CSV escaping neutralizes formulas and preserves quoted text',()=>{assert.equal(csv(['Name','Value'],[['=1+1','a,"b'],[' \t@SUM(1)','0.10']]),'"Name","Value"\r\n"\'=1+1","a,""b"\r\n"\' \t@SUM(1)","0.10"\r\n');});

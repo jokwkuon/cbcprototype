@@ -1,28 +1,7 @@
-# settings
-**Status:** Unapproved specification worksheet
+# Settings — REQ-008
 
-## Purpose
-Staff roles and controlled lookup values; scope not detailed in source PDF.
+Implemented for the synthetic local board demo under provisional ADR-018; CBC acceptance remains pending. Routes: `/settings`.
 
-## UI
-- [ ] List/search or visualization
-- [ ] Detail view and/or form
-- [ ] Validation/error/empty states
+See [decision rules](../../project/decisions.md), [field matrix](../field-matrix.md), [coverage audit](../../delivery/field-coverage.csv) and [executed verification](../../delivery/progress.md). Tests: `board-completion.spec.ts`. Code presence alone is not runtime or CBC acceptance evidence.
 
-## Data model
-- [ ] Tables, keys and relationships
-- [ ] Manually entered vs derived fields
-- [ ] Historical/source information
-
-## Backend and rules
-- [ ] Operations and permissions
-- [ ] Calculations and state transitions
-- [ ] Error cases and audit expectations
-
-## Tests and acceptance
-- [ ] Synthetic scenario
-- [ ] Unit/integration/data tests
-- [ ] CBC review and sign-off
-
-## Open questions
-- TBD
+Verified current identity, role, active status, actual operational/financial permissions and sign-out. User administration and password/email changes are explicitly unavailable; no sensitive environment configuration is exposed.
