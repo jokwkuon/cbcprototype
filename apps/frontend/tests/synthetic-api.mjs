@@ -7,6 +7,8 @@ const profiles = ["admin","staff","staff","finance","viewer"].map((role,i)=>({id
 const emptyTables=()=>({organizations:[],contacts:[],activities:[],activity_contacts:[],tasks:[]});
 let tables=emptyTables();
 let failActivities=false;
+let failDashboard="";
+let emptyFinancialSummary=false;
 const port=Number(process.env.CBC_SYNTHETIC_API_PORT??54329);
 const appOrigin=process.env.CBC_SYNTHETIC_APP_ORIGIN??"http://127.0.0.1:3100";
 const today=()=>new Intl.DateTimeFormat("en-CA",{timeZone:"America/Edmonton",year:"numeric",month:"2-digit",day:"2-digit"}).format(new Date());
@@ -20,7 +22,9 @@ const server=http.createServer(async(req,res)=>{
   const send=(status,body)=>{res.writeHead(status,{"Content-Type":"application/json"});res.end(req.method==="HEAD"?undefined:JSON.stringify(body));};
   if(req.method==="OPTIONS")return send(200,{});
   let raw="";for await(const chunk of req)raw+=chunk;const body=raw?JSON.parse(raw):{};
-  if(url.pathname==="/__reset"){ tables=emptyTables(); failActivities=false; return send(200,{}); }
+  if(url.pathname==="/__reset"){ tables=emptyTables(); failActivities=false; failDashboard=""; emptyFinancialSummary=false; return send(200,{}); }
+  if(url.pathname==="/__empty-financial-summary"){emptyFinancialSummary=body.enabled===true;return send(200,{});}
+  if(url.pathname==="/__fail-dashboard"){failDashboard=body.query??"";return send(200,{});}
   if(url.pathname==="/__fail-activities"){failActivities=body.fail===true;return send(200,{});}
   if(url.pathname==="/auth/v1/token"){
     const profile=profiles.find(p=>body.email===`${p.role}${p.role==="staff"?"2":""}@example.test`);
@@ -32,8 +36,11 @@ const server=http.createServer(async(req,res)=>{
   if(url.pathname==="/auth/v1/logout")return send(200,{});
   if(!profile)return send(401,{message:"Sign in"});
   const table=url.pathname.split("/").at(-1);
+  const dashboardQuery=table==="contacts"&&req.method==="HEAD"?"contacts":table==="organizations"?(req.method==="HEAD"?"organizations":url.searchParams.get("select")==="relationship_status"?"statuses":url.searchParams.get("limit")==="5"?"recent":""):"";
+  if(failDashboard&&dashboardQuery===failDashboard)return send(500,{message:"Synthetic dashboard failure"});
   if(failActivities&&(["activities","activity_contacts","tasks","follow_ups","activity_today","activity_last_contact","save_activity"].includes(table)))return send(500,{message:"Synthetic activity query failure"});
   if(url.pathname.includes("/rpc/")){
+    if(table==="giving_summary"&&emptyFinancialSummary)return send(200,{year:body.p_year,period_end:today(),comparison_basis:"Synthetic empty calendar year",annual_cash:"0",lifetime_cash:"0",prior_cash:"0",pledged:"0",outstanding:"0",in_kind_declared:"0",yoy_delta:"0",yoy_percent:null});
     if(table==="activity_today")return send(200,today());
     if(table==="activity_last_contact"){
       const target=tables.activities.find(a=>a.id===body.p_activity_id),targetContacts=tables.activity_contacts.filter(c=>c.activity_id===target?.id).map(c=>c.contact_id);

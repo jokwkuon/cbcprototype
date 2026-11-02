@@ -35,3 +35,5 @@ await (await import('./seed-giving.mjs')).seedGiving();
 console.log('Seeded five contributions, four receipt records, two typed initiative references and one synthetic document link.');
 await (await import('./seed-interests.mjs')).seedInterests();
 console.log('Seeded one Sponsor Interest, a distinct opportunity reference, two linked discussions, one program alignment and three existing follow-up links.');
+await (await import('./seed-programs.mjs')).seedPrograms();
+console.log('Seeded two operational programs, three cohorts, two recipients and four enrollments with repeated identity, unknown support and unknown outcomes.');

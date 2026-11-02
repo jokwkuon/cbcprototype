@@ -1,0 +1,75 @@
+\set ON_ERROR_STOP on
+-- REQ-010/002/006/008: disposable synthetic fixtures and actual PostgreSQL enforcement.
+create function pg_temp.assert_true(ok boolean,label text) returns void language plpgsql as $$ begin if ok is not true then raise exception 'FAIL: %',label; end if; end $$;
+create function pg_temp.expect_error(statement text,expected text,label text) returns void language plpgsql as $$ begin begin execute statement; exception when others then if sqlstate=expected then return; end if; raise exception 'FAIL: % expected %, received %',label,expected,sqlstate; end; raise exception 'FAIL: % unexpectedly allowed',label; end $$;
+select set_config('request.jwt.claim.sub','10000000-0000-4000-8000-000000000001',false);
+set role authenticated;
+insert into public.organizations(id,name) values('95000000-0000-4000-8000-000000000001','Synthetic Education Institution'),('95000000-0000-4000-8000-000000000002','Synthetic Other Institution');
+insert into public.contacts(id,organization_id,first_name,last_name) values('96000000-0000-4000-8000-000000000001','95000000-0000-4000-8000-000000000001','Synthetic','Program Contact');
+insert into public.programs(id,name,funding_program_id) values('90000000-0000-4000-8000-000000000001','Synthetic Program One','70000000-0000-4000-8000-000000000001'),('90000000-0000-4000-8000-000000000002','Synthetic Program Two',null);
+insert into public.program_cohorts(id,program_id,label,year) values('91000000-0000-4000-8000-000000000001','90000000-0000-4000-8000-000000000001','Synthetic Cohort One',2024),('91000000-0000-4000-8000-000000000002','90000000-0000-4000-8000-000000000001','Synthetic Cohort Two',2025),('91000000-0000-4000-8000-000000000003','90000000-0000-4000-8000-000000000002','Synthetic Cohort Three',null);
+insert into public.program_recipients(id,name,contact_id,organization_id,alumni_since) values('92000000-0000-4000-8000-000000000001',null,'96000000-0000-4000-8000-000000000001','95000000-0000-4000-8000-000000000001','2024-01-01'),('92000000-0000-4000-8000-000000000002','Synthetic Standalone Recipient',null,null,null);
+insert into public.program_enrollments(id,program_id,cohort_id,recipient_id,support_amount,education_level,institution,field_of_study,graduation_status,graduation_date,employment_status,employment_field) values
+('93000000-0000-4000-8000-000000000001','90000000-0000-4000-8000-000000000001','91000000-0000-4000-8000-000000000001','92000000-0000-4000-8000-000000000001',0.10,'Synthetic Post-Secondary','Synthetic College','Synthetic Discipline','Graduated','2024-01-01','Employed','Synthetic Employment'),
+('93000000-0000-4000-8000-000000000002','90000000-0000-4000-8000-000000000001','91000000-0000-4000-8000-000000000002','92000000-0000-4000-8000-000000000001',0.20,null,null,null,null,null,null,null),
+('93000000-0000-4000-8000-000000000003','90000000-0000-4000-8000-000000000001','91000000-0000-4000-8000-000000000001','92000000-0000-4000-8000-000000000002',null,null,null,null,null,null,null,null),
+('93000000-0000-4000-8000-000000000004','90000000-0000-4000-8000-000000000002','91000000-0000-4000-8000-000000000003','92000000-0000-4000-8000-000000000001',5,null,null,null,null,null,null,null);
+select pg_temp.assert_true((public.program_summary('90000000-0000-4000-8000-000000000001')->>'participants')::int=2 and (public.program_summary('90000000-0000-4000-8000-000000000001')->>'enrollments')::int=3,'distinct people across repeated cohorts; enrollments separate');
+select pg_temp.assert_true((public.program_summary('90000000-0000-4000-8000-000000000001')->>'known_support')::numeric=0.30 and (public.program_summary('90000000-0000-4000-8000-000000000001')->>'unknown_support_count')::int=1,'exact decimal support; unknown preserved');
+select pg_temp.assert_true((public.program_summary(null,'91000000-0000-4000-8000-000000000001')->>'enrollments')::int=2 and (public.program_summary(null,'91000000-0000-4000-8000-000000000001')->>'known_support')::numeric=0.10,'cohort filter isolation');
+select pg_temp.assert_true((public.program_summary()->>'participants')::int=2 and (public.program_summary()->>'enrollments')::int=4 and (public.program_summary()->>'known_support')::numeric=5.30,'global summary deduplicates recipient identity across programs');
+select pg_temp.assert_true((public.program_summary('90000000-0000-4000-8000-000000000002','91000000-0000-4000-8000-000000000001')->>'enrollments')::int=0 and public.program_summary('90000000-0000-4000-8000-000000000002','91000000-0000-4000-8000-000000000001')->>'known_support' is null,'empty scoped amount stays no known amount');
+select pg_temp.assert_true(not public.program_summary() ? 'graduation_rate' and not public.program_summary() ? 'employed_in_field','no unsupported outcome percentage');
+select pg_temp.assert_true((select graduation_status is null and employment_status is null from public.program_enrollment_details where id='93000000-0000-4000-8000-000000000002'),'unknown outcomes are not failure or success');
+select pg_temp.assert_true((select recipient_name='Synthetic Program Contact' and cohort_year=2024 and institution='Synthetic College' and field_of_study='Synthetic Discipline' and graduation_date='2024-01-01' and employment_field='Synthetic Employment' from public.program_enrollment_details where id='93000000-0000-4000-8000-000000000001'),'manual education/outcome mappings and live contact identity');
+select pg_temp.assert_true((select alumni_cash is null and recorded_interactions is null and last_contact is null from public.program_recipient_details where id='92000000-0000-4000-8000-000000000002'),'unlinked identity has no invented giving or interaction zero');
+select pg_temp.assert_true((select alumni_cash::numeric=0 and recorded_interactions=0 and last_contact is null from public.program_recipient_details where id='92000000-0000-4000-8000-000000000001'),'explicit alumni/contact with no eligible records has verified zero');
+insert into public.activities(id,organization_id,occurred_at,activity_type) values('97000000-0000-4000-8000-000000000001','95000000-0000-4000-8000-000000000001','2023-01-01','Synthetic Call'),('97000000-0000-4000-8000-000000000002','95000000-0000-4000-8000-000000000001','2099-01-01','Synthetic Future'),('97000000-0000-4000-8000-000000000003','95000000-0000-4000-8000-000000000001','2025-01-01','Synthetic Unrelated');
+insert into public.activity_contacts values('97000000-0000-4000-8000-000000000001','96000000-0000-4000-8000-000000000001'),('97000000-0000-4000-8000-000000000002','96000000-0000-4000-8000-000000000001');
+select pg_temp.assert_true((select last_contact='2023-01-01' and recorded_interactions=1 from public.program_recipient_details where id='92000000-0000-4000-8000-000000000001'),'engagement and last contact ignore future and unlinked organization interactions');
+insert into public.contributions(id,organization_id,contact_id,contribution_date,amount,contribution_type) values('98000000-0000-4000-8000-000000000001','95000000-0000-4000-8000-000000000001','96000000-0000-4000-8000-000000000001','2020-01-01',999,'Cash');
+insert into public.cash_receipts(contribution_id,received_on,amount,is_void,void_reason) values('98000000-0000-4000-8000-000000000001','2023-12-31',5,false,null),('98000000-0000-4000-8000-000000000001','2024-01-01',0.10,false,null),('98000000-0000-4000-8000-000000000001','2025-01-01',0.20,false,null),('98000000-0000-4000-8000-000000000001','2025-01-01',99,true,'Synthetic correction');
+select pg_temp.assert_true((select alumni_cash::numeric=0.30 from public.program_recipient_details where id='92000000-0000-4000-8000-000000000001'),'alumni cash inclusive effective date; excludes pre-alumni and void cash; never pledge');
+select pg_temp.assert_true((public.program_summary('90000000-0000-4000-8000-000000000001')->>'known_support')::numeric=0.30,'giving never changes declared program support');
+select pg_temp.expect_error($q$insert into public.programs(name,funding_program_id) values('Synthetic invalid','70000000-0000-4000-8000-000000000002')$q$,'23503','Event cannot align as Program');
+select pg_temp.expect_error($q$update public.program_enrollments set program_id='90000000-0000-4000-8000-000000000002' where id='93000000-0000-4000-8000-000000000001'$q$,'23503','cross-program cohort rejected');
+select pg_temp.expect_error($q$update public.program_cohorts set program_id='90000000-0000-4000-8000-000000000002' where id='91000000-0000-4000-8000-000000000001'$q$,'23503','enrolled cohort cannot reparent behind enrollment');
+select pg_temp.expect_error($q$insert into public.program_enrollments(program_id,cohort_id,recipient_id) values('90000000-0000-4000-8000-000000000001','91000000-0000-4000-8000-000000000001','92000000-0000-4000-8000-000000000001')$q$,'23505','duplicate recipient in cohort rejected');
+select pg_temp.expect_error($q$insert into public.program_recipients(name,contact_id) values('Synthetic duplicate','96000000-0000-4000-8000-000000000001')$q$,'23505','linked contact identity not duplicated');
+select pg_temp.expect_error($q$update public.program_recipients set organization_id='95000000-0000-4000-8000-000000000002' where id='92000000-0000-4000-8000-000000000001'$q$,'23503','recipient contact must belong to explicit organization');
+select pg_temp.expect_error($q$update public.contacts set organization_id='95000000-0000-4000-8000-000000000002' where id='96000000-0000-4000-8000-000000000001'$q$,'23503','linked explicit affiliation prevents contact reparenting');
+select pg_temp.expect_error($q$insert into public.program_recipients(name) values('  ')$q$,'23514','recipient requires name or contact');
+select pg_temp.expect_error($q$update public.program_recipients set alumni_since='2099-01-01' where id='92000000-0000-4000-8000-000000000001'$q$,'23514','future alumni marker rejected');
+select pg_temp.expect_error($q$update public.program_cohorts set year=0 where id='91000000-0000-4000-8000-000000000001'$q$,'23514','invalid cohort year rejected');
+select pg_temp.expect_error($q$update public.program_enrollments set support_amount=-1 where id='93000000-0000-4000-8000-000000000001'$q$,'23514','negative support rejected');
+select pg_temp.expect_error($q$update public.program_enrollments set support_amount='NaN' where id='93000000-0000-4000-8000-000000000001'$q$,'23514','nonfinite support rejected');
+select pg_temp.expect_error($q$update public.program_enrollments set support_amount=0.001 where id='93000000-0000-4000-8000-000000000001'$q$,'23514','subcent support rejected');
+select pg_temp.expect_error($q$update public.program_enrollments set currency='USD' where id='93000000-0000-4000-8000-000000000001'$q$,'23514','no implicit FX conversion');
+select pg_temp.expect_error($q$update public.program_enrollments set id=gen_random_uuid() where id='93000000-0000-4000-8000-000000000001'$q$,'23514','immutable identity');
+create temp table enrollment_time as select created_at from public.program_enrollments where id='93000000-0000-4000-8000-000000000001';
+select set_config('request.jwt.claim.sub','10000000-0000-4000-8000-000000000002',false);
+update public.program_enrollments set graduation_status='Manual review pending',created_at='1900-01-01',updated_at='1900-01-01' where id='93000000-0000-4000-8000-000000000001';
+select pg_temp.assert_true((select e.created_at=t.created_at and updated_at>'2020-01-01' and graduation_status='Manual review pending' from public.program_enrollments e cross join enrollment_time t where id='93000000-0000-4000-8000-000000000001'),'Staff edits manual outcomes; preserves server metadata');
+update public.program_recipients set organization_id=null where id='92000000-0000-4000-8000-000000000001';
+select pg_temp.assert_true((select linked_organization_id='95000000-0000-4000-8000-000000000001' from public.program_recipient_details where id='92000000-0000-4000-8000-000000000001'),'unselected organization inherits linked contact affiliation');
+select pg_temp.expect_error($q$delete from public.program_enrollments where id='93000000-0000-4000-8000-000000000001'$q$,'42501','Staff cannot hard delete');
+select set_config('request.jwt.claim.sub','10000000-0000-4000-8000-000000000004',false);
+select pg_temp.assert_true((select count(*)=4 from public.program_enrollment_details),'Finance reads program data');
+select pg_temp.expect_error($q$insert into public.programs(name) values('Denied')$q$,'42501','Finance cannot create operational programs');
+with changed as(update public.program_enrollments set notes='Denied' returning *) select pg_temp.assert_true((select count(*)=0 from changed),'Finance cannot edit support');
+select set_config('request.jwt.claim.sub','10000000-0000-4000-8000-000000000005',false);
+select pg_temp.assert_true((public.program_summary()->>'participants')::int=2,'Viewer reads actual aggregate');
+select pg_temp.expect_error($q$insert into public.program_recipients(name) values('Denied')$q$,'42501','Viewer cannot create recipient');
+with changed as(update public.program_cohorts set label='Denied' returning *) select pg_temp.assert_true((select count(*)=0 from changed),'Viewer cannot edit cohort');
+select set_config('request.jwt.claim.sub','10000000-0000-4000-8000-000000000006',false);
+select pg_temp.assert_true((select count(*)=0 from public.program_enrollment_details),'inactive cannot read');
+select pg_temp.expect_error($q$select public.program_summary()$q$,'42501','inactive cannot aggregate');
+select pg_temp.expect_error($q$insert into public.programs(name) values('Denied')$q$,'42501','inactive cannot write');
+select set_config('request.jwt.claim.sub','10000000-0000-4000-8000-000000000001',false);
+select pg_temp.expect_error($q$delete from public.programs$q$,'42501','Admin cannot hard delete programs');
+select pg_temp.expect_error($q$delete from public.program_recipients$q$,'42501','Admin cannot hard delete recipients');
+select pg_temp.expect_error($q$delete from public.program_cohorts$q$,'42501','Admin cannot hard delete cohorts');
+reset role; set role anon;
+select pg_temp.expect_error($q$select * from public.program_enrollment_details$q$,'42501','anonymous cannot read');
+select pg_temp.expect_error($q$select public.program_summary()$q$,'42501','anonymous cannot aggregate');
+reset role;

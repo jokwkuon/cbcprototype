@@ -36,6 +36,7 @@ async function saveRecord(kind: "organization" | "contact", editing: boolean, fo
   revalidatePath("/contacts", "layout");
   revalidatePath("/dashboard");
   revalidatePath("/interests", "layout");
+  revalidatePath("/programs", "layout");
   redirect(`/${plural}/${id}`);
 }
 export async function createOrganization(_state: FormState, form: FormData) { return saveRecord("organization", false, form); }
