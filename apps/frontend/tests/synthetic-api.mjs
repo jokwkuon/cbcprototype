@@ -9,6 +9,7 @@ let tables=emptyTables();
 let failActivities=false;
 let failDashboard="";
 let emptyFinancialSummary=false;
+let reportFixture=null;
 const port=Number(process.env.CBC_SYNTHETIC_API_PORT??54329);
 const appOrigin=process.env.CBC_SYNTHETIC_APP_ORIGIN??"http://127.0.0.1:3100";
 const today=()=>new Intl.DateTimeFormat("en-CA",{timeZone:"America/Edmonton",year:"numeric",month:"2-digit",day:"2-digit"}).format(new Date());
@@ -22,7 +23,8 @@ const server=http.createServer(async(req,res)=>{
   const send=(status,body)=>{res.writeHead(status,{"Content-Type":"application/json"});res.end(req.method==="HEAD"?undefined:JSON.stringify(body));};
   if(req.method==="OPTIONS")return send(200,{});
   let raw="";for await(const chunk of req)raw+=chunk;const body=raw?JSON.parse(raw):{};
-  if(url.pathname==="/__reset"){ tables=emptyTables(); failActivities=false; failDashboard=""; emptyFinancialSummary=false; return send(200,{}); }
+  if(url.pathname==="/__reset"){ tables=emptyTables(); failActivities=false; failDashboard=""; emptyFinancialSummary=false; reportFixture=null; return send(200,{}); }
+  if(url.pathname==="/__report-fixture"){reportFixture=body;return send(200,{});}
   if(url.pathname==="/__empty-financial-summary"){emptyFinancialSummary=body.enabled===true;return send(200,{});}
   if(url.pathname==="/__fail-dashboard"){failDashboard=body.query??"";return send(200,{});}
   if(url.pathname==="/__fail-activities"){failActivities=body.fail===true;return send(200,{});}
@@ -39,6 +41,13 @@ const server=http.createServer(async(req,res)=>{
   const dashboardQuery=table==="contacts"&&req.method==="HEAD"?"contacts":table==="organizations"?(req.method==="HEAD"?"organizations":url.searchParams.get("select")==="relationship_status"?"statuses":url.searchParams.get("limit")==="5"?"recent":""):"";
   if(failDashboard&&dashboardQuery===failDashboard)return send(500,{message:"Synthetic dashboard failure"});
   if(failActivities&&(["activities","activity_contacts","tasks","follow_ups","activity_today","activity_last_contact","save_activity"].includes(table)))return send(500,{message:"Synthetic activity query failure"});
+  if(reportFixture?.failure===table)return send(500,{message:"Synthetic report query failed"});
+  if(reportFixture&&["giving_summary","contribution_details","giving_receipts"].includes(table)){
+    if(table==="giving_summary"&&reportFixture.delay)await new Promise(resolve=>setTimeout(resolve,reportFixture.delay));
+    if(reportFixture.failure===table)return send(500,{message:"Synthetic report query failed"});
+    if(table==="giving_summary")return send(200,{year:body.p_year,as_of:today(),period_end:`${body.p_year}-12-31`<today()?`${body.p_year}-12-31`:today(),prior_period_end:`${body.p_year-1}-12-31`,comparison_basis:"Synthetic empty period",annual_cash:reportFixture.mismatch?"1":"0",lifetime_cash:"0",prior_cash:"0",pledged:"0",outstanding:"0",in_kind_declared:"0",yoy_delta:"0",yoy_percent:null});
+    res.setHeader("Content-Range","*/0");return send(200,[]);
+  }
   if(url.pathname.includes("/rpc/")){
     if(table==="giving_summary"&&emptyFinancialSummary)return send(200,{year:body.p_year,period_end:today(),comparison_basis:"Synthetic empty calendar year",annual_cash:"0",lifetime_cash:"0",prior_cash:"0",pledged:"0",outstanding:"0",in_kind_declared:"0",yoy_delta:"0",yoy_percent:null});
     if(table==="activity_today")return send(200,today());

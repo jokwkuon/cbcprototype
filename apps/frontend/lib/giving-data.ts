@@ -1,3 +1,4 @@
+import { readAll } from "./read-all";
 import { crmContext } from "./crm-context";
 import { validId } from "./crm-validation";
 import { contributionTypes,fundingStatuses } from "./giving-validation";
@@ -7,11 +8,12 @@ export type Receipt={id:string;contribution_id:string;received_on:string;amount:
 export type GivingSummary={year:number;as_of:string;period_end:string;prior_period_end:string;annual_cash:string;prior_cash:string;lifetime_cash:string;pledged:string;outstanding:string;in_kind_declared:string;yoy_delta:string;yoy_percent:string|null;comparison_basis:string};
 export async function financeContext(){const ctx=await crmContext();return {...ctx,financialWriter:["admin","finance"].includes(ctx.profile.role)};}
 type Client=Awaited<ReturnType<typeof crmContext>>["client"];
-export async function contributions(client:Client,filter?:{organization?:string;contact?:string;id?:string}) {
- let q=client.from("contribution_details").select("*").order("contribution_date",{ascending:false}).order("id");
+export async function contributions(client:Client,filter?:{organization?:string;contact?:string;id?:string},complete=false) {
+ let q=client.from("contribution_details").select("*",complete?{count:"exact"}:undefined).order("contribution_date",{ascending:false}).order("id");
  if(filter?.organization) q=q.eq("organization_id",filter.organization);
  if(filter?.contact) q=q.eq("contact_id",filter.contact);
  if(filter?.id) {if(!validId(filter.id)) return [];q=q.eq("id",filter.id);}
+ if(complete) return await readAll<Contribution>((from,to)=>q.range(from,to));
  const {data,error}=await q;if(error) throw new Error("Giving data unavailable. No failed query is reported as zero revenue.");return (data??[]) as Contribution[];
 }
 export async function givingSummary(client:Client,year:number,filter?:{organization?:string;contact?:string}) {
