@@ -12,6 +12,7 @@ The repository began as a planning scaffold for Calgary Black Chambers (CBC) and
 - Sponsor Interests: priorities, explicit program/discussion/opportunity/task links, inherited restricted owner and Admin archive/restore.
 - Programs & Recipients: program/cohort/recipient/enrollment create/detail/edit, education and manual outcomes, scoped distinct participant/enrollment counts and exact known support totals. Linked-contact interactions, Last Contact and explicitly eligible person-wide alumni giving are supported. Program/cohort filters normalize on the server and clear incompatible cohorts in the browser.
 - Dashboard: basic CRM counts/status/recent records, action queue and giving summary. Failed queries display unavailable states; successful zero counts remain zero.
+- Reports: six reachable categories; Financial Performance reuses verified Giving summaries with calendar-year cash and organization filters, reconciled receipt/balance detail and Giving links. Sponsor Relationship shows recorded agreement/renewal dates, interactions and opportunity links without inferred pipeline/risk metrics. Four other categories and unsupported metrics remain explicitly pending.
 
 Permissions are enforced in the database as well as the UI. Verification uses synthetic fixtures and real **local** Supabase Auth/PostgREST; it does not establish hosted deployment or CBC acceptance.
 
@@ -19,9 +20,9 @@ Permissions are enforced in the database as well as the UI. Verification uses sy
 
 The [133-row field audit](docs/delivery/field-coverage.csv) records **90 represented fields**, **88 with verified working demo behavior**, including **one partial field**, and **19 calculated fields** (an overlapping subset). Thus 87 fields are fully functional within the documented demo scope. **46 fields have deferred whole-field behavior**: 43 absent, two placeholders and one partial classification. Other limitations, including manual renewal instead of automation, are recorded separately.
 
-Mentorship, Membership, Documents, Reports and Settings remain unavailable as full navigation destinations. Six report categories and much of the specified executive dashboard still need representation. Global search, importer, email/calendar integrations, full audit history, production financial reconciliation and approved outcome/health/risk calculations remain deferred. Document links do not provide file storage or enforce access to external files.
+Mentorship, Membership, Documents and Settings remain unavailable as full navigation destinations. Four report categories have pending pages; Financial Performance and Sponsor Relationship provide supported record/summary subsets, with event ROI/pipeline/renewal rates/export pending. Much of the specified executive dashboard remains incomplete. Global search, importer, email/calendar integrations, full audit history, production financial reconciliation and approved outcome/health/risk calculations remain deferred. Document links do not provide file storage or enforce access to external files.
 
-See [current verification, counting definitions and blockers](docs/delivery/progress.md#current-field-audit). The 133 detailed fields exclude directory-only metrics, dashboard panels, reports and Settings; 90/133 is not whole-board completion.
+See [current verification, counting definitions and blockers](docs/delivery/progress.md#reports-foundation). The 133 detailed fields exclude directory-only metrics, dashboard panels, reports and Settings; 90/133 is not whole-board completion.
 
 ## Run and verify locally
 
@@ -37,7 +38,7 @@ node scripts/demo/run.mjs
 
 These helpers target the isolated local synthetic environment. Generated credentials stay in ignored, permission-restricted `.local/cbc-demo` files; never copy them into tracked files. Do not apply migrations to an existing hosted project without operator review and separate authorization.
 
-Verification: frontend `npm test`, `npm run typecheck`, `npm run lint`, production build, `npm run test:e2e` and `npm run test:integration`; root `node scripts/demo/verify-database.mjs`, `verify-api.mjs`, `verify-giving.mjs`, `verify-interests.mjs` and `verify-programs.mjs`. Browser suites rebuild the production app and must run sequentially. Required browser-runtime setup and exact executed results are in the linked delivery notes.
+Verification: frontend `npm test`, `npm run typecheck`, `npm run lint`, production build, `npm run test:e2e` and `npm run test:integration`; root `node scripts/demo/verify-database.mjs`, `verify-api.mjs`, `verify-giving.mjs`, `verify-interests.mjs`, `verify-programs.mjs` and `verify-reports.mjs`. Browser suites rebuild the production app and must run sequentially. Required browser-runtime setup and exact executed results are in the linked delivery notes.
 
 ## Planning and traceability
 

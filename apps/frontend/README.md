@@ -109,3 +109,10 @@ Apply the sixth canonical migration only to the local demo using the guarded hel
 The existing Programs slice provides programs, cohorts, recipients and enrollments, with shared forms, role restrictions, manual outcomes, exact support and linked-contact evidence under provisional ADR-014. Run `node scripts/demo/verify-programs.mjs` from the root for 68 real local API checks. The complete integration browser suite now has 17 scenarios, including program-switch/cohort-reset and direct-URL normalization. Fixture regressions have 15 scenarios, including independent CRM query failures, successful empty data, recovery and zero cash versus failed financial summary. `npm test` has 19 validation tests.
 
 Apply/seed only the guarded isolated local environment before running these suites. The source-only fixtures lack Programs endpoints; Programs workflows use real local Auth/PostgREST. Runtime tools under `/tmp` may need restoration after a session reset; run browser suites sequentially. Manual CBC demonstration, provisional-rule approval, full audit history, absent modules and hosted rollout remain pending.
+
+
+## Reports foundation — REQ-013/004/006/008
+
+Reports navigation reaches all six categories. `/reports/financial` reuses Giving summaries, exact complete record reads and source links; cash-year/organization filters do not turn all-time balances into historical snapshots. Sponsor Relationship provides manual agreement/renewal dates, linked interactions and opportunity references; pipeline/risk/renewal-rate metrics remain pending. Four other categories and event ROI/export remain explicitly pending. No migrations or permission changes are required.
+
+From the root, `node scripts/demo/verify-reports.mjs` runs 70 actual local report API checks after the existing named seed. Frontend report unit tests cover filters, exact cents and complete/paged failure handling; real-browser tests use isolated synthetic report records, while the fixture suite forces errors and slow loading. See [latest executed counts and limitations](../../docs/delivery/progress.md#reports-foundation). CBC report approval and manual demonstration remain pending.

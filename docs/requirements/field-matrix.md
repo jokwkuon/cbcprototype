@@ -227,16 +227,16 @@ These entries supplement the field guides; aliases reuse their field rows rather
 
 ## Reports — physical p.19, REQ-013
 
-Each report is a missing page/workflow. All outputs are calculated/read-only, proposed queries over the named domains; validation C applies to every output. Output schema, filters, export format and metric definitions are not specified beyond these categories and require approval. Proposed UI: `/reports` with a Run Report action per category, explicit pending definitions, and synthetic preview. No report query/table/route exists.
+All six source categories now have reachable pages under `/reports`; Financial Performance uses the existing ADR-012 Giving queries under ADR-015. No invented report formulas or new schema/policies. Read-only report output is separate from the 133 detailed database fields. See [current evidence](../delivery/progress.md#reports-foundation).
 
-| Report | Specified output fields/topics | Proposed database sources | Type | Status |
+| Report | Specified output fields/topics | Database sources | Type | Status |
 |---|---|---|---|---|
-| Executive Performance | Funding; sponsorship; membership; program KPIs | giving, organizations, memberships, enrollments | aggregate measures | Missing |
-| Sponsor Relationship | Pipeline; renewals; interactions; opportunities | opportunities, agreements, activities | money/date/history | Missing |
-| Scholarship Impact | Awards; graduation; employment; alumni engagement | enrollments, outcomes, engagement | money/count/percent/history | Missing |
-| Mentorship | Pairings; check-ins; satisfaction; at-risk relationships | pairs, checkins, feedback | count/score/classification | Missing |
-| Membership | Growth; retention; engagement; renewal risk | memberships, engagement | count/percent/score/classification | Missing |
-| Financial | Revenue; commitments; giving history; event ROI | receipts, commitments, contributions, event costs | money/history/ratio | Missing |
+| Executive Performance | Funding; sponsorship; membership; program KPIs | proposed domain queries | aggregate measures | Reachable pending page; calculations deferred |
+| Sponsor Relationship | Pipeline; renewals; interactions; opportunities | contribution_details; organization-linked activities; opportunity references | money/date/history | Manual agreements/renewals, interactions and reference links functional locally; pipeline/rates/risk pending |
+| Scholarship Impact | Awards; graduation; employment; alumni engagement | proposed domain queries | money/count/percent/history | Reachable pending page; calculations deferred |
+| Mentorship | Pairings; check-ins; satisfaction; at-risk relationships | locked draft, no operational query | count/score/classification | Reachable pending page; calculations deferred |
+| Membership | Growth; retention; engagement; renewal risk | locked draft, no operational query | count/percent/score/classification | Reachable pending page; calculations deferred |
+| Financial Performance (source Financial) | Received cash; commitments; giving history; event ROI | giving_summary; contribution_details; giving_receipts | money/history/ratio | Cash/balances/history locally implemented and reconciled; year cash/org filters; event ROI/export pending |
 
 ## Executive dashboard — physical p.20, REQ-006
 
@@ -265,7 +265,7 @@ All mappings below are proposed queries/configuration; every display is missing 
 
 ## Navigation and controls
 
-Physical pages 1,3–20 show Dashboard, Organizations, Contacts, Giving, Activities, Interests, Programs, Mentorship, Membership, Documents, Reports and Settings. Dashboard, Organizations, Contacts, Activities & Follow-Ups, Sponsorship & Giving and Sponsor Interests now have routes; six other destinations remain inert “Soon” labels. Settings has **no field specification**: user/role and lookup editors are proposals requiring REQ-008 and CBC definition, not inferred PDF requirements. Proposed `/settings` must show this limitation.
+Physical pages 1,3–20 show Dashboard, Organizations, Contacts, Giving, Activities, Interests, Programs, Mentorship, Membership, Documents, Reports and Settings. Dashboard, Organizations, Contacts, Activities & Follow-Ups, Sponsorship & Giving, Sponsor Interests, Programs & Recipients and Reports now have routes; Mentorship, Membership, Documents and Settings remain inert “Soon” labels. Settings has **no field specification**: user/role and lookup editors are proposals requiring REQ-008 and CBC definition, not inferred PDF requirements. Proposed `/settings` must show this limitation.
 
 Directory illustrations include Search and Add New. Organizations/Contacts have code for local directory search and create; global header search is now disabled and labeled unavailable. Activities has purpose/type/organization search, status filtering and forms. Giving and Sponsor Interests have list/create/detail/edit; Interests adds search and an archive filter. Other module searches/forms remain missing. Reports' Add New meaning is undefined. Dashboard Export Report is absent and needs format/access approval. No invented Settings fields or KPI formulas are approved by this inventory.
 

@@ -10,7 +10,7 @@
 | Mentorship | pairing and check-in view | pair health, check-ins, satisfaction | Later |
 | Membership | members, renewals | membership status and engagement | Later |
 | Documents | uploaded files and links | version/access controls | Later |
-| Reports & Executive Dashboard | KPIs and report views | aggregates and report filters | MVP subset |
+| Reports & Executive Dashboard — REQ-013/006 | six Reports destinations; Financial Performance and Sponsor Relationship subsets; partial dashboard | existing Giving summaries, manual renewals/interactions/opportunity links; unsupported report formulas pending | Local verified subset; CBC acceptance pending |
 | Settings | user roles and categories | TBD; menu item is not fully specified | Conditional |
 
 The source PDF includes nine detailed database modules, reports and executive dashboard. This table does not claim every screen is approved for the student MVP.

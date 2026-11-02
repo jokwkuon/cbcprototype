@@ -1,6 +1,6 @@
 # Board-demo checklist and acceptance tests
 
-Status: local automated verification now includes Programs & Recipients and review regressions (2026-11-01); see each executed evidence section below. Planned scenarios are the full-demo target; manual CBC demonstration/acceptance remains pending. Extends [acceptance](acceptance.md) without claiming its gates passed. Field-level coverage is in the [matrix](../requirements/field-matrix.md); implementation order and evidence are in [progress](progress.md). Use synthetic people, organizations, transactions and files only.
+Status: local automated verification now includes Reports foundation, Financial Performance and Sponsor Relationship (2026-11-01–02); see each executed evidence section below. Planned scenarios are the full-demo target; manual CBC demonstration/acceptance remains pending. Extends [acceptance](acceptance.md) without claiming its gates passed. Field-level coverage is in the [matrix](../requirements/field-matrix.md); implementation order and evidence are in [progress](progress.md). Use synthetic people, organizations, transactions and files only.
 
 ## Demo readiness
 
@@ -137,3 +137,24 @@ REQ-010/002/006/008; provisional ADR-014, CBC approval pending. [Current evidenc
 - [ ] Any separately authorized hosted deployment and instructor/production approvals.
 
 Suggested Programs walkthrough: use synthetic Staff to create/edit a program/cohort/recipient/enrollment; show repeated cohorts, unknown support and manual outcomes; switch program after selecting a cohort and show the cleared filter and matching summary; open an incompatible direct URL; show linked contact interactions and explicit person-wide alumni cash; demonstrate Finance/Viewer read-only behavior and the pending alignment/rate labels. Record reviewer/date/commit/environment/results/approval reference. Nothing here authorizes hosted changes or source-document publication.
+
+
+## Reports foundation / Financial Performance — REQ-013/004/006/008
+
+Current evidence is recorded in [progress](progress.md#reports-foundation). Detailed-field totals remain 90/133 represented; Reports output/navigation is outside that denominator.
+
+- [x] AT-13 representation subset: all six named categories reachable from Reports and shared desktop/mobile navigation. Financial Performance and Sponsor Relationship have supported subsets; four categories show topics and Definition pending without invented values.
+- [x] AT-05/12/13 subset: exact received cash versus active Cash pledged/outstanding, lifetime/prior/comparable-year summaries, in-kind separation, period ledger, source Giving links and organization scopes verified locally. Changing cash year preserves all-time current balances; void receipts are excluded.
+- [x] AT-14: existing Admin/Finance/Staff/Viewer read access and financial write boundaries preserved; anonymous/inactive denial verified. No policy/grant/schema change or report editing control.
+- [x] AT-16: SQL/API/validation/browser checks cover reconciliation, filters, real pagination, successful empty data, loading, invalid queries and forced failures/recovery. Exact final counts in progress; screenshots/traces remain disabled.
+- [ ] AT-13 complete: four report categories still pending outputs; Sponsor pipeline/renewal metrics and Financial event ROI/export and broader executive dashboard remain deferred.
+- [ ] Synthetic manual CBC walkthrough and named sign-off; automated browser evidence is not this manual gate.
+
+Suggested walkthrough: select a synthetic organization with a prior-year pledge and receipts in two years; compare each selected-period receipt ledger to cash received and open a Giving detail. Change year and show that all-time pledged/outstanding values do not change; demonstrate void exclusion, in-kind separation and zero-baseline behavior. Select an empty organization and an empty receipt period; show explicit unavailable/loading states in the synthetic failure fixture. Open all five pending report categories and explain missing definitions. Demonstrate Staff/Viewer read access with existing Giving edit controls absent; record reviewer/date/commit/environment/results/approval reference.
+
+
+Sponsor Relationship continuation checklist:
+
+- [x] Select an organization explicitly; show manual agreement/renewal dates, linked interactions and opportunity reference links. Future renewal dates remain planning metadata, never cash or automatic scheduling.
+- [x] All four active reader roles, source navigation links, empty groups, invalid organization and failed contribution/activity/opportunity queries with recovery are covered by local automated checks.
+- [ ] Approve sponsor eligibility, pipeline/risk/renewal-rate rules and estimate currency before implementing those calculations. Manually demonstrate and obtain named CBC acceptance of the supported record subset.

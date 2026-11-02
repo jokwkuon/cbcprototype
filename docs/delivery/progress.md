@@ -1,6 +1,57 @@
 # Board-demo progress and prioritized plan
 
-Updated 2026-11-01 on `feature/mvp-foundation`. Programs & Recipients is now included in locally verified scope. **The complete board demo is not ready:** 90/133 detailed fields are represented; five navigation destinations and 43 detailed fields still lack module UI. See the current audit below; all earlier checkpoints and totals are historical. Source examples and live CBC records are not used.
+Updated 2026-11-02 on `feature/mvp-foundation`. Reports foundation, Financial Performance and Sponsor Relationship now join the locally verified Programs & Recipients scope. **The complete board demo is not ready:** 90/133 detailed fields are represented; four navigation destinations and 43 detailed fields still lack module UI. The six report categories are reachable; four have pending-only pages; two provide working subsets with unsupported calculations pending. See the current audit below; all earlier checkpoints and totals are historical. Source examples and live CBC records are not used.
+
+<a id="reports-foundation"></a>
+## Reports foundation, Financial Performance and Sponsor Relationship — 2026-11-01–02
+
+REQ-013/004/006/008; ADR-012 financial rules retained, ADR-015 documents presentation/verification conventions. Explicit owner request authorizes this slice on `feature/mvp-foundation`; no source PDF was reopened. No hosted/production resource, canonical migration, RLS policy or financial grant was changed. Existing users retain the same financial read/write rules.
+
+### Implemented behavior and limits
+
+`/reports` and desktop/mobile navigation link all six required categories. `/reports/financial` implements Financial Performance (source Financial); `/reports/sponsor` implements the next record-based subset after Financial verification. `/reports/executive`, `/reports/scholarship`, `/reports/mentorship` and `/reports/membership` show their specified topics with Definition pending and no preview values. This is **two functional report subsets and four pending-only categories**, not six completed reports.
+
+Financial Performance reuses the existing `giving_summary` RPC, invoker `contribution_details`/`giving_receipts` views and shared summary/table components. A selected calendar year scopes actual receipt-date cash and prior comparable cash; current year is comparable Calgary YTD and completed years are full years. Optional organization selection scopes both summary and details. Pledged/outstanding/lifetime cash/in-kind remain clearly labeled all-time current values, not historical year-end balances. Invalid/duplicate/unknown query filters produce explicit errors, not unfiltered fallback totals. Years 0002 through current year are supported; future cash periods are not offered.
+
+Period receipts exclude voids, retain source Giving links and reconcile exactly to cash received. All-time contribution details distinguish active Cash pledged amounts, planning stage, cash received, outstanding and separately declared in-kind. Prospects/cancelled stages do not create debt, while cancelled-record receipts remain cash. Giving links retain their existing role-aware edit restrictions; the report has no write controls. Year filtering does not filter all-time balances. Event ROI, accounting reconciliation/refunds, financial targets and export remain pending, without invented formulas.
+
+Complete ordered reads follow exact API counts rather than accepting the default row cap. Exact integer cents verify period/prior/lifetime cash, pledged/outstanding/in-kind and each contribution's received balance against record detail. Failed/incomplete/changing/duplicate reads or mismatched totals withhold the report with a retry/reset action. This is **not a persisted transactional snapshot**: concurrent edits can require retry. No new reporting framework or privileged endpoint is introduced.
+
+Next loading/Suspense UI contains no sample totals. Successful empty contribution scopes, empty receipt periods and zero amounts have explicit states. Failed date, organization, summary, contribution or receipt queries show Financial report unavailable, never fabricated zeroes. Auth/profile failures use existing access/error handling. The whole-board definition of done still requires a manual synthetic walkthrough and relevant CBC approval.
+
+After Financial Performance passed its complete local suite, work continued to Sponsor Relationship as requested. The report requires an explicitly selected organization; selection does not classify it as a sponsor. It shows all recorded contribution agreement/renewal dates (including future manual planning dates), explicit organization-linked activities and opportunity name/reference links. No currency estimate sum, pipeline stage/total, sponsor eligibility, renewal rate, risk score or automatic schedule is inferred. Empty/no-selection/error states and existing read restrictions are preserved. Activity, opportunity and Giving saves invalidate report displays. No new business rule or data policy is introduced.
+
+### Exact verification
+
+Financial implementation commit: `fda650b`. The initial Financial-only pass had 234 SQL assertions, 244 API checks, 23 real-browser and 22 fixture scenarios. The final combined results below include the subsequent Sponsor subset.
+
+Sponsor continuation commit: `ee5b1bc`. Documentation is committed separately.
+
+| Check | Current result |
+|---|---|
+| `npm test` | PASS: 23 tests (19 regressions + 4 report period/exact-money/pagination/failure tests) |
+| Typecheck and lint | PASS |
+| Production build | PASS within both browser suites, using explicit synthetic/local public settings |
+| `node scripts/demo/verify-database.mjs` | PASS: 237 SQL assertions (217 prior + 20 report query-contract assertions) in a fresh disposable PostgreSQL 17 database; seven canonical migrations unchanged |
+| Existing real API scripts | PASS: CRM/Activities 20; Giving 39; Interests 59; Programs 68 (186 regressions) |
+| `node scripts/demo/verify-reports.mjs` | PASS: 70 actual local Auth/PostgREST report checks; all four roles, real pagination, period/lifetime/commitment reconciliation, empty scope, invalid period, anonymous/inactive denial unchanged Staff/Viewer write boundaries, explicit organization interactions/opportunities and manual future renewals |
+| Total API checks | **256 passed** |
+| `npm run test:integration` | PASS: 27 actual local Supabase Chromium scenarios (17 regressions + 6 Financial/foundation + 4 Sponsor reader/scope/source-link scenarios) |
+| `npm run test:e2e` | PASS: 25 fixture Chromium scenarios (15 regressions + 7 Financial loading/empty/query-failure/recovery/mismatch + 3 Sponsor failure/recovery scenarios) |
+| Readiness guards | PASS: 3 private-artifact/manifest/endpoint checks |
+| Repeatability | PASS: 2 no-op migration replays and 2 seed replays; history and named fixtures remain stable |
+| Local security advisor | PASS: zero findings |
+| Manual board demo / CBC approval / hosted deployment | NOT performed; remain separate gates |
+
+Browser results use private credential-safe reporting for actual Auth/PostgREST; screenshots/traces/videos remain disabled. All records are synthetic; setup creates isolated report organizations/pledges/receipts without overwriting prior module records. Initial new browser tests needed corrections: their alert locator also matched Next's route announcer, the Sponsor setup selector needed to allow the existing required-field marker, and the real-browser bulk receipt fixture needed explicit non-void flags on every row. Final results above are from the corrected suites, not those failed attempts. Existing middleware deprecation and Node module-type warnings remain. Browser runtime uses the previously documented `/tmp` libraries/browser; run suites sequentially because they rebuild `.next`.
+
+### Coverage and remaining work
+
+The detailed-field audit remains **90/133 represented; 88 with working demo behavior (87 complete + one partial); 19 calculated as an overlapping subset; 46 deferred whole-field behaviors**. Exclusive partition remains 87 complete + one partial + two placeholders + 43 absent = 133. The [CSV](field-coverage.csv) now records which Giving fields are reused in Financial Performance and adds report evidence; it does not count reused fields again or imply that agreement/document/renewal fields are directly displayed in the Financial report.
+
+Reports is now a reachable navigation destination, leaving Mentorship, Membership, Documents and Settings absent. All six report topics have pages; four are pending-only. Sponsor pipeline/renewal performance and unsupported Financial outputs remain pending. Event ROI, export, broader dashboard displays and existing outcome/engagement gaps remain. CBC/instructor scope/stack/student decisions, provisional rules, production finance policy and historical PDF-publication decisions remain open. No hosted changes or Git history rewrite occurred.
+
+The requested next-category continuation is delivered as the Sponsor Relationship subset, after Financial passed its full suite. The next smallest report slice would be Scholarship Impact using existing Programs counts, support completeness and raw outcomes, while award identity, graduation/employment rates and program-attributed alumni giving remain pending. This is a recommendation only; no additional category is promoted in this task.
 
 <a id="current-field-audit"></a>
 ## Current review fixes and field audit — 2026-11-01
