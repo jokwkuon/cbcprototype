@@ -1,3 +1,4 @@
+import { readAll } from "./read-all";
 import { crmContext } from "./crm-context";
 import { validId } from "./crm-validation";
 import type { FieldDefinition } from "./crm-fields";
@@ -12,11 +13,11 @@ export type ProgramSummary = { participants: number; enrollments: number; known_
 type Client = Awaited<ReturnType<typeof crmContext>>["client"];
 export async function enrollments(client: Client, filters: { id?: string; program?: string; cohort?: string; recipient?: string; contact?: string; organization?: string } = {}) {
   if (Object.values(filters).some(id => id && !validId(id))) return [];
-  let query = client.from("program_enrollment_details").select("*").order("recipient_name").order("id");
-  for (const [key, value] of Object.entries(filters)) if (value) query = query.eq(key === "id" ? "id" : `${key}_id`, value);
-  const { data, error } = await query;
-  if (error) throw new Error("Program enrollments unavailable. Check access and local migrations.");
-  return (data ?? []) as Enrollment[];
+  return readAll<Enrollment>((from,to)=>{
+    let query = client.from("program_enrollment_details").select("*",{count:"exact"}).order("id");
+    for (const [key,value] of Object.entries(filters)) if(value) query=query.eq(key === "id" ? "id" : `${key}_id`,value);
+    return query.range(from,to);
+  });
 }
 export async function programSummary(client: Client, program?: string, cohort?: string) {
   const { data, error } = await client.rpc("program_summary", { p_program_id: program || null, p_cohort_id: cohort || null });

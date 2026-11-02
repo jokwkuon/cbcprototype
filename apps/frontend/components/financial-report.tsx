@@ -18,6 +18,7 @@ export async function FinancialReport({client,filters}:{client:Awaited<ReturnTyp
       <label>Organization<select name="organization" aria-label="Report organization" defaultValue={organization}><option value="">All organizations</option>{organizations.map(o=><option key={o.id} value={o.id}>{o.name}</option>)}</select></label>
       <button>Apply report filters</button>
     </form>
+    <Link className="underline" href={`/reports/financial/export?year=${year}&organization=${organization}`}>Export filtered receipt CSV</Link>
     <p>Receipt period: {String(year).padStart(4,"0")}-01-01 through {summary.period_end} ({summary.comparison_basis}). The year filter applies to cash received and the prior comparable period only. Pledged, outstanding, lifetime cash and in-kind totals below are all-time current balances as of {summary.as_of}; they are not historical year-end balances.</p>
     {!records.length&&<p role="status" className="my-4">No contributions recorded in this scope. Verified totals are zero.</p>}
     <FinancialSummaryValues summary={summary} cashLabel="Selected-period cash received"/>
@@ -29,6 +30,6 @@ export async function FinancialReport({client,filters}:{client:Awaited<ReturnTyp
       {!periodReceipts.length&&<p role="status" className="my-3">No received payments in this period.</p>}
     </section>
     <section aria-label="All-time contribution balances"><h2 className="mb-3 text-xl font-bold">All-time contribution balances and giving history</h2><p className="mb-3">Active Cash commitments count as pledged. Prospect/cancelled stages create no outstanding debt; their actual cash receipts remain received cash. In-kind is separate. Each row links to its Giving record.</p><GivingTable records={records} showPledged/></section>
-    <section className="card my-5 p-5"><h2 className="text-xl font-bold">Event ROI — Definition pending</h2><p>Approved event revenue/cost allocation and ROI formula are not available. No ROI or profit is calculated. Export and accounting reconciliation/refunds remain pending.</p></section>
+    <section className="card my-5 p-5"><h2 className="text-xl font-bold">Event ROI — Definition pending</h2><p>Approved event revenue/cost allocation and ROI formula are not available. No ROI or profit is calculated. Accounting reconciliation/refunds remain pending.</p></section>
   </>;
 }
