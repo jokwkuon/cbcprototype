@@ -1,28 +1,7 @@
-# membership
-**Status:** Unapproved specification worksheet
+# Membership — REQ-009/008
 
-## Purpose
-Member types, fees, engagement and renewal lifecycle.
+Implemented for the synthetic local board demo under provisional ADR-016; CBC acceptance remains pending. Routes: `/membership, /membership/new, /membership/[id], /membership/[id]/edit`.
 
-## UI
-- [ ] List/search or visualization
-- [ ] Detail view and/or form
-- [ ] Validation/error/empty states
+See [decision rules](../../project/decisions.md), [field matrix](../field-matrix.md), [coverage audit](../../delivery/field-coverage.csv) and [executed verification](../../delivery/progress.md). Tests: `membership.sql; verify-membership.mjs; membership.spec.ts`. Code presence alone is not runtime or CBC acceptance evidence.
 
-## Data model
-- [ ] Tables, keys and relationships
-- [ ] Manually entered vs derived fields
-- [ ] Historical/source information
-
-## Backend and rules
-- [ ] Operations and permissions
-- [ ] Calculations and state transitions
-- [ ] Error cases and audit expectations
-
-## Tests and acceptance
-- [ ] Synthetic scenario
-- [ ] Unit/integration/data tests
-- [ ] CBC review and sign-off
-
-## Open questions
-- TBD
+Contact/organization membership terms, type/industry, dates, exact nullable CAD fee and manual payment label, date status, recorded history, inherited owner, linked program/interaction evidence and upcoming renewals. Event attendance, engagement score, renewal risk, entitlements, automatic renewal and payment collection remain deferred.

@@ -1,0 +1,14 @@
+import {test,expect,type Page} from '@playwright/test';
+import {readFileSync} from 'node:fs';
+import {resolve} from 'node:path';
+const local=resolve(__dirname,'../../../../.local/cbc-demo');
+const accounts=JSON.parse(readFileSync(resolve(local,'accounts.json'),'utf8'));
+const base=JSON.parse(readFileSync(resolve(local,'records.json'),'utf8'));
+const seed=JSON.parse(readFileSync(resolve(local,'membership-records.json'),'utf8'));
+async function login(page:Page,role:string){const a=accounts.find((a:{role:string})=>a.role===role);await page.goto('/login');await page.getByLabel('Email',{exact:true}).fill(a.email);await page.getByLabel('Password',{exact:true}).fill(a.password);await page.getByRole('button',{name:'Sign in',exact:true}).click();await expect(page).toHaveURL(/dashboard$/);}
+test('REQ-009 Staff creates, edits and searches a membership; history and pending calculations',async({page})=>{
+ await login(page,'staff');await page.goto('/membership/new');await page.getByLabel('Contact member',{exact:true}).selectOption(base.contactIds[1]);await page.getByLabel('Membership Type',{exact:true}).fill(`Synthetic UI ${Date.now()}`);await page.getByLabel('Start Date',{exact:true}).fill('2026-01-01');await page.getByLabel('Renewal Date',{exact:true}).fill('2027-01-01');await page.getByLabel('Membership Fee (CAD)',{exact:true}).fill('125.10');await page.getByRole('button',{name:'Save membership',exact:true}).click();await expect(page).toHaveURL(/membership\/[a-f0-9-]+$/);await expect(page.getByText('125.10 CAD (planning metadata)',{exact:true})).toBeVisible();await page.getByRole('link',{name:'Edit membership',exact:true}).click();await page.getByLabel('Notes',{exact:true}).fill('Synthetic membership revised');await page.getByRole('button',{name:'Save membership',exact:true}).click();await expect(page.getByText('Synthetic membership revised',{exact:true})).toBeVisible();await expect(page.getByText('Definition pending',{exact:true})).toHaveCount(2);
+ await page.goto('/membership?q=synthetic-no-match-XYZ');await expect(page.getByText('No memberships found.',{exact:true})).toBeVisible();await page.goto('/membership?renewals=1');await expect(page.getByRole('link',{name:'Synthetic Participant 1',exact:true})).toBeVisible();
+});
+for(const role of ['finance','viewer'])test(`REQ-009 ${role} read-only membership access`,async({page})=>{await login(page,role);await page.goto(`/membership/${seed.ids[0]}`);await expect(page.getByRole('link',{name:'Edit membership',exact:true})).toHaveCount(0);await expect(page.getByText(/Renewal overdue — provisional/)).toBeVisible();await page.goto('/membership/new');await expect(page.getByText('Read-only access.',{exact:true})).toBeVisible();});
+test('REQ-009 anonymous membership access redirects',async({page})=>{await page.goto('/membership');await expect(page).toHaveURL(/login$/);});
