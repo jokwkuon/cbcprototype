@@ -1,28 +1,7 @@
-# mentorship
-**Status:** Unapproved specification worksheet
+# Mentorship — REQ-011/008
 
-## Purpose
-Mentor-mentee pairings, check-ins, satisfaction and relationship-health rules.
+Implemented for the synthetic local board demo under provisional ADR-017; CBC acceptance remains pending. Routes: `/mentorship, /mentorship/new, detail/edit, check-in create/edit`.
 
-## UI
-- [ ] List/search or visualization
-- [ ] Detail view and/or form
-- [ ] Validation/error/empty states
+See [decision rules](../../project/decisions.md), [field matrix](../field-matrix.md), [coverage audit](../../delivery/field-coverage.csv) and [executed verification](../../delivery/progress.md). Tests: `board-completion.sql; verify-mentorship.mjs; board-completion.spec.ts`. Code presence alone is not runtime or CBC acceptance evidence.
 
-## Data model
-- [ ] Tables, keys and relationships
-- [ ] Manually entered vs derived fields
-- [ ] Historical/source information
-
-## Backend and rules
-- [ ] Operations and permissions
-- [ ] Calculations and state transitions
-- [ ] Error cases and audit expectations
-
-## Tests and acceptance
-- [ ] Synthetic scenario
-- [ ] Unit/integration/data tests
-- [ ] CBC review and sign-off
-
-## Open questions
-- TBD
+Contact pairings with enforced shared organization and valid program/cohort, manual lifecycle/cadence, completed check-ins, deterministic latest raw feedback, recorded counts/issues, next action/due date and shared-contact pairing histories. Pair Health, survey scoring and automatic matching remain deferred.

@@ -1,0 +1,14 @@
+import {readAll} from './read-all';
+import {crmContext} from './crm-context';
+import {membershipOptions} from './membership-data';
+import {pairFields,checkinFields} from './mentorship-validation';
+import type {RecordField} from '../components/record-form';
+export type Pair={id:string;organization_id:string;mentor_id:string;mentee_id:string;program_id:string;cohort_id:string;mentor_name:string;mentee_name:string;organization_name:string;program_name:string;cohort_label:string;start_date:string;target_end_date:string|null;status:string;checkin_frequency:string|null;last_checkin:string|null;checkins_completed:number;mentor_satisfaction:string|null;mentee_satisfaction:string|null;issues:string|null;next_action:string|null;action_due_date:string|null};
+export function pairs(client:Awaited<ReturnType<typeof crmContext>>['client']){return readAll<Pair>((a,b)=>client.from('mentorship_details').select('*',{count:'exact'}).order('id').range(a,b));}
+export async function mentorshipFields(kind:'pair'|'checkin',pairId?:string):Promise<RecordField[]>{
+ const {client}=await crmContext();
+ if(kind==='checkin')return checkinFields.map(name=>({name,label:({pair_id:'Pair',checked_in_on:'Check-In Date',mentor_satisfaction:'Mentor Satisfaction (manual feedback)',mentee_satisfaction:'Mentee Satisfaction (manual feedback)',feedback:'Feedback',issues:'Issues / Flags'} as Record<string,string>)[name],required:['pair_id','checked_in_on'].includes(name),type:name==='checked_in_on'?'date':'text',...(name==='pair_id'?{options:[{id:pairId!,name:'Current pairing'}]}:{})}));
+ const [base,programs,cohorts]=await Promise.all([membershipOptions(client),readAll<{id:string;name:string}>((a,b)=>client.from('programs').select('id,name',{count:'exact'}).order('id').range(a,b)),readAll<{id:string;label:string;program_id:string}>((a,b)=>client.from('program_cohorts').select('id,label,program_id',{count:'exact'}).order('id').range(a,b))]);
+ const labels:Record<string,string>={organization_id:'Organization',mentor_id:'Mentor',mentee_id:'Mentee',program_id:'Program',cohort_id:'Cohort',start_date:'Start Date',target_end_date:'Target End Date',status:'Status (manual)',checkin_frequency:'Check-In Frequency (manual)',issues:'Issues / Flags',next_action:'Next Action',action_due_date:'Action Due Date'};
+ return pairFields.map(name=>({name,label:labels[name],required:['organization_id','mentor_id','mentee_id','program_id','cohort_id','start_date','status'].includes(name),type:name.endsWith('_date')?'date':'text',...(['mentor_id','mentee_id'].includes(name)?{options:base.contacts}:name==='organization_id'?{options:base.organizations}:name==='program_id'?{options:programs}:name==='cohort_id'?{options:cohorts.map(c=>({id:c.id,name:`${programs.find(p=>p.id===c.program_id)?.name} / ${c.label}`}))}:{})}));
+}
