@@ -7,6 +7,7 @@ import { formValues, recordId, ValidationError, type FormState } from "../../lib
 function refresh() {
   revalidatePath("/interests", "layout");
   revalidatePath("/organizations", "layout");
+  revalidatePath("/reports", "layout");
 }
 async function saveInterest(editing: boolean, form: FormData): Promise<FormState> {
   let id: string;

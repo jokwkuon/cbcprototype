@@ -12,6 +12,11 @@ for(const role of ['admin','finance','staff','viewer']){
  let pages=0;
  const records=await readAll((from,to)=>{pages++;return c.from('contribution_details').select('*',{count:'exact'}).eq('organization_id',base.organizationId).order('id').range(from,Math.min(to,from+1));});
  assert(pages>1,`${role} actual REST pagination reads all contribution pages`);
+ const interactions=await readAll((from,to)=>c.from('activities').select('*',{count:'exact'}).eq('organization_id',base.organizationId).order('id').range(from,to));
+ assert(interactions.length>0&&interactions.every(a=>a.organization_id===base.organizationId),`${role} explicit organization-linked interactions`);
+ const opportunities=await readAll((from,to)=>c.from('opportunities').select('id,name,organization_id',{count:'exact'}).eq('organization_id',base.organizationId).order('id').range(from,to));
+ assert(opportunities.length>0&&opportunities.every(o=>o.organization_id===base.organizationId),`${role} organization opportunity references`);
+ assert(records.find(r=>r.id==='64000000-0000-4000-8000-000000000001')?.renewal_date===`${Number(base.calendarDate.slice(0,4))+1}-01-01`,`${role} future manual renewal stays planning metadata`);
  const ids=new Set(records.map(r=>r.id));
  const receipts=(await readAll((from,to)=>c.from('giving_receipts').select('*',{count:'exact'}).order('id').range(from,to))).filter(r=>ids.has(r.contribution_id));
  for(const year of [2025,Number(base.calendarDate.slice(0,4))]){

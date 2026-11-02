@@ -42,7 +42,7 @@ const server=http.createServer(async(req,res)=>{
   if(failDashboard&&dashboardQuery===failDashboard)return send(500,{message:"Synthetic dashboard failure"});
   if(failActivities&&(["activities","activity_contacts","tasks","follow_ups","activity_today","activity_last_contact","save_activity"].includes(table)))return send(500,{message:"Synthetic activity query failure"});
   if(reportFixture?.failure===table)return send(500,{message:"Synthetic report query failed"});
-  if(reportFixture&&["giving_summary","contribution_details","giving_receipts"].includes(table)){
+  if(reportFixture&&["giving_summary","contribution_details","giving_receipts","opportunities"].includes(table)){
     if(table==="giving_summary"&&reportFixture.delay)await new Promise(resolve=>setTimeout(resolve,reportFixture.delay));
     if(reportFixture.failure===table)return send(500,{message:"Synthetic report query failed"});
     if(table==="giving_summary")return send(200,{year:body.p_year,as_of:today(),period_end:`${body.p_year}-12-31`<today()?`${body.p_year}-12-31`:today(),prior_period_end:`${body.p_year-1}-12-31`,comparison_basis:"Synthetic empty period",annual_cash:reportFixture.mismatch?"1":"0",lifetime_cash:"0",prior_cash:"0",pledged:"0",outstanding:"0",in_kind_declared:"0",yoy_delta:"0",yoy_percent:null});

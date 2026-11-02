@@ -9,6 +9,7 @@ function refreshActivity() {
   revalidatePath("/dashboard");
   revalidatePath("/interests","layout");
   revalidatePath("/programs","layout");
+  revalidatePath("/reports","layout");
 }
 function saveError(error:unknown,form:FormData,activity=false):FormState {
   return {values:activity?activityValues(form):formValues(form),errors:error instanceof ValidationError?error.errors:undefined,message:error instanceof Error?error.message:"Unable to save. Please try again."};

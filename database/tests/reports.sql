@@ -39,4 +39,13 @@ select pg_temp.assert_true((select count(*)=0 from public.giving_receipts),'inac
 reset role;set role anon;
 select pg_temp.expect_error($q$select * from public.giving_receipts$q$,'42501','anonymous cannot read report ledger');
 select pg_temp.expect_error($q$select public.giving_summary(2025)$q$,'42501','anonymous cannot execute report summary');
+reset role;set role authenticated;
+select set_config('request.jwt.claim.sub','10000000-0000-4000-8000-000000000001',false);
+update public.contributions set agreement_start='2024-01-01',agreement_end='2027-12-31',renewal_date='2027-01-01' where id='b1000000-0000-4000-8000-000000000001';
+select pg_temp.assert_true((select renewal_date='2027-01-01' and agreement_end='2027-12-31' and cash_received::numeric=0.30 from public.contribution_details where id='b1000000-0000-4000-8000-000000000001'),'manual future renewal does not change received cash');
+insert into public.activities(id,organization_id,occurred_at,activity_type,purpose) values('b2000000-0000-4000-8000-000000000001','b0000000-0000-4000-8000-000000000001','2020-01-01','Meeting','Synthetic Sponsor Report');
+insert into public.opportunities(id,organization_id,name) values('b3000000-0000-4000-8000-000000000001','b0000000-0000-4000-8000-000000000001','Synthetic Sponsor Report Opportunity');
+select set_config('request.jwt.claim.sub','10000000-0000-4000-8000-000000000005',false);
+select pg_temp.assert_true((select count(*)=1 from public.activities where organization_id='b0000000-0000-4000-8000-000000000001'),'Viewer explicit organization interaction scope');
+select pg_temp.assert_true((select count(*)=1 from public.opportunities where organization_id='b0000000-0000-4000-8000-000000000001'),'Viewer explicit organization opportunity scope');
 reset role;rollback;

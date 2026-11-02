@@ -18,3 +18,9 @@ test('REQ-013: inconsistent ledger refuses totals and slow queries show loading'
  await request.post(`${api}/__report-fixture`,{data:{delay:2500}});await page.goto('/reports/financial?year=2024',{waitUntil:'commit'});
  await expect(page.getByRole('status').filter({hasText:'Loading report…'})).toBeVisible();await expect(page.getByRole('region',{name:'Financial summary'})).toBeVisible();await expect(page.getByText('Loading report…',{exact:false})).toHaveCount(0);
 });
+
+for(const failure of ['contribution_details','activities','opportunities'])test(`REQ-013: Sponsor ${failure} failure stays explicit`,async({page,request})=>{
+ await login(page);await page.goto('/organizations/new');await page.getByLabel('Organization Name').fill('Synthetic Sponsor Failure');await page.getByRole('button',{name:'Save record',exact:true}).click();await expect(page.getByRole('heading',{name:'Synthetic Sponsor Failure',exact:true})).toBeVisible();const organization=page.url().split('/').pop();
+ await request.post(`${api}/__report-fixture`,{data:{failure}});await page.goto(`/reports/sponsor?organization=${organization}`);await expect(page.getByRole('alert').filter({hasText:'Sponsor report unavailable'})).toBeVisible();await expect(page.getByText('No opportunity references recorded.',{exact:true})).toHaveCount(0);
+ await request.post(`${api}/__report-fixture`,{data:{}});await page.reload();await expect(page.getByText('No opportunity references recorded.',{exact:true})).toBeVisible();
+});

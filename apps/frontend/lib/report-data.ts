@@ -1,5 +1,5 @@
 import type { crmContext } from "./crm-context";
-import { businessToday } from "./activity-data";
+import { businessToday, type Activity } from "./activity-data";
 import { contributions, givingSummary, type Receipt } from "./giving-data";
 import { readAll } from "./read-all";
 import { cents, sumMoney, reportYear, ReportFilterError } from "./report-validation";
@@ -14,9 +14,7 @@ export const reportCategories = [
 type Client = Awaited<ReturnType<typeof crmContext>>["client"];
 export async function financialReport(client: Client, filters: {year?:string|string[]; organization?:string|string[]}) {
   const today = await businessToday(client), year = reportYear(filters.year, today);
-  const organizations = await readAll<{id:string;name:string}>((from,to) => client.from("organizations").select("id,name",{count:"exact"}).order("id").range(from,to));
-  const organization = filters.organization ?? "";
-  if (typeof organization !== "string" || (organization && !organizations.some(o=>o.id===organization))) throw new ReportFilterError("Choose an available organization, or All organizations.");
+  const {organizations,organization}=await reportScope(client,filters.organization);
   const scope = organization ? {organization} : undefined;
   const [summary, records, receipts] = await Promise.all([
     givingSummary(client, year, scope), contributions(client, scope, true),
@@ -39,4 +37,21 @@ export async function financialReport(client: Client, filters: {year?:string|str
   // Verify each contribution's balance against receipts too, including overpayment/cancellation.
   for (const c of records) if (!matches(c.cash_received,eligible.filter(r=>r.contribution_id===c.id).map(r=>r.amount))) throw new Error("Contribution receipts changed while loading.");
   return {summary,records,periodReceipts,byId,organizations,organization,year};
+}
+
+export async function reportScope(client:Client,rawOrganization?:string|string[]) {
+  const organizations = await readAll<{id:string;name:string}>((from,to) => client.from("organizations").select("id,name",{count:"exact"}).order("id").range(from,to));
+  const organization = rawOrganization ?? "";
+  if (typeof organization !== "string" || (organization && !organizations.some(o=>o.id===organization))) throw new ReportFilterError("Choose an available organization, or All organizations.");
+  return {organizations,organization};
+}
+export async function sponsorReport(client:Client,rawOrganization?:string|string[]) {
+  const scope=await reportScope(client,rawOrganization);
+  if(!scope.organization)return {...scope,records:[],activities:[],opportunities:[]};
+  const [records,activities,opportunities]=await Promise.all([
+    contributions(client,{organization:scope.organization},true),
+    readAll<Activity>((from,to)=>client.from("activities").select("*",{count:"exact"}).eq("organization_id",scope.organization).order("occurred_at",{ascending:false}).order("id").range(from,to)),
+    readAll<{id:string;name:string}>((from,to)=>client.from("opportunities").select("id,name",{count:"exact"}).eq("organization_id",scope.organization).order("id").range(from,to)),
+  ]);
+  return {...scope,records,activities,opportunities};
 }
