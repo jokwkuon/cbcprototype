@@ -1,5 +1,7 @@
-import type { ReactNode } from "react";
-export function Card({ children, className = "" }: { children: ReactNode; className?: string }) { return <section className={`card p-5 ${className}`}>{children}</section>; }
-export function Pill({ children, tone = "neutral" }: { children: ReactNode; tone?: "success" | "warning" | "danger" | "primary" | "neutral" }) { return <span className={`pill pill-${tone}`}>{children}</span>; }
-export function PageHeader({ title, subtitle, action }: { title: string; subtitle?: string; action?: ReactNode }) { return <div className="mb-6 flex flex-wrap items-end justify-between gap-4"><div><h1 className="text-2xl font-extrabold tracking-tight md:text-3xl">{title}</h1>{subtitle&&<p className="mt-1 text-sm text-[var(--cbc-muted)]">{subtitle}</p>}</div>{action}</div>; }
-export function Button({ children, variant = "primary", ...props }: React.ButtonHTMLAttributes<HTMLButtonElement> & { variant?: "primary" | "secondary" }) { return <button {...props} className={`${variant === "primary" ? "bg-[var(--cbc-primary)] text-white shadow-md shadow-purple-200" : "border bg-white"} rounded-lg px-4 py-2.5 text-sm font-bold transition hover:opacity-90 ${props.className ?? ""}`}>{children}</button>; }
+import type {ReactNode} from 'react';
+import {Icon} from './icons';
+export function Card({children,className=''}:{children:ReactNode;className?:string}){return <section className={`card p-5 ${className}`}>{children}</section>;}
+export function Pill({children,tone='neutral'}:{children:ReactNode;tone?:'success'|'warning'|'danger'|'primary'|'neutral'}){return <span className={`pill pill-${tone}`}>{children}</span>;}
+export function PageHeader({title,subtitle,action}:{title:string;subtitle?:string;action?:ReactNode}){return <div className="page-header"><div><div className="eyebrow">Relationship &amp; impact</div><h1>{title}</h1>{subtitle&&<p>{subtitle}</p>}</div>{action&&<div className="page-actions">{action}</div>}</div>;}
+export function Button({children,variant='primary',...props}:React.ButtonHTMLAttributes<HTMLButtonElement>&{variant?:'primary'|'secondary'}){return <button {...props} className={`button button-${variant} ${props.className||''}`}>{children}</button>;}
+export function EmptyState({title,description}:{title:string;description:string}){return <div className="empty-state"><span className="empty-icon"><Icon name="documents"/></span><h3>{title}</h3><p>{description}</p></div>;}

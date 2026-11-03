@@ -1,0 +1,1 @@
+export default function Loading(){return <div className="p-8" role="status" aria-label="Loading workspace" aria-busy="true"><div className="skeleton h-8 w-56 mb-4"/><div className="skeleton h-4 w-80 max-w-full mb-8"/><div className="metric-grid">{[1,2,3,4].map(n=><div className="skeleton skeleton-card" key={n}/>)}</div><div className="skeleton h-72"/></div>;}
