@@ -1,3 +1,4 @@
+import { localDate } from "../lib/presentation";
 import Link from "next/link";
 import { followUps,businessToday,type FollowUp } from "../lib/activity-data";
 import { createClient } from "../lib/supabase/server";
@@ -13,5 +14,5 @@ export async function ActionQueue({compact=false}:{compact?:boolean}={}) {
   const {tasks,today}=data,end=new Date(today+"T00:00:00Z");end.setUTCDate(end.getUTCDate()+6);
   const until=end.toISOString().slice(0,10),open=tasks.filter(task=>task.status!=="Complete");
   const queue=open.filter(task=>task.status==="Overdue"||task.due_date&&task.due_date<=until);
-  return <section className="card my-5 p-6"><h2 className="mb-2 font-bold">Action Queue — overdue and next 7 days</h2><p className="mb-4 text-sm">Calgary dates: {today} to {until}. Completed actions are excluded.</p><div className="flex items-center justify-between mb-4"><span className="text-xs text-slate-500">{queue.length} actionable follow-ups</span><Link className="text-xs text-purple" href="/activities">View all activities →</Link></div><FollowUpList tasks={compact?queue.slice(0,5):queue}/>{open.some(task=>!task.due_date)&&<p className="mt-3">{open.filter(task=>!task.due_date).length} open follow-up(s) have no due date. <Link href="/activities">Review activities</Link></p>}</section>;
+  return <section className="card my-5 p-6"><h2 className="mb-2 font-bold">Action Queue — overdue and next 7 days</h2><p className="mb-4 text-sm">Calgary dates: {localDate(today)} to {localDate(until)}. Completed actions are excluded.</p><div className="flex items-center justify-between mb-4"><span className="text-xs text-slate-500">{queue.length} actionable follow-ups</span><Link className="text-xs text-purple" href="/activities">View all activities →</Link></div><FollowUpList tasks={compact?queue.slice(0,5):queue}/>{open.some(task=>!task.due_date)&&<p className="mt-3">{open.filter(task=>!task.due_date).length} open follow-up(s) have no due date. <Link href="/activities">Review activities</Link></p>}</section>;
 }

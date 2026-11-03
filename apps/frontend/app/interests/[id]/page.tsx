@@ -1,3 +1,4 @@
+import { RecordHeader } from "../../../components/record-header";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Shell } from "../../../components/shell";
@@ -20,7 +21,7 @@ export default async function InterestDetail({ params }: { params: Promise<{ id:
   const taskIds = (tasks.data ?? []).map(t => t.task_id);
   const linkedTasks = taskIds.length ? await client.from("follow_ups").select("*").in("id", taskIds).order("due_date", { ascending: true, nullsFirst: false }).order("id") : { data: [], error: null };
   if (linkedTasks.error) throw new Error("Unable to load linked follow-ups.");
-  return <Shell><Link href="/interests">← Sponsor Interests</Link><div className="my-5 flex justify-between"><h1 className="text-3xl font-bold">{i.category}</h1>{canWrite && <Link href={`/interests/${id}/edit`}>Edit interest</Link>}</div>
+  return <Shell><RecordHeader name={i.category} subtitle={i.organization_name} status={i.archived_at?'Archived':'Active'} back="/interests" backLabel="Sponsor Interests" editHref={canWrite?`/interests/${id}/edit`:undefined} editLabel="Edit interest"/>
     <section className="card p-6"><DetailFields fields={[
       ["Organization", <Link key="org" href={`/organizations/${i.organization_id}`}>{i.organization_name}</Link>],
       ["Primary Contact", i.primary_contact_id ? <Link href={`/contacts/${i.primary_contact_id}`}>{i.primary_contact_name}</Link> : "Not linked"],
