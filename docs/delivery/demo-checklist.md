@@ -158,3 +158,23 @@ Sponsor Relationship continuation checklist:
 - [x] Select an organization explicitly; show manual agreement/renewal dates, linked interactions and opportunity reference links. Future renewal dates remain planning metadata, never cash or automatic scheduling.
 - [x] All four active reader roles, source navigation links, empty groups, invalid organization and failed contribution/activity/opportunity queries with recovery are covered by local automated checks.
 - [ ] Approve sponsor eligibility, pipeline/risk/renewal-rate rules and estimate currency before implementing those calculations. Manually demonstrate and obtain named CBC acceptance of the supported record subset.
+
+## Remaining MVP completion — 2026-11-02
+
+Earlier missing-module/coverage totals above are historical. Current audit: **133 represented / 125 complete demo fields / two partially functional / six pending definitions**. 127 fields have some functionality; six pending displays are excluded. DOC-06 records metadata registration only; binary upload is deferred. PRO-13 remains partial engagement classification. See the per-field CSV and provisional ADR-016/017/018.
+
+- [x] Membership list/search/create/detail/edit, member identity/affiliation, term history, exact unknown-aware fee/manual payment, date status and upcoming renewals, inherited owner and source histories.
+- [x] Mentorship list/create/detail/edit, shared-organization contacts, program/cohort integrity, check-in create/edit/history, count/latest/raw feedback, issues and action dates; health pending.
+- [x] Documents list/search/create/detail/edit, explicit source references, server provenance, version/dates/classification; Internal/Admin-only RLS. Binary upload/download clearly deferred.
+- [x] Settings current account/role/access information and sign-out; administrative features clearly unavailable.
+- [x] All six report categories have queried source records, defined summaries/filters/empty/error states and CSV subsets under the signed-in user's permissions.
+- [x] Dashboard operational summaries link to Membership, Mentorship, Interests, Programs and recent interactions alongside existing CRM/follow-up/finance sections. Failure states do not imply zero.
+- [x] [Reproducible synthetic walkthrough](board-demo-walkthrough.md) and [separate hosted deployment plan](hosted-demo-deployment-plan.md) prepared. Exact executed checks/results are recorded separately in progress.
+- [ ] Named human CBC board walkthrough and approval of provisional membership/mentorship/document access conventions, definitions and visible pending metrics.
+- [ ] Instructor stack/deliverable acceptance, production privacy/security rules and any real-record authorization.
+- [ ] Repository owner resolves tracked architecture PDF publication/history remediation before any publication; no history rewrite authorized.
+- [ ] Explicit approval for separate hosted resources, deployment target/budget and subsequent hosted smoke/advisor checks. Existing project remains untouched.
+
+Record reviewer, date, commit, environment, actual observed outcomes and approval reference for the unchecked gates. Automated browser execution is runtime/demo evidence, not human CBC acceptance.
+
+Final local verification: 28 unit/validation tests; 279 SQL assertions; 335 real API checks; 38 real-Supabase browser scenarios; 33 fixture browser scenarios; three readiness guards; two migration/seed replays; typecheck/lint/production builds; zero local security advisor findings. All pass. Exact commands and scope are in progress. Fictional names and explicit synthetic notices are retained; no binary files, hosted changes or public push.

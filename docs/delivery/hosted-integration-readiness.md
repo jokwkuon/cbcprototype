@@ -125,3 +125,18 @@ Five canonical migrations now include `20261027060754_sponsorship_giving.sql`, v
 The sixth canonical migration is `20261028015014_sponsor_interests.sql`, dependent on existing organization/contact ownership, Activities/tasks and Giving Program references. Only the isolated local target is changed. ADR-013 is provisional pending CBC approval. Interest mutations require Admin/Staff, archiving/restoration Admin; all active roles read. No hard deletion or widened financial/profile permissions.
 
 `node scripts/demo/seed.mjs` now includes the named interest fixture and affiliation-negative targets. Run `node scripts/demo/verify-interests.mjs` after seeding. Repeatability asserts the interest, two opportunity references and exact program/discussion/task join counts as well as the earlier baseline. The database runner includes 38 new Sponsor Interests assertions (172 total), independently of actual Auth/PostgREST/API/browser integration. Current results and remaining approvals are in progress. Earlier four/five-migration counts are historical; a future hosted proposal must review all six current checksum-verified migrations against its explicitly approved target.
+
+## 2026-11-02 completion addendum (supersedes earlier next-module/migration counts)
+
+Ten canonical migrations now include Membership, Mentorship and metadata-only Documents. Six reports, dashboard summaries and Settings use the same local stack; see [current walkthrough](board-demo-walkthrough.md), [coverage](field-coverage.csv) and [separate hosted deployment plan](hosted-demo-deployment-plan.md). Old four/five/six/seven-migration and next-module statements above are historical checkpoints. Existing hosted schema/security/history remains untouched and unverified for rollout.
+
+This workstation's current browser runtime is ignored and local:
+
+```sh
+export PLAYWRIGHT_BROWSERS_PATH="$PWD/.local/playwright"
+export LD_LIBRARY_PATH="$PWD/.local/browser-libs/runtime/usr/lib/x86_64-linux-gnu${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
+npm run test:e2e --prefix apps/frontend
+npm run test:integration --prefix apps/frontend
+```
+
+Use installed system Chromium libraries on other machines, or install the documented Playwright runtime dependencies. The local library fallback contains downloaded distro `libnspr4`, `libnss3` and `libasound2t64` packages extracted without system changes. Never commit those binaries. Tests must run sequentially because both build the same frontend output. Current exact results supersede older counts only where explicitly recorded in progress.

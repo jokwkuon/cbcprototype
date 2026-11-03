@@ -1,6 +1,6 @@
 # Architecture field matrix
 
-Current field audit: 2026-11-01 (earlier rows retain their evidence granularity), branch `feature/mvp-foundation`. Source: safe local copy of *CBC Database Architecture 2026.pdf*, 20 physical PDF pages. Page numbers below are **physical pages**, not the illustrated footer or database-page number. No source examples or personal records are reproduced.
+Current field audit: 2026-11-02 (earlier rows retain their evidence granularity), branch `feature/mvp-foundation`. Source: safe local copy of *CBC Database Architecture 2026.pdf*, 20 physical PDF pages. Page numbers below are **physical pages**, not the illustrated footer or database-page number. No source examples or personal records are reproduced.
 
 This is a field-level inventory and proposed design, not an approved schema. [Register](register.csv) and [decisions](../project/decisions.md) remain authoritative for approval. The requested board demo represents every source page/field; modules marked LATER in the register need scope reconciliation before operational implementation.
 
@@ -136,59 +136,59 @@ Current totals and all 133 independently classified rows are in [field coverage]
 
 | ID | Field | Source p. | Type | M/A | Database mapping | UI location | Validation | Status |
 |---|---|---|---|---|---|---|---|---|
-| MEN-01 | Mentor | 14 | person reference | M | cbc_demo_draft.mentorship_pairs.mentor_id | /mentorship detail/form | R | Draft DB only; UI missing |
-| MEN-02 | Mentee | 14 | person reference | M | cbc_demo_draft.mentorship_pairs.mentee_id | /mentorship detail/form | R | Draft DB only; UI missing |
-| MEN-03 | Program / Cohort | 14 | cohort reference | M | cbc_demo_draft.mentorship_pairs.cohort_id | /mentorship detail/form | R | Draft DB only; UI missing |
-| MEN-04 | Start Date | 14 | date | M | cbc_demo_draft.mentorship_pairs.start_date | /mentorship detail/form | D | Draft DB only; UI missing |
-| MEN-05 | Target End Date | 14 | date | M | cbc_demo_draft.mentorship_pairs.target_end_date | /mentorship detail/form | D | Draft DB only; UI missing |
-| MEN-06 | Status | 14 | lookup | M | cbc_demo_draft.mentorship_pairs.status | /mentorship detail/form | E | Draft DB only; UI missing |
-| MEN-07 | Check-In Frequency | 14 | cadence | M | cbc_demo_draft.mentorship_pairs.checkin_frequency | /mentorship detail/form | D | Draft DB only; UI missing |
-| MEN-08 | Last Check-In | 14 | timestamp | A | checkins.latest (proposed) | /mentorship detail (read-only) | C | Missing |
-| MEN-09 | Check-Ins Completed | 14 | integer | A | checkins.count (proposed) | /mentorship detail (read-only) | C | Missing |
-| MEN-10 | Pair Health | 14 | classification | A | mentorship_pairs.pair_health (proposed) | /mentorship detail (read-only) | C | Missing |
-| MEN-11 | Mentor Satisfaction | 14 | survey score | A | feedback.mentor_latest (proposed) | /mentorship detail (read-only) | C | Missing |
-| MEN-12 | Mentee Satisfaction | 14 | survey score | A | feedback.mentee_latest (proposed) | /mentorship detail (read-only) | C | Missing |
-| MEN-13 | Issues / Flags | 14 | text | M | cbc_demo_draft.mentorship_pairs.issues | /mentorship detail/form | T | Draft DB only; UI missing |
-| MEN-14 | Next Action | 14 | text | M | cbc_demo_draft.tasks.description | /mentorship detail/form | T | Draft DB only; UI missing |
-| MEN-15 | Action Due Date | 14 | date | M | cbc_demo_draft.tasks.due_date | /mentorship detail/form | D | Draft DB only; UI missing |
+| MEN-01 | Mentor | 14 | person reference | M | mentorship_pairs.mentor_id | /mentorship detail/form | Required contact FK within selected organization; mentor differs from mentee. | Complete within demo scope — local shared workflow evidence; CBC pending |
+| MEN-02 | Mentee | 14 | person reference | M | mentorship_pairs.mentee_id | /mentorship detail/form | Required contact FK within selected organization; mentee differs from mentor. | Complete within demo scope — local shared workflow evidence; CBC pending |
+| MEN-03 | Program / Cohort | 14 | cohort reference | M | mentorship_pairs.program_id + cohort_id | /mentorship detail/form | Required program/cohort composite FK; reject cross-program cohort and reparenting. | Complete within demo scope — local shared workflow evidence; CBC pending |
+| MEN-04 | Start Date | 14 | date | M | mentorship_pairs.start_date | /mentorship detail/form | Required finite calendar date; form/DB checks. | Complete within demo scope — local shared workflow evidence; CBC pending |
+| MEN-05 | Target End Date | 14 | date | M | mentorship_pairs.target_end_date | /mentorship detail/form | Optional finite date on/after start; form/DB checks. | Complete within demo scope — local shared workflow evidence; CBC pending |
+| MEN-06 | Status | 14 | lookup | M | mentorship_pairs.status | /mentorship detail/form | Required trimmed nonblank manual label; DB check; no lifecycle inference. | Complete within demo scope — local shared workflow evidence; CBC pending |
+| MEN-07 | Check-In Frequency | 14 | cadence | M | mentorship_pairs.checkin_frequency | /mentorship detail/form | Optional trimmed manual cadence text; no automatic schedule. | Complete within demo scope — local shared workflow evidence; CBC pending |
+| MEN-08 | Last Check-In | 14 | timestamp | A | mentorship_details.last_checkin | /mentorship detail (read-only) | Read-only max completed recorded check-in date; future completed check-ins rejected. | Complete within demo scope — local shared workflow evidence; CBC pending |
+| MEN-09 | Check-Ins Completed | 14 | integer | A | mentorship_details.checkins_completed | /mentorship detail (read-only) | Read-only count of recorded completed check-in rows under RLS. | Complete within demo scope — local shared workflow evidence; CBC pending |
+| MEN-10 | Pair Health | 14 | classification | A | No approved health rule; explicit pending label | /mentorship detail (read-only) | Read-only pending label; no health formula. | Definition pending — label only; no calculation |
+| MEN-11 | Mentor Satisfaction | 14 | survey score | A | mentorship_details.mentor_satisfaction | /mentorship detail (read-only) | Optional raw feedback text on check-in; latest by date descending/UUID ascending; null remains unknown. | Complete within demo scope — local shared workflow evidence; CBC pending |
+| MEN-12 | Mentee Satisfaction | 14 | survey score | A | mentorship_details.mentee_satisfaction | /mentorship detail (read-only) | Optional raw feedback text on check-in; latest by date descending/UUID ascending; null remains unknown. | Complete within demo scope — local shared workflow evidence; CBC pending |
+| MEN-13 | Issues / Flags | 14 | text | M | mentorship_pairs.issues + mentorship_checkins.issues | /mentorship detail/form | Optional trimmed manual pair/check-in issues text. | Complete within demo scope — local shared workflow evidence; CBC pending |
+| MEN-14 | Next Action | 14 | text | M | mentorship_pairs.next_action | /mentorship detail/form | Optional trimmed manual next-action text. | Complete within demo scope — local shared workflow evidence; CBC pending |
+| MEN-15 | Action Due Date | 14 | date | M | mentorship_pairs.action_due_date | /mentorship detail/form | Optional finite calendar due date; no inferred completion. | Complete within demo scope — local shared workflow evidence; CBC pending |
 
 ## Membership — REQ-009
 
 | ID | Field | Source p. | Type | M/A | Database mapping | UI location | Validation | Status |
 |---|---|---|---|---|---|---|---|---|
-| MEM-01 | Member | 16 | person or organization reference | M | cbc_demo_draft.memberships.contact_id OR member_organization_id | /membership detail/form | R | Draft DB only; UI missing |
-| MEM-02 | Membership Type | 16 | lookup | M | cbc_demo_draft.memberships.membership_type | /membership detail/form | E | Draft DB only; UI missing |
-| MEM-03 | Organization | 16 | organization reference | M | cbc_demo_draft.memberships.organization_id | /membership detail/form | R | Draft DB only; UI missing |
-| MEM-04 | Industry | 16 | lookup | M | cbc_demo_draft.memberships.industry | /membership detail/form | E | Draft DB only; UI missing |
-| MEM-05 | Start Date | 16 | date | M | cbc_demo_draft.memberships.start_date | /membership detail/form | D | Draft DB only; UI missing |
-| MEM-06 | Renewal Date | 16 | date | M | cbc_demo_draft.memberships.renewal_date | /membership detail/form | D | Draft DB only; UI missing |
-| MEM-07 | Membership Fee | 16 | decimal / currency | M | cbc_demo_draft.memberships.fee | /membership detail/form | N | Draft DB only; UI missing |
-| MEM-08 | Payment Status | 16 | lookup | M | cbc_demo_draft.memberships.payment_status | /membership detail/form | E | Draft DB only; UI missing |
-| MEM-09 | Status | 16 | classification | A | memberships.status (proposed) | /membership detail (read-only) | C | Missing |
-| MEM-10 | Events Attended | 16 | integer | A | attendance.count (proposed) | /membership detail (read-only) | C | Missing |
-| MEM-11 | Program Participation | 16 | program history | A | memberships.enrollments (proposed) | /membership detail (read-only) | C | Missing |
-| MEM-12 | Last Engagement | 16 | timestamp | A | engagement.latest (proposed) | /membership detail (read-only) | C | Missing |
-| MEM-13 | Engagement Score | 16 | decimal | A | engagement.score (proposed) | /membership detail (read-only) | C | Missing |
-| MEM-14 | Renewal Risk | 16 | classification | A | memberships.renewal_risk (proposed) | /membership detail (read-only) | C | Missing |
-| MEM-15 | Relationship Owner | 16 | user reference | A | organizations.relationship_owner (proposed) | /membership detail (read-only) | C | Missing |
+| MEM-01 | Member | 16 | person or organization reference | M | memberships.contact_id OR member_organization_id | /membership detail/form | Exactly one contact or organization member; valid FK; composite affiliation FK. | Complete within demo scope — local shared workflow evidence; CBC pending |
+| MEM-02 | Membership Type | 16 | lookup | M | memberships.membership_type | /membership detail/form | Required trimmed nonblank text; DB nonblank check. | Complete within demo scope — local shared workflow evidence; CBC pending |
+| MEM-03 | Organization | 16 | organization reference | M | memberships.organization_id + inherited contact affiliation | /membership detail/form | Optional organization FK; same contact affiliation or same corporate member; inheritance otherwise. | Complete within demo scope — local shared workflow evidence; CBC pending |
+| MEM-04 | Industry | 16 | lookup | M | memberships.industry | /membership detail/form | Optional trimmed manual text; taxonomy pending. | Complete within demo scope — local shared workflow evidence; CBC pending |
+| MEM-05 | Start Date | 16 | date | M | memberships.start_date | /membership detail/form | Required finite calendar date; form validDate and DB isfinite. | Complete within demo scope — local shared workflow evidence; CBC pending |
+| MEM-06 | Renewal Date | 16 | date | M | memberships.renewal_date | /membership detail/form | Optional finite calendar date on/after start; DB and form chronology. | Complete within demo scope — local shared workflow evidence; CBC pending |
+| MEM-07 | Membership Fee | 16 | decimal / currency | M | memberships.fee (exact CAD text in membership_details) | /membership detail/form | Nullable exact nonnegative CAD decimal; max two decimals; reject NaN/Infinity/negative; unknown preserved. | Complete within demo scope — local shared workflow evidence; CBC pending |
+| MEM-08 | Payment Status | 16 | lookup | M | memberships.payment_status | /membership detail/form | Optional trimmed manual text; no inferred payment. | Complete within demo scope — local shared workflow evidence; CBC pending |
+| MEM-09 | Status | 16 | classification | A | membership_details.status | /membership detail (read-only) | Read-only Calgary date derivation; start precedence; today not overdue; SQL boundary assertions. | Complete within demo scope — local shared workflow evidence; CBC pending |
+| MEM-10 | Events Attended | 16 | integer | A | No attendance workflow; explicit pending label | /membership detail (read-only) | Read-only pending label; no attendance query/count. | Definition pending — label only; no calculation |
+| MEM-11 | Program Participation | 16 | program history | A | program_enrollment_details explicit member links | /membership detail (read-only) | Read-only fully paginated explicit contact/organization recipient enrollment links under RLS. | Complete within demo scope — local shared workflow evidence; CBC pending |
+| MEM-12 | Last Engagement | 16 | timestamp | A | membership_details.last_engagement | /membership detail (read-only) | Read-only latest eligible nonfuture linked interaction via activity_last_contact. | Complete within demo scope — local shared workflow evidence; CBC pending |
+| MEM-13 | Engagement Score | 16 | decimal | A | No approved score; explicit pending label | /membership detail (read-only) | Read-only pending label; no score input or calculation. | Definition pending — label only; no calculation |
+| MEM-14 | Renewal Risk | 16 | classification | A | No approved risk rule; explicit pending label | /membership detail (read-only) | Read-only pending label; no risk input or calculation. | Definition pending — label only; no calculation |
+| MEM-15 | Relationship Owner | 16 | user reference | A | membership_details.relationship_owner + staff_directory | /membership detail (read-only) | Read-only inherited organization owner; restricted staff_directory labels. | Complete within demo scope — local shared workflow evidence; CBC pending |
 
 ## Documents — REQ-012
 
 | ID | Field | Source p. | Type | M/A | Database mapping | UI location | Validation | Status |
 |---|---|---|---|---|---|---|---|---|
-| DOC-01 | Document Name | 18 | text | M | cbc_demo_draft.documents.name | /documents detail/form | T | Draft DB only; UI missing |
-| DOC-02 | Document Type | 18 | lookup | M | cbc_demo_draft.documents.document_type | /documents detail/form | E | Draft DB only; UI missing |
-| DOC-03 | Organization | 18 | organization reference | M | cbc_demo_draft.document_organizations.organization_id | /documents detail/form | R | Draft DB only; UI missing |
-| DOC-04 | Contact | 18 | contact reference | M | cbc_demo_draft.document_contacts.contact_id | /documents detail/form | R | Draft DB only; UI missing |
-| DOC-05 | Program / Event | 18 | initiative reference | M | document_initiatives.initiative_id (proposed) | /documents detail/form | R | Missing |
-| DOC-06 | Upload Date | 18 | timestamp | A | documents.uploaded_at (proposed) | /documents detail (read-only) | C | Missing |
-| DOC-07 | Uploaded By | 18 | user reference | A | documents.uploaded_by (proposed) | /documents detail (read-only) | C | Missing |
-| DOC-08 | Version | 18 | text | M | cbc_demo_draft.documents.version | /documents detail/form | T | Draft DB only; UI missing |
-| DOC-09 | Effective Date | 18 | date | M | cbc_demo_draft.documents.effective_date | /documents detail/form | D | Draft DB only; UI missing |
-| DOC-10 | Expiry Date | 18 | date | M | cbc_demo_draft.documents.expiry_date | /documents detail/form | D | Draft DB only; UI missing |
-| DOC-11 | Related Agreement | 18 | agreement reference | A | document_agreements.agreement_id (proposed) | /documents detail (read-only) | C | Missing |
-| DOC-12 | Access Level | 18 | permission classification | M | cbc_demo_draft.documents.access_level | /documents detail/form | T | Draft DB only; UI missing |
-| DOC-13 | Last Updated | 18 | timestamp | A | documents.updated_at (proposed) | /documents detail (read-only) | C | Missing |
+| DOC-01 | Document Name | 18 | text | M | documents.name | /documents detail/form | Required trimmed nonblank text; DB check. | Complete within demo scope — local shared workflow evidence; CBC pending |
+| DOC-02 | Document Type | 18 | lookup | M | documents.document_type | /documents detail/form | Optional trimmed manual text; no approved taxonomy inferred. | Complete within demo scope — local shared workflow evidence; CBC pending |
+| DOC-03 | Organization | 18 | organization reference | M | documents.organization_id | /documents detail/form | Optional organization FK; composite contact affiliation when both linked. | Complete within demo scope — local shared workflow evidence; CBC pending |
+| DOC-04 | Contact | 18 | contact reference | M | documents.contact_id | /documents detail/form | Optional contact FK; composite organization affiliation when both linked. | Complete within demo scope — local shared workflow evidence; CBC pending |
+| DOC-05 | Program / Event | 18 | initiative reference | M | documents.initiative_id | /documents detail/form | Optional funding_initiatives FK; lookup labels distinguish Program/Event. | Complete within demo scope — local shared workflow evidence; CBC pending |
+| DOC-06 | Upload Date | 18 | timestamp | A | documents.uploaded_at (metadata registration only) | /documents detail (read-only) | Server-set immutable metadata registration timestamp; no file-upload claim. | Partially functional — local shared workflow evidence; CBC pending |
+| DOC-07 | Uploaded By | 18 | user reference | A | documents.uploaded_by (metadata creator only) | /documents detail (read-only) | Server sets authenticated creator; update preserves original; forged values overridden. | Complete within demo scope — local shared workflow evidence; CBC pending |
+| DOC-08 | Version | 18 | text | M | documents.version | /documents detail/form | Optional trimmed manual version label; no binary version history. | Complete within demo scope — local shared workflow evidence; CBC pending |
+| DOC-09 | Effective Date | 18 | date | M | documents.effective_date | /documents detail/form | Optional finite calendar date; form/DB checks. | Complete within demo scope — local shared workflow evidence; CBC pending |
+| DOC-10 | Expiry Date | 18 | date | M | documents.expiry_date | /documents detail/form | Optional finite date on/after effective date when both known; form/DB checks. | Complete within demo scope — local shared workflow evidence; CBC pending |
+| DOC-11 | Related Agreement | 18 | agreement reference | A | documents.agreement_id + agreement_classification | /documents detail (read-only) | Optional contributions FK and manual agreement classification; no derived document inference. | Complete within demo scope — local shared workflow evidence; CBC pending |
+| DOC-12 | Access Level | 18 | permission classification | M | documents.access_level | /documents detail/form | Internal/Admin only enum; RLS enforces active-role read and Admin/Staff writes; restricted class Admin only. | Complete within demo scope — local shared workflow evidence; CBC pending |
+| DOC-13 | Last Updated | 18 | timestamp | A | documents.updated_at | /documents detail (read-only) | Server-set modification timestamp; caller cannot forge it. | Complete within demo scope — local shared workflow evidence; CBC pending |
 
 ## Directory illustrations and page-only fields
 
@@ -310,3 +310,9 @@ Current coverage is **75/133 detailed fields represented**: 74 locally implement
 ## Current Programs and review audit — 2026-11-01
 
 Earlier checkpoint totals in this document are historical. The [current 133-row audit](../delivery/field-coverage.csv) supersedes them: 90 represented, 88 with working local demo behavior (87 complete within demo scope plus one partial), 19 calculated as an overlapping subset, and 46 with deferred whole-field behavior. See [definitions and executed evidence](../delivery/progress.md#current-field-audit). PRO-01–15 and the Programs directory/KPI rows above now reflect the operational schema/UI; no source PDF was reopened for this reconciliation. Page-only/report/dashboard completion is separate from the 133 denominator.
+
+## Remaining MVP completion — 2026-11-02
+
+REQ-009/011/012/013/006/008; provisional ADR-016/017/018. Membership, Mentorship and Documents now use exposed RLS-protected public schemas and working workflows, not locked draft tables. Settings shows actual account permissions. Six reports and the dashboard show queried records/defined counts, with explicit failures and pending formulas. Source physical-page references above are retained; no PDF or extracted content was republished.
+
+Current detailed coverage: 133 represented, 125 complete within demo scope, two partial (PRO-13 engagement classification; DOC-06 metadata registration with binary upload deferred) and six definition-pending displays (CON-12, PRO-12, MEN-10, MEM-10, MEM-13, MEM-14). Functional includes the two partial fields: 127; placeholders are excluded. See CSV for per-field status, validation, calculation evidence and dependencies. This is local synthetic implementation/automated verification, not CBC approval or production readiness.

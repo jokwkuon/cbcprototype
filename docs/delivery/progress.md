@@ -1,6 +1,77 @@
 # Board-demo progress and prioritized plan
 
-Updated 2026-11-02 on `feature/mvp-foundation`. Reports foundation, Financial Performance and Sponsor Relationship now join the locally verified Programs & Recipients scope. **The complete board demo is not ready:** 90/133 detailed fields are represented; four navigation destinations and 43 detailed fields still lack module UI. The six report categories are reachable; four have pending-only pages; two provide working subsets with unsupported calculations pending. See the current audit below; all earlier checkpoints and totals are historical. Source examples and live CBC records are not used.
+Updated 2026-11-02 on `feature/mvp-foundation`. The remaining local board-demo implementation is present: Membership, Mentorship, metadata-only Documents, Settings, six queried record reports/CSV and the executive dashboard. **133/133 fields represented; 125 complete within demo scope; two partial; six pending definitions.** CBC/manual acceptance and hosted deployment remain separate gates. All earlier checkpoints below are historical. Fictional demonstration names use reserved example domains and explicit synthetic-only notices; no real CBC data is included.
+
+<a id="current-field-audit"></a>
+## Remaining MVP completion — current audit
+
+REQ-009/011/012/013/006/008. Provisional ADR-016/017/018 follow the repository owner's explicit implementation authorization; they are not CBC-approved production rules. The original seven migrations are unchanged; three additive migrations implement the new domains. No hosted change, binary storage, source-PDF republication or public push occurred.
+
+- Membership: list/search/create/detail/edit, contact/corporate identity and affiliation constraints, type/industry, start/renewal dates, exact nullable CAD planning fee/manual payment, provisional Calgary status, recorded-term history, program/interaction source evidence, restricted inherited owner and upcoming-renewal view.
+- Mentorship: pair list/create/detail/edit, distinct same-organization contacts, valid program/cohort, dates/manual status/cadence, completed check-in create/edit/history, count/latest date/raw feedback, issues/action dates and related pairing history. Pair Health is pending.
+- Documents: list/search/create/detail/edit metadata, type/source links, protected metadata creator/registration/update dates, manual version/agreement classification/effective/expiry dates and enforced Internal/Admin-only classification. Binary upload/download is deferred. Settings displays verified identity/permissions and sign-out; administration is unavailable.
+- Reports: six categories query authorized records, expose meaningful filters and source links, distinguish empty/error states and export supported filtered CSV. Existing Financial and Sponsor subsets remain intact; exact support/count rules are reused without invented rates. CSV quotes cells, neutralizes spreadsheet formulas and shares permissions/filter logic. Executive global panels are labeled separately from relationship filters.
+- Dashboard: CRM status/count queries and enrollment histories fully paginate; financial/action summaries are retained. Membership/renewals, Mentorship, Interests, Programs/recipients and recent interactions link to source modules. Independent query failures withhold affected counts.
+
+### Coverage and counting
+
+The [CSV](field-coverage.csv) has 133 unique detailed IDs with database/UI mapping, field validation, functional/calculation status, test evidence and business dependencies. Represented includes pending labels; functional includes partial behavior; complete excludes partials and placeholders. Calculated is an overlapping subset of actual aggregate/date/latest behavior; inherited links and server metadata are not counted as calculations.
+
+| Module | Fields | Represented | Functional (including partial) | Complete demo scope |
+|---|---:|---:|---:|---:|
+| ORG | 18 | 18 | 18 | 18 |
+| CON | 15 | 15 | 14 | 14 |
+| GIV | 16 | 16 | 16 | 16 |
+| ACT | 15 | 15 | 15 | 15 |
+| INT | 11 | 11 | 11 | 11 |
+| PRO | 15 | 15 | 14 | 13 |
+| MEN | 15 | 15 | 14 | 14 |
+| MEM | 15 | 15 | 12 | 12 |
+| DOC | 13 | 13 | 13 | 12 |
+| **Total** | **133** | **133** | **127** | **125** |
+
+Exclusive partition: **125 complete + two partial + six pending-definition displays + zero absent = 133**. Partial: PRO-13 broader engagement classification and DOC-06 metadata registration without binary upload. Pending: CON-12 Events Attended, PRO-12 Field Alignment, MEN-10 Pair Health, MEM-10 Events Attended, MEM-13 Engagement Score, MEM-14 Renewal Risk. The calculated subset is 25; none of the six placeholders is functional. Status vocabulary distinguishes Complete within demo scope, Partially functional, Represented placeholder, Not implemented and Definition pending; current remaining placeholders all have unresolved definitions. Directory/report/dashboard/Settings-only displays are outside the 133 denominator.
+
+### Runtime verification
+
+All executed against the isolated local stack or its disposable fresh test database; no hosted endpoint was targeted. Private reports live under ignored `.local/cbc-demo`; no generated credentials, screenshots or traces are committed.
+
+| Check / exact command | Result |
+|---|---|
+| `npm test --prefix apps/frontend` | PASS: 28 validation/unit tests |
+| `npm run typecheck --prefix apps/frontend` | PASS |
+| `npm run lint --prefix apps/frontend` | PASS |
+| `node scripts/demo/verify-database.mjs` | PASS: 279 SQL assertions on fresh PostgreSQL 17; ten canonical versions/checksums; RLS/extension audit |
+| `node scripts/demo/verify-api.mjs` | PASS: 20 real Auth/PostgREST checks |
+| `node scripts/demo/verify-giving.mjs` | PASS: 39 real checks |
+| `node scripts/demo/verify-interests.mjs` | PASS: 59 real checks |
+| `node scripts/demo/verify-programs.mjs` | PASS: 68 real checks |
+| `node scripts/demo/verify-reports.mjs` | PASS: 70 real checks |
+| `node scripts/demo/verify-membership.mjs` | PASS: 32 real checks |
+| `node scripts/demo/verify-mentorship.mjs` | PASS: 25 real checks |
+| `node scripts/demo/verify-documents.mjs` | PASS: 22 real checks; **335 API checks total** |
+| `npm run test:integration --prefix apps/frontend` | PASS: 38 real-Supabase Chromium scenarios, including twelve-step workflows, all active roles, anonymous, filters/source links/CSV and read-only controls |
+| `npm run test:e2e --prefix apps/frontend` | PASS: 33 Chromium fixture scenarios, including empty/failure/recovery and existing regressions |
+| Production build | PASS through both browser-suite `npm run build && npm run start` commands with explicit test API/public settings |
+| `node scripts/demo/check-repeatability.mjs` | PASS: two migration/seed replays; stable canonical history and named new/existing fixture counts |
+| `node scripts/demo/stack.mjs audit` then `node scripts/demo/audit.mjs` | PASS: zero local security advisor findings |
+| `node scripts/demo/readiness.test.mjs` | PASS: three target/manifest/credential privacy guards |
+| `node scripts/demo/refresh-fictional-labels.mjs` twice | PASS: local legacy generic names replaced, no records deleted; IDs/links/counts/cash preserved; idempotent |
+| Outgoing-source/credential check and `git diff --check` | PASS: no known private local credentials/key markers/generated local files/PDF changes in outgoing source; publication gate remains |
+
+The browser environment requires Chromium and its runtime libraries. This workstation used ignored `.local/playwright` plus `.local/browser-libs/runtime/usr/lib/x86_64-linux-gnu`; see readiness guide for exact exports. Initial sandbox process/port restrictions and missing browser libraries were resolved. Validation-form state preservation, a new metadata-trigger update bug, stale placeholder assertions, duplicate navigation selectors and a delayed fixture-reset race were fixed and rerun. Final results above supersede intermediate failed attempts; no failure was treated as a pass.
+
+Fictional names replaced generic labels in seed scripts, browser-created records, SQL/unit fixtures and the import example; explicit synthetic notices and reserved domains remain. Earlier test runs left generic names in the local database; a guarded local-only label refresh renamed those without changing financial data or record identity. Role checks cover Admin/Staff/Finance/Viewer; SQL/API separately verify anonymous and inactive denial. Automated tests are evidence for selected flows/shared validators, not a separate end-to-end test for each field or CBC approval.
+
+Implementation commits: `fda6d09` Membership; `712381a` Mentorship; `9833b31` Documents/Settings; `78628b1` Reports/Dashboard; `d26f243` full verification tooling; `c57c7e2` fictional fixtures; `4a61672` local legacy-label refresh. Handoff documentation is committed separately.
+
+### Demo and acceptance evidence
+
+[Walkthrough](board-demo-walkthrough.md) covers all twelve requested steps; automated real-browser workflows provide runtime demonstration evidence. Generated credential location is `.local/cbc-demo/accounts.json` (mode 600 within mode-700 local directory), never published passwords. [Separate hosted plan](hosted-demo-deployment-plan.md) covers a new synthetic-only Supabase project, hosting/configuration/migrations/Auth/seed/RLS/advisors/smoke/rollback/cost review. Existing hosted project remains untouched.
+
+**CBC/manual approval is not complete.** Named CBC/instructor review is required for provisional lifecycle, permissions, pending formulas, stack/deliverables and board acceptance. Binary files, event attendance, unsupported risk/health/retention/alignment/ROI calculations, immutable audit history, imports, payment collection and production accounting remain deferred. Repository-owner resolution of the already-tracked architecture PDF/public-history exposure is required before publication; no history rewrite or push is performed.
+
+## Historical checkpoints
 
 <a id="reports-foundation"></a>
 ## Reports foundation, Financial Performance and Sponsor Relationship — 2026-11-01–02
@@ -53,8 +124,8 @@ Reports is now a reachable navigation destination, leaving Mentorship, Membershi
 
 The requested next-category continuation is delivered as the Sponsor Relationship subset, after Financial passed its full suite. The next smallest report slice would be Scholarship Impact using existing Programs counts, support completeness and raw outcomes, while award identity, graduation/employment rates and program-attributed alumni giving remain pending. This is a recommendation only; no additional category is promoted in this task.
 
-<a id="current-field-audit"></a>
-## Current review fixes and field audit — 2026-11-01
+<a id="historical-field-audit"></a>
+## Historical review fixes and field audit — 2026-11-01
 
 REQ-010/002/006/008. The checkout already contained an uncommitted Programs foundation (operational migration, UI, shared revalidation, SQL/API/browser tests and provisional ADR-014). This pass inspected and verified it alongside the review fixes; it does not claim it was absent before this review. No new business module or formula was added. All earlier checkpoints below retain historical evidence, not current totals.
 

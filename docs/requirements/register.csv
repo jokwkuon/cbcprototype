@@ -7,9 +7,9 @@ REQ-005,Activities,Log interactions and manage due tasks,MUST,PROPOSED,Partnersh
 REQ-006,Analytics,Show approved metrics in dashboard,MUST,NEEDS_DEFINITION,Leadership,Metrics match approved source records
 REQ-007,Import,Load reviewed legacy HubSpot records,SHOULD,NEEDS_AUDIT,CBC technical liaison,Imported records traceable to source
 REQ-008,Access,Restrict sensitive access by role,MUST,NEEDS_DEFINITION,CBC admin,Unauthorized operations denied
-REQ-009,Membership,Manage memberships and renewals,LATER,PROPOSED,Membership lead,Defined lifecycle and metrics verified
-REQ-010,Programs,Track participants and outcomes,LATER,PROPOSED,Programs lead,Approved cohort reporting works
-REQ-011,Mentorship,Manage pairs and check-ins,LATER,PROPOSED,Mentorship lead,Check-in history and rules verified
-REQ-012,Documents,Manage linked file records,LATER,PROPOSED,CBC admin,Files protected by approved access rules
-REQ-013,Reports,Provide six functional report categories,LATER,PROPOSED,Leadership,Reports match approved examples
+REQ-009,Membership,Manage memberships and renewals,LATER,PROVISIONAL_MVP,Membership lead,Defined lifecycle and metrics verified; local synthetic implementation authorized 2026-11-02; CBC acceptance pending
+REQ-010,Programs,Track participants and outcomes,LATER,PROVISIONAL_MVP,Programs lead,Approved cohort reporting works; local synthetic implementation authorized 2026-11-02; CBC acceptance pending
+REQ-011,Mentorship,Manage pairs and check-ins,LATER,PROVISIONAL_MVP,Mentorship lead,Check-in history and rules verified; local synthetic implementation authorized 2026-11-02; CBC acceptance pending
+REQ-012,Documents,Manage linked file records,LATER,PROVISIONAL_MVP,CBC admin,Files protected by approved access rules; local synthetic implementation authorized 2026-11-02; CBC acceptance pending
+REQ-013,Reports,Provide six functional report categories,LATER,PROVISIONAL_MVP,Leadership,Reports match approved examples; local synthetic implementation authorized 2026-11-02; CBC acceptance pending
 REQ-014,Sponsor Interests,Represent sponsor priorities and explicit program discussion opportunity and follow-up links,MUST,PROVISIONAL_MVP,Partnerships,AT-07 AT-14 AT-15 and AT-16 verified locally under ADR-013; CBC approval pending

@@ -11,18 +11,21 @@ The repository began as a planning scaffold for Calgary Black Chambers (CBC) and
 - Sponsorship & Giving: separate pledges/receipts, partial payments, void corrections, CAD cash summaries, manual renewals and document reference links.
 - Sponsor Interests: priorities, explicit program/discussion/opportunity/task links, inherited restricted owner and Admin archive/restore.
 - Programs & Recipients: program/cohort/recipient/enrollment create/detail/edit, education and manual outcomes, scoped distinct participant/enrollment counts and exact known support totals. Linked-contact interactions, Last Contact and explicitly eligible person-wide alumni giving are supported. Program/cohort filters normalize on the server and clear incompatible cohorts in the browser.
-- Dashboard: basic CRM counts/status/recent records, action queue and giving summary. Failed queries display unavailable states; successful zero counts remain zero.
-- Reports: six reachable categories; Financial Performance reuses verified Giving summaries with calendar-year cash and organization filters, reconciled receipt/balance detail and Giving links. Sponsor Relationship shows recorded agreement/renewal dates, interactions and opportunity links without inferred pipeline/risk metrics. Four other categories and unsupported metrics remain explicitly pending.
+- Membership: contact/corporate terms, validated affiliations, manual fees/payments, provisional date status, history and upcoming renewals.
+- Mentorship: organization/program/cohort-bound pairs, manual lifecycle, check-in history/counts/latest raw feedback, issues and next actions.
+- Documents: protected metadata CRUD and Internal/Admin-only access; binary files deferred. Settings displays the actual account, role and implemented permissions.
+- Dashboard: CRM, actions, finance, interests, programs/recipients, membership/renewals, mentorship and recent interactions. Failed queries display unavailable states; successful zero counts remain zero.
+- Reports: all six categories query source records with relevant filters, supported counts/exact money, source links and permission-preserving CSV subsets. Advanced undefined metrics remain pending.
 
 Permissions are enforced in the database as well as the UI. Verification uses synthetic fixtures and real **local** Supabase Auth/PostgREST; it does not establish hosted deployment or CBC acceptance.
 
 ## Coverage and gaps
 
-The [133-row field audit](docs/delivery/field-coverage.csv) records **90 represented fields**, **88 with verified working demo behavior**, including **one partial field**, and **19 calculated fields** (an overlapping subset). Thus 87 fields are fully functional within the documented demo scope. **46 fields have deferred whole-field behavior**: 43 absent, two placeholders and one partial classification. Other limitations, including manual renewal instead of automation, are recorded separately.
+The [133-row field audit](docs/delivery/field-coverage.csv) records **133 represented**, **127 with working behavior**, **125 complete within demo scope**, **two partial** and **six pending definitions**. The calculated subset is 25; explicit links/server metadata do not inflate that count. PRO-13 remains partial engagement classification; DOC-06 records metadata registration without binary upload.
 
-Mentorship, Membership, Documents and Settings remain unavailable as full navigation destinations. Four report categories have pending pages; Financial Performance and Sponsor Relationship provide supported record/summary subsets, with event ROI/pipeline/renewal rates/export pending. Much of the specified executive dashboard remains incomplete. Global search, importer, email/calendar integrations, full audit history, production financial reconciliation and approved outcome/health/risk calculations remain deferred. Document links do not provide file storage or enforce access to external files.
+Pending: event attendance, field alignment, pair health, engagement score and renewal risk. Global search, imports/integrations, full immutable audit history, production accounting/refunds, payment collection, automatic renewal and other undefined outcome/retention/ROI formulas remain deferred. No file was uploaded by metadata registration. CBC/instructor acceptance and hosted deployment are separate gates.
 
-See [current verification, counting definitions and blockers](docs/delivery/progress.md#reports-foundation). The 133 detailed fields exclude directory-only metrics, dashboard panels, reports and Settings; 90/133 is not whole-board completion.
+See [current verification and counting definitions](docs/delivery/progress.md#current-field-audit), [board walkthrough](docs/delivery/board-demo-walkthrough.md) and [separate hosted plan](docs/delivery/hosted-demo-deployment-plan.md). The 133 denominator excludes directory-only metrics, dashboard/report panels and Settings.
 
 ## Run and verify locally
 
@@ -38,7 +41,7 @@ node scripts/demo/run.mjs
 
 These helpers target the isolated local synthetic environment. Generated credentials stay in ignored, permission-restricted `.local/cbc-demo` files; never copy them into tracked files. Do not apply migrations to an existing hosted project without operator review and separate authorization.
 
-Verification: frontend `npm test`, `npm run typecheck`, `npm run lint`, production build, `npm run test:e2e` and `npm run test:integration`; root `node scripts/demo/verify-database.mjs`, `verify-api.mjs`, `verify-giving.mjs`, `verify-interests.mjs`, `verify-programs.mjs` and `verify-reports.mjs`. Browser suites rebuild the production app and must run sequentially. Required browser-runtime setup and exact executed results are in the linked delivery notes.
+Verification: frontend `npm test`, `npm run typecheck`, `npm run lint`, production build, `npm run test:e2e` and `npm run test:integration`; root `node scripts/demo/verify-database.mjs`, `verify-api.mjs`, `verify-giving.mjs`, `verify-interests.mjs`, `verify-programs.mjs`, `verify-reports.mjs`, `verify-membership.mjs`, `verify-mentorship.mjs` and `verify-documents.mjs`. Browser suites rebuild the production app and must run sequentially. Required browser-runtime setup and exact executed results are in the linked delivery notes.
 
 ## Planning and traceability
 
@@ -50,4 +53,7 @@ Code lives in `apps/frontend`; canonical schema changes in `database/migrations`
 
 ## Data and publication policy
 
-This is a public repository. Commit synthetic records only: no live CBC records, private documents, confidential screenshots, credentials or tokens. The architecture PDF is absent from the current tree; its historical Git exposure still requires a repository-owner decision before publication. No history remediation or publication is authorized by local implementation work.
+This is a public repository. Commit synthetic records only: no live CBC records, private documents, confidential screenshots, credentials or tokens. The architecture PDF is already tracked; that is not permission to republish it. Its removal and historical Git exposure require a repository-owner decision before publication. No history remediation or publication is authorized by local implementation work.
+
+
+Open `http://localhost:3140/login`. Generated credentials are private in `.local/cbc-demo/accounts.json`; passwords are never published here. All named people and organizations are fictional examples.
