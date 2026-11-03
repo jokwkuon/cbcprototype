@@ -1,0 +1,5 @@
+import {test} from 'node:test';import assert from 'node:assert/strict';
+import {localDate,recordReference} from '../lib/presentation.ts';
+import {monthlyCash,exactCents} from '../lib/chart-data.ts';
+test('REQ-006/013 V2 chart sums exact dated receipts without crossing year or future months',()=>{const totals=monthlyCash([{received_on:'2025-01-01',amount:'0.10'},{received_on:'2025-01-31',amount:'0.20'},{received_on:'2025-02-01',amount:'99999999999999999999.99'},{received_on:'2024-01-01',amount:'10.00'},{received_on:'2025-12-01',amount:'20.00'}],2025,2);assert.deepEqual(totals,[30n,9999999999999999999999n]);assert.equal(exactCents(totals[0]),'0.30');assert.equal(exactCents(-10n),'-0.10');assert.throws(()=>monthlyCash([],2025,13));});
+test('REQ-006 V2 dates preserve calendar dates and Calgary time including DST',()=>{assert.match(localDate('2026-01-01'),/Jan 1, 2026/);assert.match(localDate('2026-01-01T07:00:00Z',true),/Jan 1, 2026/);assert.match(localDate('2026-07-01T06:00:00Z',true),/Jul 1, 2026/);assert.equal(recordReference('b0000000-0000-4000-8000-000000000002'),'b000·0002');});
