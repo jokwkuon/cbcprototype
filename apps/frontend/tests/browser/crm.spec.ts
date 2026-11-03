@@ -26,8 +26,8 @@ test("REQ-001/002: create, read, update, linked navigation and inline validation
   await page.getByRole("button",{name:"Save record"}).click();
   await expect(page.getByRole("heading",{name:"Copper Finch Ventures",exact:true})).toBeVisible();
   for (const label of ["Organization Name","Organization Type","Industry","Website","Primary Contact","Relationship Owner","Relationship Status","Relationship Strength","Priority Level","Potential","Estimated Opportunity","Notes"]) await expect(page.locator("dt").filter({hasText:new RegExp(`^${label}$`)})).toBeVisible();
-  for (const value of ["Community Partner","Professional services","Calgary","1234.56","Cultivate","https://example.test/"]) await expect(page.getByText(value,{exact:true})).toBeVisible();
-  const orgUrl=page.url(); await expect(page.getByText("Jordan Ellis",{exact:true})).toBeVisible();
+  for (const value of ["Community Partner","Professional services","Calgary","1234.56","Cultivate","https://example.test/"]) await expect(page.locator("#overview").getByText(value,{exact:true})).toBeVisible();
+  const orgUrl=page.url(); await expect(page.locator("main").getByText("Jordan Ellis",{exact:true})).toBeVisible();
   await expect(page.locator("#giving-history")).toContainText("Giving history unavailable");
   await page.getByRole("link",{name:"Edit organization",exact:true}).click();
   await page.getByLabel("Potential",{exact:true}).selectOption("High");
@@ -43,9 +43,9 @@ test("REQ-001/002: create, read, update, linked navigation and inline validation
   await page.getByLabel("Notes",{exact:true}).fill("Interested in mentoring emerging entrepreneurs");
   await page.getByRole("button",{name:"Save record"}).click();
   await expect(page.getByRole("heading",{name:"Maya Thompson",exact:true})).toBeVisible();
-  await expect(page.getByText("Jordan Ellis",{exact:true})).toBeVisible();
+  await expect(page.locator("main").getByText("Jordan Ellis",{exact:true})).toBeVisible();
   for (const label of ["First Name","Last Name","Title","Organization","Email","Phone","Contact Type","Influence Level","Relationship Owner","Interests","Notes"]) await expect(page.locator("dt").filter({hasText:new RegExp(`^${label}$`)})).toBeVisible();
-  for (const value of ["person@example.test","555-0100","Decision Maker","Interested in mentoring emerging entrepreneurs"]) await expect(page.getByText(value,{exact:true})).toBeVisible();
+  for (const value of ["person@example.test","555-0100","Decision Maker","Interested in mentoring emerging entrepreneurs"]) await expect(page.locator("#profile").getByText(value,{exact:true})).toBeVisible();
   await expect(page.getByText("Definition pending",{exact:true})).toHaveCount(1);
   await expect(page.locator("#giving-history")).toContainText("Giving history unavailable");
   const contactUrl=page.url();
@@ -66,7 +66,7 @@ test("REQ-008: staff self-assignment only and no edit owner control",async({page
   await page.getByRole("button",{name:"Save record"}).click();await page.getByRole("link",{name:"Edit organization",exact:true}).click();
   await expect(page.getByLabel("Relationship Owner")).toHaveCount(0);
   await page.getByLabel("Potential",{exact:true}).selectOption("High");await page.getByRole("button",{name:"Save record"}).click();
-  await expect(page.getByText("Jordan Ellis",{exact:true})).toBeVisible();
+  await expect(page.locator("main").getByText("Jordan Ellis",{exact:true})).toBeVisible();
 });
 for(const role of ["finance","viewer"]){test(`REQ-008: ${role} has no create controls`,async({page})=>{
   await signIn(page,role);await page.goto("/organizations");await expect(page.getByRole("link",{name:"+ Add organization",exact:true})).toHaveCount(0);
@@ -75,6 +75,6 @@ for(const role of ["finance","viewer"]){test(`REQ-008: ${role} has no create con
 test("REQ-008: anonymous redirect and mobile navigation",async({page})=>{
  await page.goto("/organizations");await expect(page).toHaveURL(/\/login$/);
  await signIn(page,"admin");await page.setViewportSize({width:390,height:844});
- await page.getByRole("navigation",{name:"Mobile navigation"}).getByRole("link",{name:"Contacts",exact:true}).click();
+ await page.getByRole("button",{name:"Open navigation",exact:true}).click();await page.getByRole("navigation",{name:"Mobile navigation"}).getByRole("link",{name:"Contacts",exact:true}).click();
  await expect(page.getByRole("heading",{name:"Contacts",exact:true})).toBeVisible();
 });

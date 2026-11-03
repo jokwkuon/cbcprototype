@@ -7,7 +7,7 @@
     "start": "next start",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
-    "test": "node --experimental-strip-types tests/validation.test.ts && node --experimental-strip-types tests/activities.test.ts && node --experimental-strip-types tests/giving.test.ts && node --experimental-strip-types tests/interests.test.ts && node --experimental-strip-types tests/programs.test.ts && node --experimental-strip-types tests/reports.test.ts && node --experimental-strip-types tests/membership.test.ts && node --experimental-strip-types tests/mentorship.test.ts && node --experimental-strip-types tests/documents.test.ts",
+    "test": "node --experimental-strip-types tests/validation.test.ts && node --experimental-strip-types tests/activities.test.ts && node --experimental-strip-types tests/giving.test.ts && node --experimental-strip-types tests/interests.test.ts && node --experimental-strip-types tests/programs.test.ts && node --experimental-strip-types tests/reports.test.ts && node --experimental-strip-types tests/membership.test.ts && node --experimental-strip-types tests/mentorship.test.ts && node --experimental-strip-types tests/documents.test.ts && node --experimental-strip-types tests/presentation.test.ts",
     "test:e2e": "playwright test",
     "test:integration": "playwright test --config playwright.integration.config.ts"
   },

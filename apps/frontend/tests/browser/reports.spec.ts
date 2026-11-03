@@ -27,7 +27,7 @@ for(const failure of ['contribution_details','activities','opportunities'])test(
 
 for(const category of ['membership','mentorship','scholarship'])test(`REQ-013 ${category} query failure and recovery preserve unknown versus empty`,async({page,request})=>{
  await login(page);const table=category==='membership'?'membership_details':category==='mentorship'?'mentorship_details':'program_enrollment_details';
- await request.post(`${api}/__report-fixture`,{data:{failure:table}});await page.goto(`/reports/${category}`);await expect(page.getByRole('heading',{name:'Report unavailable',exact:true})).toBeVisible();await expect(page.getByText('No matching records. Queries succeeded.',{exact:true})).toHaveCount(0);
+ await request.post(`${api}/__report-fixture`,{data:{failure:table}});await page.goto(`/reports/${category}`);await expect(page.getByRole('heading',{name:'Report unavailable',exact:true})).toBeVisible();await expect(page.getByText('No records match these filters.',{exact:true})).toHaveCount(0);
  const response=await page.request.get(`/reports/${category}/export`);expect(response.status()).toBe(400);expect(response.headers()['content-type']||'').not.toContain('text/csv');
- await request.post(`${api}/__report-fixture`,{data:{}});await page.reload();await expect(page.getByText('No matching records. Queries succeeded.',{exact:true})).toBeVisible();
+ await request.post(`${api}/__report-fixture`,{data:{}});await page.reload();await expect(page.getByText('No records match these filters.',{exact:true})).toBeVisible();
 });

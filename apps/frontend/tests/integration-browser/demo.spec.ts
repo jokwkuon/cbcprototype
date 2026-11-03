@@ -1,3 +1,4 @@
+import { localDate } from "../../lib/presentation";
 import {test,expect,type Page} from "@playwright/test";
 import {readFileSync} from "node:fs";
 import {resolve} from "node:path";
@@ -25,7 +26,7 @@ test("REQ-001/002/005/008: real Auth and complete record/relationship/action wor
  await page.goto("/dashboard");await expect(page.getByRole("link",{name:action,exact:true})).toBeVisible();
  await page.goto(activityUrl);await page.locator("article").filter({hasText:action}).getByRole("link",{name:"Edit follow-up",exact:true}).click();await expect(page.getByRole("heading",{name:"Edit follow-up",exact:true})).toBeVisible();await page.getByLabel("Completion",{exact:true}).selectOption("complete");await page.getByRole("button",{name:"Save record"}).click();await expect(page.locator("article").filter({hasText:action})).toContainText("Complete");
  await page.goto("/dashboard");await expect(page.getByRole("link",{name:action,exact:true})).toHaveCount(0);
- await page.goto(contactUrl);await expect(page.getByRole("link",{name,exact:true})).toHaveCount(2);await expect(page.getByText("2022-01-01 12:00:00 UTC",{exact:true}).first()).toBeVisible();
+ await page.goto(contactUrl);await expect(page.getByRole("link",{name,exact:true})).toHaveCount(2);await expect(page.getByText(localDate("2022-01-01T12:00:00Z",true),{exact:true}).first()).toBeVisible();
  await page.goto("/contacts");await expect(page.getByRole("heading",{name:"Contacts",exact:true})).toBeVisible();
 });
 for(const role of ["finance","viewer"]){test(`REQ-008: real ${role} read-only controls`,async({page})=>{
