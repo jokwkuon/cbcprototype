@@ -4,6 +4,7 @@
 - Do not implement unstated business rules or fabricate approved KPI formulas.
 - Never add live CBC records, private documents, screenshots with personal details, credentials or tokens to this public repository.
 - Use synthetic test fixtures only.
+- Give all demo and test entities believable fictional names (people, organizations, companies, institutions, programs, cohorts and documents), and use natural example descriptions instead of names such as "Synthetic Participant" or "Demo Organization". Apply this convention to future fixtures, seeds, browser-created records and walkthroughs. Preserve explicit synthetic/demo-data notices, reserved example email/URL domains and confidentiality safeguards.
 - Do not choose a stack without the instructor's student skill and deliverable requirements.
 - Use small, understandable relational components; avoid unnecessary microservices or distributed data engineering.
 - Reference requirement IDs in issues and PRs.

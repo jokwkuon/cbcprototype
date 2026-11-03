@@ -4,15 +4,15 @@ create function pg_temp.expect_error(statement text,expected text,label text) re
 update public.profiles set is_active=true where id='10000000-0000-4000-8000-000000000002';
 set role authenticated;
 select set_config('request.jwt.claim.sub','10000000-0000-4000-8000-000000000001',false);
-insert into public.contacts(id,first_name,last_name) values('30000000-0000-4000-8000-000000000002','Demo','Participant Two');
-select public.save_activity(null,'{"organization_id":"20000000-0000-4000-8000-000000000001","occurred_at":"2020-01-01T14:30:00Z","activity_type":"Meeting","purpose":"Synthetic Check-in","location":"Demo Room","key_discussion":"Synthetic discussion","sponsor_needs":"Demo needs","cbc_opportunity":"Demo opportunity","outcome":"Demo outcome"}',array['30000000-0000-4000-8000-000000000001'::uuid,'30000000-0000-4000-8000-000000000002'::uuid]) as activity_id \gset
+insert into public.contacts(id,first_name,last_name) values('30000000-0000-4000-8000-000000000002','Amara','Participant Two');
+select public.save_activity(null,'{"organization_id":"20000000-0000-4000-8000-000000000001","occurred_at":"2020-01-01T14:30:00Z","activity_type":"Meeting","purpose":"Partnership planning check-in","location":"Demo Room","key_discussion":"Discuss scholarship access and mentor recruitment","sponsor_needs":"Demo needs","cbc_opportunity":"Demo opportunity","outcome":"Prepare a partnership proposal"}',array['30000000-0000-4000-8000-000000000001'::uuid,'30000000-0000-4000-8000-000000000002'::uuid]) as activity_id \gset
 select pg_temp.assert_true((select count(*)=2 from public.activity_contacts where activity_id=:'activity_id'),'multiple participants persisted');
-select pg_temp.assert_true((select key_discussion='Synthetic discussion' and outcome='Demo outcome' from public.activities where id=:'activity_id'),'manual fields persisted');
+select pg_temp.assert_true((select key_discussion='Discuss scholarship access and mentor recruitment' and outcome='Prepare a partnership proposal' from public.activities where id=:'activity_id'),'manual fields persisted');
 insert into public.tasks(id,activity_id,description,owner_id,due_date) values
-('40000000-0000-4000-8000-000000000001',:'activity_id','Synthetic overdue','10000000-0000-4000-8000-000000000002',public.activity_today()-1),
-('40000000-0000-4000-8000-000000000002',:'activity_id','Synthetic today','10000000-0000-4000-8000-000000000003',public.activity_today()),
-('40000000-0000-4000-8000-000000000003',:'activity_id','Synthetic undated',null,null);
-select pg_temp.assert_true((select status='Overdue' and owner_name='Demo Staff A' from public.follow_ups where id='40000000-0000-4000-8000-000000000001'),'derived overdue and permitted owner label');
+('40000000-0000-4000-8000-000000000001',:'activity_id','Follow up on proposal','10000000-0000-4000-8000-000000000002',public.activity_today()-1),
+('40000000-0000-4000-8000-000000000002',:'activity_id','Confirm meeting agenda','10000000-0000-4000-8000-000000000003',public.activity_today()),
+('40000000-0000-4000-8000-000000000003',:'activity_id','Prepare partnership brief',null,null);
+select pg_temp.assert_true((select status='Overdue' and owner_name='Jordan Ellis' from public.follow_ups where id='40000000-0000-4000-8000-000000000001'),'derived overdue and permitted owner label');
 select pg_temp.assert_true((select status='Open' from public.follow_ups where id='40000000-0000-4000-8000-000000000002'),'due today open');
 select pg_temp.assert_true((select status='Open' from public.follow_ups where id='40000000-0000-4000-8000-000000000003'),'undated open');
 select pg_temp.assert_true(public.follow_up_status('2026-07-01',null,'2026-07-01')='Open','fixed date boundary');
@@ -30,7 +30,7 @@ select pg_temp.assert_true(public.activity_last_contact(p_contact_id=>'30000000-
 select public.save_activity(null,'{"organization_id":"20000000-0000-4000-8000-000000000001","occurred_at":"2099-01-01T14:30:00Z","activity_type":"Meeting","purpose":"Planned meeting"}',array['30000000-0000-4000-8000-000000000002'::uuid]) as future_id \gset
 select pg_temp.assert_true(public.activity_last_contact(p_activity_id=>:'future_id')='2020-01-01T14:30:00Z','future record excluded from last contact');
 select pg_temp.expect_error(format($q$select public.save_activity(%L,'{"occurred_at":"2021-01-01T12:00Z","activity_type":"Call","purpose":"Must rollback"}',array['30000000-0000-4000-8000-000000000099'::uuid])$q$,:'activity_id'),'42501','invalid participant atomic rejection');
-select pg_temp.assert_true((select purpose='Synthetic Check-in' from public.activities where id=:'activity_id'),'atomic activity rollback');
+select pg_temp.assert_true((select purpose='Partnership planning check-in' from public.activities where id=:'activity_id'),'atomic activity rollback');
 select pg_temp.assert_true((select count(*)=2 from public.activity_contacts where activity_id=:'activity_id'),'atomic participant rollback');
 select pg_temp.expect_error($q$insert into public.activities(occurred_at,activity_type) values(now(),' ')$q$,'23514','nonblank activity type');
 select pg_temp.expect_error($q$insert into public.activities(occurred_at,activity_type) values('infinity','Call')$q$,'23514','finite activity date');

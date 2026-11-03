@@ -13,7 +13,7 @@ end $$;
 set role authenticated;
 select set_config('request.jwt.claim.sub','10000000-0000-4000-8000-000000000001',false);
 select pg_temp.assert_true((select count(*)=2 from public.staff_directory),'admin directory: active staff only');
-insert into public.organizations(id,name,relationship_owner) values('20000000-0000-4000-8000-000000000001','Synthetic Organization A','10000000-0000-4000-8000-000000000002');
+insert into public.organizations(id,name,relationship_owner) values('20000000-0000-4000-8000-000000000001','Prairie Lantern Ventures','10000000-0000-4000-8000-000000000002');
 update public.organizations set relationship_owner='10000000-0000-4000-8000-000000000003' where id='20000000-0000-4000-8000-000000000001';
 select pg_temp.assert_true((select relationship_owner='10000000-0000-4000-8000-000000000003' from public.organizations where id='20000000-0000-4000-8000-000000000001'),'admin reassign');
 select pg_temp.expect_error($q$update public.organizations set relationship_owner='10000000-0000-4000-8000-000000000006'$q$,'23514','inactive target');
@@ -25,8 +25,8 @@ update public.organizations set relationship_owner='10000000-0000-4000-8000-0000
 select set_config('request.jwt.claim.sub','10000000-0000-4000-8000-000000000002',false);
 select pg_temp.assert_true((select count(*)=1 from public.staff_directory),'staff directory only self');
 select pg_temp.assert_true((select count(*)=1 from public.profiles),'staff profiles only self');
-insert into public.organizations(id,name,relationship_owner) values('20000000-0000-4000-8000-000000000002','Synthetic Organization B','10000000-0000-4000-8000-000000000002');
-insert into public.organizations(id,name) values('20000000-0000-4000-8000-000000000003','Synthetic Unassigned');
+insert into public.organizations(id,name,relationship_owner) values('20000000-0000-4000-8000-000000000002','Aspen Bridge Consulting','10000000-0000-4000-8000-000000000002');
+insert into public.organizations(id,name) values('20000000-0000-4000-8000-000000000003','Blue Heron Collective');
 select pg_temp.expect_error($q$insert into public.organizations(name,relationship_owner) values('Invalid','10000000-0000-4000-8000-000000000003')$q$,'42501','staff cannot create for other');
 select pg_temp.expect_error($q$update public.organizations set relationship_owner='10000000-0000-4000-8000-000000000003'$q$,'42501','staff cannot reassign');
 select pg_temp.expect_error($q$update public.organizations set relationship_owner=null where id='20000000-0000-4000-8000-000000000001'$q$,'42501','staff cannot clear');
@@ -37,7 +37,7 @@ select pg_temp.expect_error($q$update public.profiles set role='admin'$q$,'42501
 select pg_temp.expect_error($q$insert into public.staff_directory values('10000000-0000-4000-8000-000000000004','Forged')$q$,'42501','directory projection immutable');
 select pg_temp.expect_error($q$select private.validate_organization_owner()$q$,'42501','guard not RPC callable');
 update public.organizations set relationship_strength='High',potential='Low',estimated_opportunity=1234.56 where id='20000000-0000-4000-8000-000000000001';
-insert into public.contacts(id,organization_id,first_name,last_name,email,contact_type,influence_level,interests,notes) values('30000000-0000-4000-8000-000000000001','20000000-0000-4000-8000-000000000001','Demo','Contact','contact@example.test','Decision Maker','High','Scholarships','Synthetic note');
+insert into public.contacts(id,organization_id,first_name,last_name,email,contact_type,influence_level,interests,notes) values('30000000-0000-4000-8000-000000000001','20000000-0000-4000-8000-000000000001','Amara','Okafor','contact@example.test','Decision Maker','High','Scholarships','Follow up on education partnership');
 update public.organizations set primary_contact_id='30000000-0000-4000-8000-000000000001' where id='20000000-0000-4000-8000-000000000001';
 select pg_temp.expect_error($q$update public.organizations set primary_contact_id='30000000-0000-4000-8000-000000000001' where id='20000000-0000-4000-8000-000000000002'$q$,'23503','primary contact affiliation');
 select pg_temp.expect_error($q$update public.contacts set organization_id='20000000-0000-4000-8000-000000000002'$q$,'23503','primary contact cannot silently move');

@@ -5,7 +5,7 @@ create or replace function pg_temp.assert_true(ok boolean,label text) returns vo
 create or replace function pg_temp.expect_error(statement text,expected text,label text) returns void language plpgsql as $$ begin begin execute statement; exception when others then if sqlstate=expected then return; end if; raise exception 'FAIL: % expected %, received %',label,expected,sqlstate; end; raise exception 'FAIL: % unexpectedly allowed',label; end $$;
 set role authenticated;
 select set_config('request.jwt.claim.sub','10000000-0000-4000-8000-000000000001',false);
-insert into public.organizations(id,name) values('b0000000-0000-4000-8000-000000000001','Synthetic Report Partner'),('b0000000-0000-4000-8000-000000000002','Synthetic Empty Report Partner');
+insert into public.organizations(id,name) values('b0000000-0000-4000-8000-000000000001','Northstar Meadow Enterprises'),('b0000000-0000-4000-8000-000000000002','Clearwater Grove Collective');
 insert into public.contributions(id,organization_id,contribution_date,amount,contribution_type,funding_status) values
 ('b1000000-0000-4000-8000-000000000001','b0000000-0000-4000-8000-000000000001','2023-01-01',0.30,'Cash','Committed'),
 ('b1000000-0000-4000-8000-000000000002','b0000000-0000-4000-8000-000000000001','2024-01-01',1.00,'Cash','Invoiced'),
@@ -15,7 +15,7 @@ insert into public.contributions(id,organization_id,contribution_date,amount,con
 insert into public.cash_receipts(contribution_id,received_on,amount,is_void,void_reason) values
 ('b1000000-0000-4000-8000-000000000001','2024-12-31',0.10,false,null),
 ('b1000000-0000-4000-8000-000000000001','2025-01-01',0.20,false,null),
-('b1000000-0000-4000-8000-000000000001','2025-01-01',99,true,'Synthetic void'),
+('b1000000-0000-4000-8000-000000000001','2025-01-01',99,true,'Duplicate receipt entered in error'),
 ('b1000000-0000-4000-8000-000000000004','2025-01-01',0.05,false,null);
 select pg_temp.assert_true((public.giving_summary(2025,'b0000000-0000-4000-8000-000000000001')->>'annual_cash')::numeric=0.25,'report period uses received date not contribution date, excludes void and includes cancelled cash');
 select pg_temp.assert_true((public.giving_summary(2024,'b0000000-0000-4000-8000-000000000001')->>'annual_cash')::numeric=0.10,'report period changes receipt sum');
@@ -43,8 +43,8 @@ reset role;set role authenticated;
 select set_config('request.jwt.claim.sub','10000000-0000-4000-8000-000000000001',false);
 update public.contributions set agreement_start='2024-01-01',agreement_end='2027-12-31',renewal_date='2027-01-01' where id='b1000000-0000-4000-8000-000000000001';
 select pg_temp.assert_true((select renewal_date='2027-01-01' and agreement_end='2027-12-31' and cash_received::numeric=0.30 from public.contribution_details where id='b1000000-0000-4000-8000-000000000001'),'manual future renewal does not change received cash');
-insert into public.activities(id,organization_id,occurred_at,activity_type,purpose) values('b2000000-0000-4000-8000-000000000001','b0000000-0000-4000-8000-000000000001','2020-01-01','Meeting','Synthetic Sponsor Report');
-insert into public.opportunities(id,organization_id,name) values('b3000000-0000-4000-8000-000000000001','b0000000-0000-4000-8000-000000000001','Synthetic Sponsor Report Opportunity');
+insert into public.activities(id,organization_id,occurred_at,activity_type,purpose) values('b2000000-0000-4000-8000-000000000001','b0000000-0000-4000-8000-000000000001','2020-01-01','Meeting','Annual partnership review');
+insert into public.opportunities(id,organization_id,name) values('b3000000-0000-4000-8000-000000000001','b0000000-0000-4000-8000-000000000001','Leadership Scholarship Partnership');
 select set_config('request.jwt.claim.sub','10000000-0000-4000-8000-000000000005',false);
 select pg_temp.assert_true((select count(*)=1 from public.activities where organization_id='b0000000-0000-4000-8000-000000000001'),'Viewer explicit organization interaction scope');
 select pg_temp.assert_true((select count(*)=1 from public.opportunities where organization_id='b0000000-0000-4000-8000-000000000001'),'Viewer explicit organization opportunity scope');

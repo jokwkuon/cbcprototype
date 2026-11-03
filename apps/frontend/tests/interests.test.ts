@@ -13,7 +13,7 @@ test("REQ-014: manual strength, optional links and deduplication; no derived val
  const parsed=parseInterest(f);assert.deepEqual(parsed.programs,[link]);assert.deepEqual(parsed.tasks,[]);assert.equal(parsed.values.strength,"Self assessed");assert.equal(parsed.values.primary_contact_id,null);assert.equal(parsed.values.notes,"Synthetic");assert.ok(!Object.hasOwn(parsed.values,"relationship_owner"));assert.ok(!Object.hasOwn(parsed.values,"archived_at"));assert.deepEqual(interestValues(f).program_ids,[link,link]);
 });
 test("REQ-003/014: opportunity is a manual reference; exact estimate text retained",()=>{
- assert.deepEqual(parseOpportunity(form({organization_id:org,name:" Synthetic ",estimated_amount:"12345678901234567890.12"})),{organization_id:org,name:"Synthetic",estimated_amount:"12345678901234567890.12"});
- assert.equal(parseOpportunity(form({organization_id:org,name:"Synthetic"})).estimated_amount,null);
- for(const amount of ["NaN","Infinity","-1","1.001","1e3"])assert.throws(()=>parseOpportunity(form({organization_id:org,name:"Synthetic",estimated_amount:amount})),ValidationError);
+ assert.deepEqual(parseOpportunity(form({organization_id:org,name:" Future Builders Partnership ",estimated_amount:"12345678901234567890.12"})),{organization_id:org,name:"Future Builders Partnership",estimated_amount:"12345678901234567890.12"});
+ assert.equal(parseOpportunity(form({organization_id:org,name:"Future Builders Partnership"})).estimated_amount,null);
+ for(const amount of ["NaN","Infinity","-1","1.001","1e3"])assert.throws(()=>parseOpportunity(form({organization_id:org,name:"Future Builders Partnership",estimated_amount:amount})),ValidationError);
 });

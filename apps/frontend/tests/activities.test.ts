@@ -4,9 +4,9 @@ import { parseActivity,parseFollowUp,validDate,activityValues,utcInputValue } fr
 import { ValidationError } from "../lib/crm-validation.ts";
 const form=(values:Record<string,string>)=>{const f=new FormData();for(const [key,value] of Object.entries(values))f.set(key,value);return f;};
 test("REQ-005: preserve UTC timestamp, trim discussion fields and deduplicate participants",()=>{
- const f=form({occurred_at:"2026-07-01T14:30",activity_type:" Coffee ",purpose:" Demo ",key_discussion:" Notes ",sponsor_needs:" Needs ",cbc_opportunity:" Opportunity ",outcome:" Outcome "});
+ const f=form({occurred_at:"2026-07-01T14:30",activity_type:" Coffee ",purpose:" Partnership planning ",key_discussion:" Scholarship access ",sponsor_needs:" Volunteer mentors ",cbc_opportunity:" Future Builders partnership ",outcome:" Prepare proposal "});
  f.append("contact_ids","30000000-0000-4000-8000-000000000001");f.append("contact_ids","30000000-0000-4000-8000-000000000001");
- const parsed=parseActivity(f);assert.equal(parsed.values.occurred_at,"2026-07-01T14:30:00.000Z");assert.equal(parsed.values.key_discussion,"Notes");assert.equal(parsed.contacts.length,1);assert.equal(parsed.values.organization_id,null);
+ const parsed=parseActivity(f);assert.equal(parsed.values.occurred_at,"2026-07-01T14:30:00.000Z");assert.equal(parsed.values.key_discussion,"Scholarship access");assert.equal(parsed.contacts.length,1);assert.equal(parsed.values.organization_id,null);
  assert.equal(activityValues(f).contact_ids.length,2);
 });
 test("REQ-005: reject impossible calendar/time and forged participants",()=>{

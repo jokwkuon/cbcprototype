@@ -7,15 +7,15 @@ const base=JSON.parse(readFileSync(resolve(local,'records.json'),'utf8')),seed=J
 const admin=await login('admin'),staff=await login('staff');const evidence=[];
 const assert=(ok,label)=>{check(ok,label);evidence.push(label);};
 const row=await staff.from('interest_details').select('*').eq('id',seed.interestId).single();
-assert(!row.error&&row.data.category==='Synthetic Education Interest'&&row.data.strength==='Manually assessed: strong','Staff reads seeded manual fields');
+assert(!row.error&&row.data.category==='Education and youth leadership'&&row.data.strength==='Manually assessed: strong','Staff reads seeded manual fields');
 assert(row.data.primary_contact_id===base.contactIds[0]&&row.data.opportunity_id===seed.opportunityId&&row.data.opportunity_amount==='1234.56','Contact/opportunity linked; estimate exact');
 assert(row.data.programs[0].id===giving.programId&&row.data.last_discussion_id===seed.discussionId&&row.data.next_task_id==='62000000-0000-4000-8000-000000000001','Program/discussion/next-action derived from explicit links');
-assert(row.data.owner_name==='Synthetic Demo staff-a','Inherited restricted owner label');
+assert(row.data.owner_name==='Jordan Ellis','Inherited restricted owner label');
 const org=randomUUID(),otherContact=randomUUID(),otherOpportunity=randomUUID();
-assert(!(await admin.from('organizations').insert({id:org,name:'Synthetic Interest API Other Org'})).error,'Synthetic other organization');
-assert(!(await admin.from('contacts').insert({id:otherContact,organization_id:org,first_name:'Synthetic',last_name:'Interest API Other Contact'})).error,'Synthetic other contact');
-assert(!(await staff.from('opportunities').insert({id:otherOpportunity,organization_id:org,name:'Synthetic Interest API Opportunity'})).error,'Staff creates small opportunity reference');
-const values={organization_id:base.organizationId,primary_contact_id:base.contactIds[0],opportunity_id:seed.opportunityId,category:'Synthetic API Interest',strength:'Self assessed',notes:'Synthetic only'};
+assert(!(await admin.from('organizations').insert({id:org,name:'Alder Grove Consulting'})).error,'Synthetic other organization');
+assert(!(await admin.from('contacts').insert({id:otherContact,organization_id:org,first_name:'Elena',last_name:'Coleman'})).error,'Synthetic other contact');
+assert(!(await staff.from('opportunities').insert({id:otherOpportunity,organization_id:org,name:'Entrepreneurship mentoring partnership'})).error,'Staff creates small opportunity reference');
+const values={organization_id:base.organizationId,primary_contact_id:base.contactIds[0],opportunity_id:seed.opportunityId,category:'Small business development',strength:'Self assessed',notes:'Synthetic only'};
 const save=await staff.rpc('save_interest',{p_id:null,p_values:values,p_programs:[giving.programId],p_activities:[base.activityId,seed.discussionId],p_tasks:['62000000-0000-4000-8000-000000000001']});
 assert(!save.error&&save.data,'Staff creates interest atomically');const id=save.data;
 for(const [change,label] of [[{primary_contact_id:otherContact},'Cross-organization contact'],[{opportunity_id:otherOpportunity},'Cross-organization opportunity'],[{organization_id:org},'Organization move with incompatible links'],[{organization_id:null},'Required organization'],[{category:'  '},'Blank category'],[{id:randomUUID()},'Immutable ID'],[{archived_at:new Date().toISOString()},'Staff archive']])assert((await staff.from('sponsor_interests').update(change).eq('id',id)).error,`${label} denied directly`);
@@ -49,9 +49,9 @@ try {
  const r=await inactive.from('interest_details').select('id');assert(!r.error&&r.data.length===0,'Inactive reader denied');
  assert((await inactive.rpc('save_interest',{p_id:null,p_values:values,p_programs:[],p_activities:[],p_tasks:[]})).error,'Inactive writer denied');
 }finally{sql(`update public.profiles set is_active=true where id='${uuid(second.id)}';`);}
-const updated=await staff.from('sponsor_interests').update({notes:'Synthetic verified edit',created_at:'1900-01-01',updated_at:'1900-01-01'}).eq('id',id).select('*').single();
+const updated=await staff.from('sponsor_interests').update({notes:'Reviewed by the partnership coordinator',created_at:'1900-01-01',updated_at:'1900-01-01'}).eq('id',id).select('*').single();
 assert(!updated.error&&updated.data.created_at===unchanged.data.created_at&&Date.parse(updated.data.updated_at)>Date.parse(unchanged.data.updated_at),'Staff edits with server-maintained timestamps');
-assert(!(await staff.rpc('save_interest',{p_id:id,p_values:{organization_id:org,category:'Synthetic moved'},p_programs:[],p_activities:[],p_tasks:[]})).error,'Organization move with optional links cleared');
+assert(!(await staff.rpc('save_interest',{p_id:id,p_values:{organization_id:org,category:'Community leadership'},p_programs:[],p_activities:[],p_tasks:[]})).error,'Organization move with optional links cleared');
 const final=await staff.from('interest_details').select('*').eq('id',id).single();assert(!final.error&&final.data.organization_id===org&&final.data.primary_contact_id===null&&final.data.next_action===null,'Optional links cleared, no invented next action');
 privateWrite('interests-api-verification.json',{checks:evidence,syntheticOnly:true});
 console.log(`PASS: ${evidence.length} real local Sponsor Interests Auth/PostgREST checks; allow/deny, affiliation, archive, atomic saves, inherited ownership and timestamps.`);

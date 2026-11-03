@@ -5,7 +5,7 @@ import {ValidationError} from "../lib/crm-validation.ts";
 const id="a0000000-0000-4000-8000-000000000001";
 function form(values:Record<string,string>){const f=new FormData();for(const [k,v] of Object.entries(values))f.set(k,v);return f;}
 test("REQ-010: required program/cohort/recipient identity and references",()=>{
- const invalid:[ProgramKind,Record<string,string>][]=[["program",{name:"  "}],["cohort",{program_id:id,label:"",year:"2024"}],["cohort",{program_id:id,label:"Synthetic",year:"0"}],["cohort",{program_id:id,label:"Synthetic",year:"2024.5"}],["recipient",{name:"  "}],["recipient",{name:"Synthetic",contact_id:"forged"}],["enrollment",{program_id:id,cohort_id:id,recipient_id:"forged"}]];
+ const invalid:[ProgramKind,Record<string,string>][]=[["program",{name:"  "}],["cohort",{program_id:id,label:"",year:"2024"}],["cohort",{program_id:id,label:"Horizon Autumn Cohort",year:"0"}],["cohort",{program_id:id,label:"Horizon Autumn Cohort",year:"2024.5"}],["recipient",{name:"  "}],["recipient",{name:"Nia Adebayo",contact_id:"forged"}],["enrollment",{program_id:id,cohort_id:id,recipient_id:"forged"}]];
  for(const [kind,values] of invalid)assert.throws(()=>parseProgramForm(kind,form(values)),ValidationError);
 });
 test("REQ-010: exact support, unknown vs zero, no unsupported fields",()=>{
@@ -18,5 +18,5 @@ test("REQ-010: date validation, standalone and linked identity",()=>{
  assert.throws(()=>parseProgramForm("enrollment",form({program_id:id,cohort_id:id,recipient_id:id,graduation_date:"2025-02-29"})),ValidationError);
  assert.throws(()=>parseProgramForm("recipient",form({contact_id:id,alumni_since:"2024-02-30"})),ValidationError);
  assert.equal(parseProgramForm("recipient",form({contact_id:id,alumni_since:"2024-02-29"})).name,null);
- assert.equal(parseProgramForm("recipient",form({name:" Synthetic standalone "})).name,"Synthetic standalone");
+ assert.equal(parseProgramForm("recipient",form({name:" Tariq Lawson "})).name,"Tariq Lawson");
 });

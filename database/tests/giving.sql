@@ -3,8 +3,8 @@ create function pg_temp.assert_true(ok boolean,label text) returns void language
 create function pg_temp.expect_error(statement text,expected text,label text) returns void language plpgsql as $$ begin begin execute statement; exception when others then if sqlstate=expected then return; end if; raise exception 'FAIL: % expected %, received %',label,expected,sqlstate; end; raise exception 'FAIL: % unexpectedly allowed',label; end $$;
 set role authenticated;
 select set_config('request.jwt.claim.sub','10000000-0000-4000-8000-000000000004',false);
-insert into public.funding_initiatives(id,kind,name) values('70000000-0000-4000-8000-000000000001','Program','Synthetic Program'),('70000000-0000-4000-8000-000000000002','Event','Synthetic Event');
-insert into public.contributions(id,organization_id,contact_id,contribution_date,amount,contribution_type,program_id,event_id,agreement_start,agreement_end,renewal_date,sponsorship_level) values('71000000-0000-4000-8000-000000000001','20000000-0000-4000-8000-000000000001','30000000-0000-4000-8000-000000000001','2024-01-01',1000,'Cash','70000000-0000-4000-8000-000000000001','70000000-0000-4000-8000-000000000002','2024-01-01','2025-01-01','2025-02-01','Synthetic Gold');
+insert into public.funding_initiatives(id,kind,name) values('70000000-0000-4000-8000-000000000001','Program','Future Builders Scholarship'),('70000000-0000-4000-8000-000000000002','Event','Prairie Connections Reception');
+insert into public.contributions(id,organization_id,contact_id,contribution_date,amount,contribution_type,program_id,event_id,agreement_start,agreement_end,renewal_date,sponsorship_level) values('71000000-0000-4000-8000-000000000001','20000000-0000-4000-8000-000000000001','30000000-0000-4000-8000-000000000001','2024-01-01',1000,'Cash','70000000-0000-4000-8000-000000000001','70000000-0000-4000-8000-000000000002','2024-01-01','2025-01-01','2025-02-01','Community Partner');
 insert into public.cash_receipts(id,contribution_id,received_on,amount) values
 ('72000000-0000-4000-8000-000000000001','71000000-0000-4000-8000-000000000001','2024-01-01',100),
 ('72000000-0000-4000-8000-000000000002','71000000-0000-4000-8000-000000000001','2025-01-01',200.10),
@@ -16,7 +16,7 @@ select pg_temp.assert_true((public.giving_summary(2025)->>'yoy_percent')::numeri
 select pg_temp.assert_true(public.giving_summary(2023)->>'yoy_percent' is null,'zero baseline has no percentage');
 select pg_temp.assert_true((public.giving_summary(2025,p_contact_id=>'30000000-0000-4000-8000-000000000002')->>'lifetime_cash')::numeric=0,'contact scope isolates history');
 select pg_temp.assert_true((public.giving_summary(2025,p_organization_id=>'20000000-0000-4000-8000-000000000001')->>'lifetime_cash')::numeric=300.30,'organization lifetime cash');
-update public.cash_receipts set is_void=true,void_reason='Synthetic correction' where id='72000000-0000-4000-8000-000000000003';
+update public.cash_receipts set is_void=true,void_reason='Duplicate receipt entered in error' where id='72000000-0000-4000-8000-000000000003';
 select pg_temp.assert_true((public.giving_summary(2025)->>'annual_cash')::numeric=200.10,'void excluded');
 update public.cash_receipts set amount=1200 where id='72000000-0000-4000-8000-000000000002';
 select pg_temp.assert_true((select outstanding::numeric=0 and cash_received::numeric=1300 and payment_status='Received' from public.contribution_details),'overpayment stays cash with zero outstanding');
@@ -37,7 +37,7 @@ select pg_temp.expect_error($q$update public.contributions set program_id='70000
 select pg_temp.expect_error($q$update public.contributions set currency='USD'$q$,'23514','CAD only');
 select pg_temp.expect_error($q$update public.contributions set agreement_end='2023-01-01'$q$,'23514','agreement date order');
 select pg_temp.expect_error($q$select public.giving_summary(null)$q$,'22023','null year denied');
-insert into public.giving_document_links(contribution_id,label,url) values('71000000-0000-4000-8000-000000000001','Synthetic agreement','https://example.test/agreement');
+insert into public.giving_document_links(contribution_id,label,url) values('71000000-0000-4000-8000-000000000001','Prairie Lantern Partnership Agreement','https://example.test/agreement');
 select pg_temp.expect_error($q$update public.giving_document_links set url='javascript:alert(1)'$q$,'23514','unsafe document URLs denied');
 select pg_temp.expect_error($q$delete from public.cash_receipts$q$,'42501','receipt deletion disabled');
 select set_config('request.jwt.claim.sub','10000000-0000-4000-8000-000000000002',false);

@@ -3,7 +3,7 @@
 import http from "node:http";
 import { randomUUID } from "node:crypto";
 const id = n => `10000000-0000-4000-8000-${String(n).padStart(12,"0")}`;
-const profiles = ["admin","staff","staff","finance","viewer"].map((role,i)=>({id:id(i+1),role,is_active:true,full_name:`Demo ${role} ${i+1}`}));
+const profiles = ["admin","staff","staff","finance","viewer"].map((role,i)=>({id:id(i+1),role,is_active:true,full_name:["Morgan Hayes","Jordan Ellis","Simone Clarke","Evelyn Brooks","Noah Bennett"][i]}));
 const emptyTables=()=>({organizations:[],contacts:[],activities:[],activity_contacts:[],tasks:[],programs:[],program_cohorts:[],program_enrollments:[],program_enrollment_details:[],membership_details:[],mentorship_details:[],sponsor_interests:[],documents:[]});
 let tables=emptyTables();
 let failActivities=false;

@@ -4,10 +4,10 @@ create or replace function pg_temp.assert_true(ok boolean,label text) returns vo
 create or replace function pg_temp.expect_error(statement text,expected text,label text) returns void language plpgsql as $$ begin begin execute statement; exception when others then if sqlstate=expected then return; end if; raise exception 'FAIL: % expected %, received %',label,expected,sqlstate; end; raise exception 'FAIL: % unexpectedly allowed',label; end $$;
 select set_config('request.jwt.claim.sub','10000000-0000-4000-8000-000000000001',false);
 set role authenticated;
-insert into public.contacts(id,organization_id,first_name,last_name) values('96000000-0000-4000-8000-000000000002','95000000-0000-4000-8000-000000000001','Synthetic','Mentee');
+insert into public.contacts(id,organization_id,first_name,last_name) values('96000000-0000-4000-8000-000000000002','95000000-0000-4000-8000-000000000001','Daniel','Mensah');
 insert into public.mentorship_pairs(id,organization_id,mentor_id,mentee_id,program_id,cohort_id,start_date,status) values('c0000000-0000-4000-8000-000000000001','95000000-0000-4000-8000-000000000001','96000000-0000-4000-8000-000000000001','96000000-0000-4000-8000-000000000002','90000000-0000-4000-8000-000000000001','91000000-0000-4000-8000-000000000001','2020-01-01','Active');
-update public.mentorship_pairs set issues='Synthetic updated' where id='c0000000-0000-4000-8000-000000000001';
-select pg_temp.assert_true((select checkins_completed=0 and last_checkin is null and issues='Synthetic updated' from public.mentorship_details where id='c0000000-0000-4000-8000-000000000001'),'pair update and empty check-ins');
+update public.mentorship_pairs set issues='Schedule another mentoring conversation' where id='c0000000-0000-4000-8000-000000000001';
+select pg_temp.assert_true((select checkins_completed=0 and last_checkin is null and issues='Schedule another mentoring conversation' from public.mentorship_details where id='c0000000-0000-4000-8000-000000000001'),'pair update and empty check-ins');
 insert into public.mentorship_checkins(id,pair_id,checked_in_on,mentor_satisfaction) values('c1000000-0000-4000-8000-000000000001','c0000000-0000-4000-8000-000000000001','2020-02-01','First by UUID'),('c1000000-0000-4000-8000-000000000002','c0000000-0000-4000-8000-000000000001','2020-02-01','Second by UUID');
 select pg_temp.assert_true((select checkins_completed=2 and last_checkin='2020-02-01' and mentor_satisfaction='First by UUID' and mentee_satisfaction is null from public.mentorship_details where id='c0000000-0000-4000-8000-000000000001'),'deterministic latest feedback; unknown preserved');
 select pg_temp.expect_error($q$update public.mentorship_pairs set mentor_id=mentee_id$q$,'23514','self pairing denied');
@@ -17,7 +17,7 @@ select pg_temp.expect_error($q$update public.contacts set organization_id='95000
 select pg_temp.expect_error($q$update public.mentorship_pairs set target_end_date='1900-01-01'$q$,'23514','end chronology');
 select pg_temp.expect_error($q$insert into public.mentorship_checkins(pair_id,checked_in_on) values('c0000000-0000-4000-8000-000000000001',public.activity_today()+1)$q$,'23514','future completed check-in denied');
 select pg_temp.expect_error($q$update public.mentorship_checkins set pair_id='ffffffff-ffff-4fff-8fff-ffffffffffff'$q$,'23514','immutable check-in parent');
-insert into public.documents(id,name,access_level,uploaded_by,uploaded_at) values('d0000000-0000-4000-8000-000000000001','Synthetic internal','Internal','10000000-0000-4000-8000-000000000005','1900-01-01'),('d0000000-0000-4000-8000-000000000002','Synthetic restricted','Admin only','10000000-0000-4000-8000-000000000005','1900-01-01');
+insert into public.documents(id,name,access_level,uploaded_by,uploaded_at) values('d0000000-0000-4000-8000-000000000001','Prairie Lantern Agreement','Internal','10000000-0000-4000-8000-000000000005','1900-01-01'),('d0000000-0000-4000-8000-000000000002','Board Governance Working Notes','Admin only','10000000-0000-4000-8000-000000000005','1900-01-01');
 select pg_temp.assert_true((select bool_and(uploaded_by=auth.uid() and uploaded_at>'2000-01-01') from public.documents),'metadata creator and timestamp server enforced');
 update public.documents set uploaded_by='10000000-0000-4000-8000-000000000005',uploaded_at='1900-01-01';
 select pg_temp.assert_true((select bool_and(uploaded_by=auth.uid() and uploaded_at>'2000-01-01') from public.documents),'metadata provenance immutable on update');
