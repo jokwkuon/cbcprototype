@@ -359,3 +359,8 @@ Final review: production demo rebuilt and started successfully at http://localho
 ## Sponsor Interests pre-commit review — 2026-10-28
 
 Reviewed implementation/migration/test/documentation paths and shared cache refreshes; no unrelated edits or confidential/token artifacts found. `git diff --check`, 172 SQL assertions, 59 real local Interests API checks, 16 validation tests, typecheck/lint and three readiness guards passed again. The real-local 11-scenario browser suite/production build was rerun before committing; the first launch was blocked by the existing demo listener, which was stopped for the isolated suite. The PDF removal is already recorded in `b26f884`; no PDF deletion is currently staged. The ignored local PDF and Git history remain untouched by the implementation commit.
+
+
+## Version 2 experience redesign (2026-11-03)
+
+The complete local frontend redesign is implemented on `version-2`, based on Version 1 commit `e0e864e`. It preserves all 133 field classifications and business-rule boundaries. Evidence: [screen inventory/design decisions](../design/version-2.md), [Version 2 verification](version-2-verification.md), and private before/after screenshot gallery at `.local/cbc-demo/version-2/comparison.html` (100 screenshots; not tracked). Local production browser capture covered 25 destinations at desktop/mobile and observed zero runtime errors, console errors or document overflow. Unit tests (30), real-Supabase browser scenarios (43) and fixture browser scenarios (33) passed. This is engineering evidence only; manual board walkthrough and CBC/instructor acceptance remain pending.

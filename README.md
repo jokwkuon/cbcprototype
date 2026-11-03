@@ -1,6 +1,6 @@
 # CBC Relationship & Impact Management Prototype
 
-**Status: locally verified synthetic prototype on `feature/mvp-foundation`; not a production deployment or an accepted complete board demo.**
+**Status: Version 1 baseline on `feature/mvp-foundation`; complete UX redesign in progress on `version-2`. Both are local-only, synthetic-data builds, not a production deployment or CBC-accepted board demo.**
 
 The repository began as a planning scaffold for Calgary Black Chambers (CBC) and a proposed Bow Valley College student project. It now contains a Next.js frontend, Supabase PostgreSQL migrations, and synthetic verification tooling. Existing implementation does not settle the open CBC/instructor scope, stack, term or student deliverable decisions.
 
@@ -25,7 +25,7 @@ The [133-row field audit](docs/delivery/field-coverage.csv) records **133 repres
 
 Pending: event attendance, field alignment, pair health, engagement score and renewal risk. Global search, imports/integrations, full immutable audit history, production accounting/refunds, payment collection, automatic renewal and other undefined outcome/retention/ROI formulas remain deferred. No file was uploaded by metadata registration. CBC/instructor acceptance and hosted deployment are separate gates.
 
-See [current verification and counting definitions](docs/delivery/progress.md#current-field-audit), [board walkthrough](docs/delivery/board-demo-walkthrough.md) and [separate hosted plan](docs/delivery/hosted-demo-deployment-plan.md). The 133 denominator excludes directory-only metrics, dashboard/report panels and Settings.
+Version 2 redesign inventory and actual local/browser verification are documented in [design notes](docs/design/version-2.md) and [verification evidence](docs/delivery/version-2-verification.md). Comparison screenshots are private under ignored `.local/cbc-demo/version-2/` and are not published. See [current verification and counting definitions](docs/delivery/progress.md#current-field-audit), [board walkthrough](docs/delivery/board-demo-walkthrough.md) and [separate hosted plan](docs/delivery/hosted-demo-deployment-plan.md). The 133 denominator excludes directory-only metrics, dashboard/report panels and Settings.
 
 ## Run and verify locally
 

@@ -178,3 +178,11 @@ Earlier missing-module/coverage totals above are historical. Current audit: **13
 Record reviewer, date, commit, environment, actual observed outcomes and approval reference for the unchecked gates. Automated browser execution is runtime/demo evidence, not human CBC acceptance.
 
 Final local verification: 28 unit/validation tests; 279 SQL assertions; 335 real API checks; 38 real-Supabase browser scenarios; 33 fixture browser scenarios; three readiness guards; two migration/seed replays; typecheck/lint/production builds; zero local security advisor findings. All pass. Exact commands and scope are in progress. Fictional names and explicit synthetic notices are retained; no binary files, hosted changes or public push.
+
+
+## Version 2 UI evidence (2026-11-03)
+
+- [x] Redesign branch exists separately from Version 1; no merge, push, deployment or hosted Supabase change.
+- [x] Local synthetic production build captured all major screens and six reports at desktop/mobile: 50 before and 50 after images; zero after-capture runtime/console errors or document overflow. Private gallery: `.local/cbc-demo/version-2/comparison.html`.
+- [x] Unit (30), fixture browser (33) and real local Supabase browser (43) suites passed; details and database/API checks are in [Version 2 verification](version-2-verification.md).
+- [ ] Manual board walkthrough and CBC/instructor approval. Not represented by automated screenshot or code evidence.
