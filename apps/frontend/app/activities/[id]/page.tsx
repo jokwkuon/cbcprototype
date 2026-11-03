@@ -1,3 +1,4 @@
+import { RecordHeader } from "../../../components/record-header";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Shell } from "../../../components/shell";
@@ -16,7 +17,7 @@ export default async function ActivityDetail({params}:{params:Promise<{id:string
   ]);
   if(links.error||org.error) throw new Error("Unable to load related activity records.");
   const form=canWrite?await followUpFormData(client):null;
-  return <Shell><Link href="/activities">← Activities &amp; Follow-Ups</Link><div className="my-5 flex justify-between gap-4"><h1 className="text-3xl font-bold">{activity.purpose||activity.activity_type}</h1>{canWrite&&<Link href={`/activities/${id}/edit`}>Edit activity</Link>}</div>
+  return <Shell><RecordHeader name={activity.purpose||activity.activity_type} subtitle={displayTime(activity.occurred_at)} status={activity.activity_type} back="/activities" backLabel="Activities & Follow-Ups" editHref={canWrite?`/activities/${id}/edit`:undefined} editLabel="Edit activity"/>
     <section className="card p-6"><DetailFields fields={[
       ["Date / Time",displayTime(activity.occurred_at)],["Activity Type",activity.activity_type],
       ["Organization",org.data?<Link href={`/organizations/${org.data.id}`}>{org.data.name}</Link>:"Not linked"],

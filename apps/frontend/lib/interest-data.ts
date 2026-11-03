@@ -1,3 +1,5 @@
+import { readAll } from "./read-all";
+import { localDate } from "./presentation";
 import { crmContext } from "./crm-context";
 import type { FieldDefinition } from "./crm-fields";
 import { validId } from "./crm-validation";
@@ -12,13 +14,11 @@ export type Interest = {
 type Client = Awaited<ReturnType<typeof crmContext>>["client"];
 export async function interests(client: Client, filters: { id?: string; organization?: string; archived?: boolean } = {}) {
   if (filters.id && !validId(filters.id)) return [];
-  let query = client.from("interest_details").select("*").order("category").order("id");
+  let query = client.from("interest_details").select("*",{count:"exact"}).order("category").order("id");
   if (filters.id) query = query.eq("id", filters.id);
   if (filters.organization) query = query.eq("organization_id", filters.organization);
   if (!filters.id && !filters.archived) query = query.is("archived_at", null);
-  const { data, error } = await query;
-  if (error) throw new Error("Sponsor Interests unavailable. Check access and reviewed local migrations.");
-  return (data ?? []) as Interest[];
+  return readAll<Interest>((from,to)=>query.range(from,to));
 }
 export async function interestFormData(id?: string, organization?: string) {
   const { client, canWrite } = await crmContext();
@@ -41,12 +41,12 @@ export async function interestFormData(id?: string, organization?: string) {
   const blank = { id: "", name: "Not linked" };
   const fields: FieldDefinition[] = [
     { name: "organization_id", label: "Organization", type: "select", required: true, options: [{ id: "", name: "Select organization" }, ...(orgs.data ?? [])] },
-    { name: "primary_contact_id", label: "Primary Contact", type: "select", options: [blank, ...(contacts.data ?? []).filter(c => c.organization_id).map(c => ({ id: c.id, name: `${c.first_name} ${c.last_name} · ${names.get(c.organization_id)}` }))], hint: "Optional; must belong to the selected organization." },
+    { name: "primary_contact_id", parentField:"organization_id", label: "Primary Contact", type: "select", options: [blank, ...(contacts.data ?? []).filter(c => c.organization_id).map(c => ({ id: c.id, name: `${c.first_name} ${c.last_name} · ${names.get(c.organization_id)}`,parentId:c.organization_id }))], hint: "Optional; must belong to the selected organization." },
     { name: "category", label: "Interest Category", required: true, hint: "Manual label; taxonomy remains provisional." },
     { name: "strength", label: "Interest Strength", hint: "Manually entered; no automatic scoring or matching." },
     { name: "program_ids", label: "Program Alignment", type: "multiselect", options: programs.data ?? [], hint: "Optional Program references shared with Giving; no automatic alignment." },
-    { name: "activity_ids", label: "Linked discussions", type: "multiselect", options: (activities.data ?? []).map(a => ({ id: a.id, name: `${a.purpose || a.activity_type} · ${a.occurred_at}` })), hint: "Last Discussed / Last Discussion use the latest selected past discussion." },
-    { name: "opportunity_id", label: "Related Opportunity", type: "select", options: [blank, ...(opportunities.data ?? []).map(o => ({ id: o.id, name: `${o.name} · ${names.get(o.organization_id)}` }))], hint: "Optional; must belong to the selected organization. This is not a contribution." },
+    { name: "activity_ids", label: "Linked discussions", type: "multiselect", options: (activities.data ?? []).map(a => ({ id: a.id, name: `${a.purpose || a.activity_type} · ${localDate(a.occurred_at,true)}` })), hint: "Last Discussed / Last Discussion use the latest selected past discussion." },
+    { name: "opportunity_id", parentField:"organization_id", label: "Related Opportunity", type: "select", options: [blank, ...(opportunities.data ?? []).map(o => ({ id: o.id, name: `${o.name} · ${names.get(o.organization_id)}`,parentId:o.organization_id }))], hint: "Optional; must belong to the selected organization. This is not a contribution." },
     { name: "task_ids", label: "Linked follow-ups", type: "multiselect", options: (tasks.data ?? []).map(t => ({ id: t.id, name: t.description })), hint: "Next Action uses selected open follow-ups: earliest due, undated last. Manage follow-ups in Activities." },
     { name: "notes", label: "Notes", type: "textarea" },
   ];

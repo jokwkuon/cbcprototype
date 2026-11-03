@@ -1,21 +1,13 @@
-"use client";
-import { useActionState } from "react";
-import Link from "next/link";
-import { FormField } from "./fields";
-import type { FieldDefinition } from "../lib/crm-fields";
-import type { FormState } from "../lib/crm-validation";
-export function CrmForm({ action, fields, values = {}, cancelHref, children }: {
-  action: (state: FormState, form: FormData) => Promise<FormState>;
-  fields: FieldDefinition[]; values?: Record<string, string | number | string[] | null>; cancelHref: string; children?: React.ReactNode;
-}) {
-  const [state, submit, pending] = useActionState(action, {});
-  const displayed = { ...values, ...state.values };
-  return <form action={submit} className="card mt-6 max-w-3xl space-y-5 p-6">
-    {values.id && <input type="hidden" name="id" value={values.id}/>}
-    {state.message && <p role="alert" className="rounded-lg bg-red-50 p-3 text-red-800">{state.message}</p>}
-    <fieldset disabled={pending} className="grid gap-5 sm:grid-cols-2" key={JSON.stringify(state.values)}>
-      {fields.map(field => <FormField key={field.name} field={field} value={displayed[field.name]} error={state.errors?.[field.name]}/>)}
-    </fieldset>
-    {children}<div className="flex gap-4 items-center"><button disabled={pending} className="rounded-lg bg-purple px-5 py-3 font-semibold text-white">{pending ? "Saving…" : "Save record"}</button><Link href={cancelHref}>Cancel</Link></div>
-  </form>;
+'use client';
+import {useActionState,useState} from 'react';
+import Link from 'next/link';
+import {FormField} from './fields';
+import {Icon} from './icons';
+import {sectionFor,useFormProtection} from './form-support';
+import type {FieldDefinition} from '../lib/crm-fields';
+import type {FormState} from '../lib/crm-validation';
+export function CrmForm({action,fields,values={},cancelHref,children}:{action:(state:FormState,form:FormData)=>Promise<FormState>;fields:FieldDefinition[];values?:Record<string,string|number|string[]|null>;cancelHref:string;children?:React.ReactNode}){
+ const [parents,setParents]=useState<Record<string,string>>(Object.fromEntries(Object.entries(values).map(([k,v])=>[k,typeof v==='string'?v:''])));
+ const [state,submit,pending]=useActionState(action,{}),displayed={...values,...state.values},protection=useFormProtection(state.message),groups=[...new Set(fields.map(f=>sectionFor(f.name)))];
+ return <form action={submit} {...protection} className="card form-surface"><div className="form-intro"><span className="result-icon"><Icon name="documents"/></span><div><h2>{values.id?'Update record':'Create a new record'}</h2><p>Required fields are marked *. Your role controls what you can change.</p></div></div>{values.id&&<input type="hidden" name="id" value={values.id}/ >}{state.message&&<p role="alert" className="form-message">{state.message}</p>}<div key={JSON.stringify(state.values)}>{groups.map(group=><fieldset disabled={pending} className="form-section" key={group}><legend>{group}</legend><div className="form-fields">{fields.filter(f=>sectionFor(f.name)===group).map(field=><div key={field.name} className={field.type==='textarea'||field.type==='multiselect'?'field-wide':undefined}><FormField field={{...field,options:field.options?.filter(o=>!o.id||!field.parentField||!parents[field.parentField]||o.parentId===parents[field.parentField]||(state.errors?.[field.name]&&o.id===displayed[field.name]))}} value={displayed[field.name]} error={state.errors?.[field.name]} onChange={e=>{const value=e.target.value;setParents(p=>({...p,[field.name]:value}));for(const child of fields.filter(f=>f.parentField===field.name)){const select=e.currentTarget.form?.elements.namedItem(child.name)as HTMLSelectElement|null;if(select&&select.value&&!child.options?.some(o=>o.id===select.value&&o.parentId===value))select.value='';}}}/></div>)}</div></fieldset>)}</div>{children}<div className="form-footer"><button type="submit" disabled={pending} className="button button-primary">{pending?'Saving…':'Save record'}</button><Link className="button" href={cancelHref}>Cancel</Link><span className="save-note">{pending?'Saving your changes securely…':'Changes are saved only when you select Save.'}</span></div></form>;
 }

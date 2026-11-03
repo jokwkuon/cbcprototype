@@ -1,3 +1,4 @@
+import { localDate } from "./presentation";
 import { utcInputValue } from "./activity-validation";
 import { crmContext, ownerOptions } from "./crm-context";
 import { activityFields, followUpFields } from "./activity-fields";
@@ -6,7 +7,7 @@ import { validId } from "./crm-validation";
 export type Activity = { id:string; organization_id:string|null; occurred_at:string; activity_type:string; location:string|null; purpose:string|null; key_discussion:string|null; sponsor_needs:string|null; cbc_opportunity:string|null; outcome:string|null };
 export type FollowUp = { id:string; activity_id:string; description:string; owner_id:string|null; due_date:string|null; completed_at:string|null; status:"Open"|"Complete"|"Overdue"; organization_id:string|null; organization_name:string|null; activity_purpose:string|null; activity_type:string; owner_name:string|null };
 type Client = Awaited<ReturnType<typeof crmContext>>["client"];
-export function displayTime(value:string|null) { return value ? new Date(value).toISOString().replace("T"," ").replace(/\.\d{3}Z$/," UTC") : "No past activity"; }
+export function displayTime(value:string|null){return value?localDate(value,true):'No past activity';}
 export async function activityById(client:Client,id:string) {
   if (!validId(id)) return null;
   const {data,error}=await client.from("activities").select("*").eq("id",id).maybeSingle();

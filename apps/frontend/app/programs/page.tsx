@@ -1,3 +1,4 @@
+import { DataTable } from "../../components/data-table";
 import Link from "next/link";
 import { Shell } from "../../components/shell";
 import { PageHeader } from "../../components/ui";
@@ -24,7 +25,7 @@ export default async function Programs({ searchParams }: { searchParams: Promise
   const visible = records.filter(e => `${e.recipient_name} ${e.program_name} ${e.cohort_label} ${e.education_level ?? ""} ${e.field_of_study ?? ""} ${e.graduation_status ?? ""} ${e.employment_status ?? ""}`.toLowerCase().includes(q.toLowerCase()));
   return <Shell><PageHeader title="Programs & Recipients" subtitle="Programs, education and recorded outcomes. Provisional MVP conventions pending CBC approval." action={canWrite && <Link href="/programs/enrollments/new">+ Add enrollment</Link>}/>
     <nav aria-label="Program records" className="mb-5 flex flex-wrap gap-4"><Link href="/programs/recipients">Recipients</Link><Link href="/programs/cohorts">Cohorts</Link>{canWrite && <><Link href="/programs/new">+ Add program</Link><Link href="/programs/recipients/new">+ Add recipient</Link><Link href="/programs/cohorts/new">+ Add cohort</Link></>}</nav>
-    <section className="card mb-5 p-5"><h2 className="mb-3 text-xl font-bold">Programs</h2>{(programs.data ?? []).map(p => <p key={p.id}><Link href={`/programs/${p.id}`}>{p.name}</Link></p>)}{!programs.data?.length && <p>No programs recorded.</p>}</section>
+    <details className="program-catalog card mb-5"><summary className="flex items-center justify-between p-4"><span className="font-semibold text-sm">Program directory <span className="text-slate-400 text-xs ml-2">{programs.data?.length||0} programs</span></span><span className="text-xs text-purple">Browse programs ↓</span></summary><DataTable label="Programs" columns={[{key:'name',label:'Program'}]} rows={(programs.data||[]).map(p=>({id:p.id,href:`/programs/${p.id}`,cells:{name:{text:p.name,href:`/programs/${p.id}`,kind:'identity'}}}))}/></details>
     <ProgramFilters key={`${program}:${cohort}:${q}`} q={q} program={program} cohort={cohort} programs={programs.data ?? []} cohorts={cohorts.data ?? []}/ ><p className="text-sm">Summary follows program/cohort filters. Search narrows the enrollment directory.</p>
     <ProgramMetrics summary={summary}/><h2 className="mb-3 text-xl font-bold">Recipient enrollments</h2><EnrollmentTable records={visible}/>
   </Shell>;

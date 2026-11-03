@@ -5,7 +5,7 @@ export type Membership={id:string;member_name:string;contact_id:string|null;memb
 export function memberships(client:Client){return readAll<Membership>((a,b)=>client.from('membership_details').select('*',{count:'exact'}).order('id').range(a,b));}
 export async function membershipOptions(client:Client){
  const [contacts,organizations]=await Promise.all([
- readAll<{id:string;first_name:string;last_name:string}>((a,b)=>client.from('contacts').select('id,first_name,last_name',{count:'exact'}).order('id').range(a,b)),
+ readAll<{id:string;first_name:string;last_name:string;organization_id:string|null}>((a,b)=>client.from('contacts').select('id,first_name,last_name,organization_id',{count:'exact'}).order('id').range(a,b)),
  readAll<{id:string;name:string}>((a,b)=>client.from('organizations').select('id,name',{count:'exact'}).order('id').range(a,b))]);
- return {contacts:contacts.map(c=>({id:c.id,name:`${c.first_name} ${c.last_name}`})),organizations};
+ return {contacts:contacts.map(c=>({id:c.id,name:`${c.first_name} ${c.last_name}`,organizationId:c.organization_id})),organizations};
 }
