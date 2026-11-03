@@ -1,0 +1,6 @@
+import type {ReportRow} from '../lib/operational-report';
+export function RecordBreakdown({category,columns,rows}:{category:string;columns:string[];rows:ReportRow[]}){
+ const key=category==='scholarship'?'Graduation (manual)':category==='executive'?'Relationship Status':'Status',index=columns.indexOf(key);if(index<0)return null;
+ const counts=new Map<string,number>();for(const r of rows){const value=r.values[index]||'Unknown';counts.set(value,(counts.get(value)||0)+1);}const max=Math.max(1,...counts.values());
+ return <section className="card chart-card my-5"><div className="section-title"><h2>{category==='scholarship'?'Recorded graduation labels':'Record status breakdown'}</h2><span className="text-xs text-slate-500">{rows.length} records in this filtered scope</span></div><div className="report-bars">{[...counts].sort((a,b)=>b[1]-a[1]).map(([label,count])=><div key={label}><span>{label}</span><div aria-hidden="true"><i style={{width:`${count/max*100}%`}}/></div><b>{count}</b></div>)}</div>{!rows.length&&<p className="text-xs">No records in this scope.</p>}<p className="chart-caption mt-4">Counts of recorded labels only. No success rate, risk or health score is inferred.</p></section>;
+}

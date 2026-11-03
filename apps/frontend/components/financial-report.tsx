@@ -1,3 +1,6 @@
+import { DataTable } from "./data-table";
+import { ReceiptChart } from "./receipt-chart";
+import { recordReference } from "../lib/presentation";
 import Link from "next/link";
 import { financialReport } from "../lib/report-data";
 import type { crmContext } from "../lib/crm-context";
@@ -22,12 +25,10 @@ export async function FinancialReport({client,filters}:{client:Awaited<ReturnTyp
     <p>Receipt period: {String(year).padStart(4,"0")}-01-01 through {summary.period_end} ({summary.comparison_basis}). The year filter applies to cash received and the prior comparable period only. Pledged, outstanding, lifetime cash and in-kind totals below are all-time current balances as of {summary.as_of}; they are not historical year-end balances.</p>
     {!records.length&&<p role="status" className="my-4">No contributions recorded in this scope. Verified totals are zero.</p>}
     <FinancialSummaryValues summary={summary} cashLabel="Selected-period cash received"/>
-    <section className="card my-5 p-5" aria-label="Received payments in period"><h2 className="mb-3 text-xl font-bold">Received payments in period</h2>
+    <section className="card chart-card my-5"><h2>Receipts by month</h2><p className="chart-caption">Selected receipt period. Values reconcile with the ledger below.</p><ReceiptChart receipts={periodReceipts} year={year} periodEnd={summary.period_end}/></section>
+    <section id="received-payments" className="card my-5 p-5" aria-label="Received payments in period"><h2 className="mb-3 text-xl font-bold">Received payments in period</h2>
       <p>Actual non-void cash receipts only; pledges and in-kind support are not received cash.</p>
-      <div className="overflow-x-auto"><table className="w-full text-left text-sm"><thead><tr>{["Received on","Giving record","Receipt reference","Received cash"].map(label=><th className="p-3" key={label}>{label}</th>)}</tr></thead>
-        <tbody>{periodReceipts.map(r=><tr key={r.id} className="border-t"><td className="p-3">{r.received_on}</td><td><Link className="underline" href={`/giving/${r.contribution_id}`}>{byId.get(r.contribution_id)?.organization_name||byId.get(r.contribution_id)?.contact_name||"Unlinked contribution"} · {r.contribution_id}</Link></td><td>{r.reference||"—"}</td><td>{money(r.amount)}</td></tr>)}</tbody>
-        <tfoot><tr><th className="p-3" colSpan={3}>Period cash received</th><td>{money(summary.annual_cash)}</td></tr></tfoot></table></div>
-      {!periodReceipts.length&&<p role="status" className="my-3">No received payments in this period.</p>}
+      <DataTable label="Period receipts" searchable={false} filterable={false} groupable={false} columns={[{key:'date',label:'Received on'},{key:'giving',label:'Giving record'},{key:'reference',label:'Receipt reference'},{key:'cash',label:'Received cash',align:'right'}]} rows={periodReceipts.map(r=>({id:r.id,cells:{date:{text:r.received_on,kind:'date'},giving:{text:byId.get(r.contribution_id)?.organization_name||byId.get(r.contribution_id)?.contact_name||'Unlinked contribution',hint:`Ref ${recordReference(r.contribution_id)}`,href:`/giving/${r.contribution_id}`},reference:{text:r.reference},cash:{text:money(r.amount),sortValue:r.amount}}}))} emptyMessage="No received payments in this period." totals={{label:'Period cash received',value:money(summary.annual_cash)}}/>
     </section>
     <section aria-label="All-time contribution balances"><h2 className="mb-3 text-xl font-bold">All-time contribution balances and giving history</h2><p className="mb-3">Active Cash commitments count as pledged. Prospect/cancelled stages create no outstanding debt; their actual cash receipts remain received cash. In-kind is separate. Each row links to its Giving record.</p><GivingTable records={records} showPledged/></section>
     <section className="card my-5 p-5"><h2 className="text-xl font-bold">Event ROI — Definition pending</h2><p>Approved event revenue/cost allocation and ROI formula are not available. No ROI or profit is calculated. Accounting reconciliation/refunds remain pending.</p></section>

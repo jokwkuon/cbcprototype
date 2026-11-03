@@ -1,4 +1,3 @@
-"use client";
-export default function ErrorPage({ reset }: { reset: () => void }) {
-  return <main className="mx-auto max-w-xl p-8"><h1 className="text-2xl font-bold">Unable to load this page</h1><p className="my-4">Check your access and demo database setup, then try again. No missing data has been reported as zero.</p><button onClick={reset}>Try again</button><a className="ml-5" href="/dashboard">Dashboard</a></main>;
-}
+'use client';
+import Link from 'next/link';import {Icon} from '../components/icons';
+export default function ErrorPage({reset}:{reset:()=>void}){return <main className="min-h-screen grid place-items-center p-8"><section className="card max-w-md p-8"><span className="empty-icon"><Icon name="documents" size={22}/></span><h1 className="text-xl mb-3">Unable to load this page</h1><p className="text-sm mb-6">Check your access and local demo connection, then try again. A failed query is never shown as a zero balance or empty history.</p><div className="flex gap-3"><button className="button button-primary" onClick={reset}>Try again</button><Link className="button" href="/dashboard">Dashboard</Link></div></section></main>;}
