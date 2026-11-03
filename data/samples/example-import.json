@@ -3,14 +3,14 @@
   "organizations": [
     {
       "external_id": "demo-org-1",
-      "name": "Example Partner Ltd"
+      "name": "Orchard Vale Partners"
     }
   ],
   "contacts": [
     {
       "external_id": "demo-contact-1",
       "first_name": "Alex",
-      "last_name": "Example",
+      "last_name": "Reed",
       "email": "alex@example.org",
       "organization_external_id": "demo-org-1"
     }
