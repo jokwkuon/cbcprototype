@@ -186,3 +186,18 @@ Final local verification: 28 unit/validation tests; 279 SQL assertions; 335 real
 - [x] Local synthetic production build captured all major screens and six reports at desktop/mobile: 50 before and 50 after images; zero after-capture runtime/console errors or document overflow. Private gallery: `.local/cbc-demo/version-2/comparison.html`.
 - [x] Unit (30), fixture browser (33) and real local Supabase browser (43) suites passed; details and database/API checks are in [Version 2 verification](version-2-verification.md).
 - [ ] Manual board walkthrough and CBC/instructor approval. Not represented by automated screenshot or code evidence.
+
+## Version 3 reference walkthrough — REQ-001/002/005/008
+
+See [audit/plan](../design/version-3-audit.md) and [verification evidence](version-3-verification.md). Local synthetic branch `version3`; no hosted changes or merge.
+
+- [x] Audit precedes UI implementation; major screen queries/actions and cumulative migration/RLS boundaries documented.
+- [x] Organization/contact workspaces preserve full record workflows and expose source activity, follow-ups and related records.
+- [x] Quick-edit persistence, invalid input retention, stale-write protection, role denial and forged ownership checks have real-local browser/API evidence.
+- [x] Keyboard navigation, mobile results return, loading, failed query/save and recovery have automated browser evidence.
+- [ ] Human CBC/instructor walkthrough and named acceptance of the reference experience and provisional business conventions.
+
+Suggested demonstration: find Prairie Lantern Ventures, inspect its next steps/activity, switch to Amara Okafor and back without losing list context; quick-edit a contact phone number, then open the full editor to confirm the untouched affiliation/interests; start a contextual interaction and show preselected participant/organization; open related Membership/Giving/Documents source records. Repeat with Viewer to demonstrate read-only actions and restricted document/owner metadata. On mobile, open a selected record and return to results. Compare the frozen Version 2 preview and private desktop/mobile gallery. Record reviewer/date/commit/environment/results and approval reference separately.
+
+- [x] Final complete suites: 51 real-local browser and 36 fixture-browser scenarios pass; 30 unit/validation tests, 279 SQL assertions, 20 Auth/API checks, three readiness guards, static/production checks and zero local advisor findings.
+- [x] Final private comparison: 62 frozen-Version-2 + 62 Version-3 screenshots; zero runtime/console/hydration errors or document overflow. Original audit screenshots separately preserved; no generated artifacts staged.
