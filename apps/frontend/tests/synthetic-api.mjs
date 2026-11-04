@@ -7,6 +7,7 @@ const profiles = ["admin","staff","staff","finance","viewer"].map((role,i)=>({id
 const emptyTables=()=>({organizations:[],contacts:[],activities:[],activity_contacts:[],tasks:[],programs:[],program_cohorts:[],program_enrollments:[],program_enrollment_details:[],membership_details:[],mentorship_details:[],sponsor_interests:[],documents:[]});
 let tables=emptyTables();
 let failActivities=false;
+let relationshipBehavior={};
 let failDashboard="";
 let emptyFinancialSummary=false;
 let reportFixture=null;
@@ -23,10 +24,11 @@ const server=http.createServer(async(req,res)=>{
   const send=(status,body)=>{res.writeHead(status,{"Content-Type":"application/json"});res.end(req.method==="HEAD"?undefined:JSON.stringify(body));};
   if(req.method==="OPTIONS")return send(200,{});
   let raw="";for await(const chunk of req)raw+=chunk;const body=raw?JSON.parse(raw):{};
-  if(url.pathname==="/__reset"){ tables=emptyTables(); failActivities=false; failDashboard=""; emptyFinancialSummary=false; reportFixture=null; return send(200,{}); }
+  if(url.pathname==="/__reset"){ tables=emptyTables(); relationshipBehavior={}; failActivities=false; failDashboard=""; emptyFinancialSummary=false; reportFixture=null; return send(200,{}); }
   if(url.pathname==="/__report-fixture"){reportFixture=body;return send(200,{});}
   if(url.pathname==="/__empty-financial-summary"){emptyFinancialSummary=body.enabled===true;return send(200,{});}
   if(url.pathname==="/__fail-dashboard"){failDashboard=body.query??"";return send(200,{});}
+  if(url.pathname==="/__relationship-behavior"){relationshipBehavior=body;return send(200,{});}
   if(url.pathname==="/__fail-activities"){failActivities=body.fail===true;return send(200,{});}
   if(url.pathname==="/auth/v1/token"){
     const profile=profiles.find(p=>body.email===`${p.role}${p.role==="staff"?"2":""}@example.test`);
@@ -40,6 +42,9 @@ const server=http.createServer(async(req,res)=>{
   const table=url.pathname.split("/").at(-1);
   const dashboardQuery=table==="contacts"&&req.method==="HEAD"?"contacts":table==="organizations"?(req.method==="HEAD"?"organizations":["relationship_status","id,relationship_status"].includes(url.searchParams.get("select"))?"statuses":url.searchParams.get("limit")==="5"?"recent":""):"";
   if(failDashboard&&dashboardQuery===failDashboard)return send(500,{message:"Synthetic dashboard failure"});
+  if(relationshipBehavior.delayTable===table&&relationshipBehavior.delay)await new Promise(resolve=>setTimeout(resolve,relationshipBehavior.delay));
+  if(relationshipBehavior.writeDelay&&req.method==="PATCH")await new Promise(resolve=>setTimeout(resolve,relationshipBehavior.writeDelay));
+  if(relationshipBehavior.writeFailure&&req.method==="PATCH")return send(503,{message:"Fictional relationship save failure"});
   if(failActivities&&(["activities","activity_contacts","tasks","follow_ups","activity_today","activity_last_contact","save_activity"].includes(table)))return send(500,{message:"Synthetic activity query failure"});
   const activeReport=reportFixture;
   if(activeReport?.failure===table)return send(500,{message:"Synthetic report query failed"});
@@ -91,8 +96,8 @@ const server=http.createServer(async(req,res)=>{
       if(profile.role==="staff"&&((req.method==="PATCH"&&Object.hasOwn(body,"relationship_owner"))||(req.method==="POST"&&body.relationship_owner&&body.relationship_owner!==profile.id)))return send(403,{code:"42501"});
       if(body.relationship_owner&&!profiles.some(p=>p.id===body.relationship_owner&&p.role==="staff"&&p.is_active))return send(400,{code:"23514"});
     }
-    if(req.method==="POST"){const row={id:randomUUID(),created_at:new Date().toISOString(),relationship_owner:null,...body};tables[table].push(row);rows=[row];}
-    else{for(const row of rows)Object.assign(row,body);}
+    if(req.method==="POST"){const row={id:randomUUID(),created_at:new Date().toISOString(),updated_at:new Date().toISOString(),relationship_owner:null,...body};tables[table].push(row);rows=[row];}
+    else{for(const row of rows)Object.assign(row,body,{updated_at:new Date().toISOString()});}
   }
   if(table==="contacts"&&url.searchParams.get("select")?.includes("organization:"))rows=rows.map(row=>({...row,organization:tables.organizations.find(org=>org.id===row.organization_id)??null}));
   if(table==="activity_contacts"&&url.searchParams.get("select")?.includes("contact:"))rows=rows.map(row=>({...row,contact:tables.contacts.find(c=>c.id===row.contact_id)??null}));

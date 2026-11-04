@@ -57,7 +57,7 @@ test("REQ-001/002: create, read, update, linked navigation and inline validation
   await expect(page.getByRole("link",{name:"Maya Thompson",exact:true})).toHaveCount(2);
   await page.goto(contactUrl);await page.reload();await expect(page.getByText("Scholarships",{exact:true})).toBeVisible();
   await page.goto("/organizations");await page.getByPlaceholder("Search organizations…").fill("Copper Finch");await page.getByPlaceholder("Search organizations…").press("Enter");
-  await expect(page.getByRole("link",{name:"Copper Finch Ventures",exact:true})).toBeVisible();
+  await expect(page.getByRole("list",{name:"Organizations",exact:true}).getByRole("link").filter({hasText:"Copper Finch Ventures"})).toBeVisible();
 });
 test("REQ-008: staff self-assignment only and no edit owner control",async({page})=>{
   await signIn(page,"staff2");await page.goto("/organizations/new");

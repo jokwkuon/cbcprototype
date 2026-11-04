@@ -1,0 +1,736 @@
+/* Version 3 relationship workspaces: scoped tokens and domain layout. */
+.relationship-surface {
+  --rel-ink:#243047;
+  --rel-muted:#607086;
+  --rel-line:#e2e7ee;
+  --rel-selected:#f2edfc;
+  --rel-space:16px;
+  color:var(--rel-ink);
+  font-size:14px}
+
+.relationship-page-heading {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+  margin-bottom:24px}
+.relationship-eyebrow {
+  font-size:12px;
+  color:#69538d;
+  margin-bottom:7px}
+.relationship-page-heading h1 {
+  font-size:26px;
+  font-weight:650;
+  letter-spacing:-.7px;
+  line-height:1.3}
+.relationship-page-heading p {
+  font-size:13px;
+  color:var(--rel-muted);
+  margin-top:7px}
+.relationship-page-heading .button {
+  font-size:13px;
+  min-height:40px}
+
+.relationship-directory {
+  background:#fff;
+  border:1px solid var(--rel-line);
+  border-radius:9px;
+  overflow:clip;
+  box-shadow:0 2px 4px #24304703}
+.relationship-toolbar {
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:14px 16px;
+  border-bottom:1px solid var(--rel-line);
+  position:relative;
+  z-index:5;
+  background:#fff}
+.relationship-toolbar input,.relationship-toolbar select {
+  font-size:13px;
+  min-height:38px}
+.directory-search {
+  display:flex;
+  align-items:center;
+  gap:8px;
+  flex:1;
+  max-width:340px;
+  color:var(--rel-muted);
+  position:relative;
+  margin:0;
+  font-weight:400}
+.directory-search input {
+  padding-left:33px;
+  background:#f8f9fc}
+.directory-search>svg {
+  position:absolute;
+  left:10px}
+.directory-search kbd {
+  position:absolute;
+  right:10px;
+  border:1px solid var(--rel-line);
+  border-radius:3px;
+  padding:0 5px;
+  font-size:11px}
+.relationship-toolbar>label:not(.directory-search) {
+  max-width:200px;
+  margin:0}
+.directory-view {
+  position:relative;
+  margin-left:auto}
+.directory-view>summary {
+  display:flex;
+  align-items:center;
+  gap:7px;
+  cursor:pointer;
+  padding:8px 10px;
+  border:1px solid var(--rel-line);
+  border-radius:6px;
+  font-size:13px;
+  list-style:none}
+.directory-view>div {
+  position:absolute;
+  right:0;
+  top:44px;
+  width:220px;
+  padding:16px;
+  background:white;
+  border:1px solid var(--rel-line);
+  box-shadow:0 10px 35px #24304718;
+  border-radius:8px;
+  z-index:8}
+.directory-view label {
+  font-size:12px;
+  margin-bottom:12px}
+.directory-view select {
+  margin-top:6px}
+.directory-clear {
+  font-size:12px;
+  color:#6d46a8;
+  text-decoration:underline;
+  white-space:nowrap}
+.directory-count {
+  font-size:12px;
+  color:var(--rel-muted);
+  white-space:nowrap}
+.relationship-split {
+  display:grid;
+  grid-template-columns:minmax(270px,34%) minmax(0,1fr);
+  min-height:640px}
+.relationship-list {
+  border-right:1px solid var(--rel-line);
+  min-width:0;
+  display:flex;
+  flex-direction:column}
+.directory-list-heading {
+  font-size:11px;
+  text-transform:uppercase;
+  letter-spacing:.7px;
+  color:var(--rel-muted);
+  padding:13px 16px;
+  display:flex;
+  justify-content:space-between;
+  border-bottom:1px solid var(--rel-line);
+  background:#fafbfc}
+.directory-records {
+  list-style:none;
+  margin:0;
+  padding:0}
+.directory-record {
+  padding:16px;
+  display:flex;
+  gap:11px;
+  align-items:start;
+  border-bottom:1px solid #edf0f5;
+  min-height:96px;
+  color:var(--rel-ink)!important;
+  text-decoration:none!important;
+  transition:background .12s}
+.directory-record:hover {
+  background:#f8f9fc}
+.directory-record[aria-current=true] {
+  background:var(--rel-selected);
+  box-shadow:inset 3px 0 #7953bb}
+.directory-avatar {
+  width:34px;
+  height:34px;
+  border:1px solid #e3ddf1;
+  border-radius:7px;
+  background:#f8f5fd;
+  display:grid;
+  place-items:center;
+  font-size:11px;
+  color:#735496;
+  flex-shrink:0}
+.directory-identity {
+  min-width:0;
+  flex:1;
+  overflow-wrap:anywhere}
+.directory-identity strong {
+  font-size:13px;
+  font-weight:650;
+  line-height:1.5;
+  display:block}
+.directory-identity>span {
+  display:block;
+  font-size:12px;
+  line-height:1.6;
+  color:var(--rel-muted);
+  margin-top:3px}
+.directory-identity small {
+  display:block;
+  font-size:11px;
+  line-height:1.6;
+  color:var(--rel-muted);
+  margin-top:3px}
+.directory-stage {
+  flex-shrink:0;
+  max-width:90px}
+.directory-stage .pill {
+  font-size:10px}
+.directory-group {
+  background:#f8f9fc;
+  font-size:12px;
+  padding:10px 16px;
+  color:var(--rel-muted);
+  font-weight:600}
+.directory-pagination {
+  margin-top:auto;
+  display:flex;
+  gap:10px;
+  align-items:center;
+  padding:12px 16px;
+  border-top:1px solid var(--rel-line);
+  font-size:12px;
+  color:var(--rel-muted)}
+.directory-pagination>span:first-child {
+  margin-right:auto}
+.directory-pagination button {
+  border:1px solid var(--rel-line);
+  border-radius:4px;
+  min-width:30px;
+  min-height:30px}
+.directory-pagination button:disabled {
+  opacity:.35}
+.relationship-selection {
+  min-width:0}
+.directory-welcome {
+  min-height:560px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  padding:40px}
+.directory-welcome>span {
+  background:#f5f2fc;
+  padding:16px;
+  border-radius:12px;
+  color:#7b60a1;
+  margin-bottom:24px}
+.directory-welcome h2 {
+  font-size:19px;
+  font-weight:600;
+  letter-spacing:-.4px}
+.directory-welcome p {
+  font-size:14px;
+  line-height:1.8;
+  max-width:340px;
+  color:var(--rel-muted);
+  margin:12px auto 24px}
+.directory-welcome small {
+  font-size:12px;
+  color:var(--rel-muted)}
+.directory-empty {
+  padding:48px 24px;
+  text-align:center}
+.directory-empty h2 {
+  font-size:17px;
+  font-weight:600;
+  margin:12px 0}
+.directory-empty p {
+  font-size:13px;
+  line-height:1.7}
+.directory-empty button,.directory-empty a {
+  display:inline-block;
+  margin-top:16px;
+  color:#7045ad;
+  text-decoration:underline}
+.return-results {
+  display:none}
+.selection-notice {
+  padding:12px 22px;
+  background:#fff9ed;
+  font-size:12px;
+  border-bottom:1px solid #eee3ce}
+.relationship-record-header {
+  padding:24px 24px 18px}
+.record-type {
+  display:flex;
+  gap:7px;
+  align-items:center;
+  font-size:11px;
+  color:var(--rel-muted);
+  margin-bottom:14px}
+.record-type>span {
+  margin-left:auto}
+.relationship-record-header h2 {
+  font-size:23px;
+  font-weight:650;
+  letter-spacing:-.6px;
+  line-height:1.3;
+  overflow-wrap:anywhere}
+.relationship-record-header>p {
+  font-size:13px;
+  color:var(--rel-muted);
+  margin-top:7px;
+  line-height:1.6}
+.relationship-record-meta {
+  display:flex;
+  gap:12px;
+  flex-wrap:wrap;
+  align-items:center;
+  margin-top:13px;
+  font-size:12px;
+  color:var(--rel-muted)}
+.relationship-actions {
+  display:flex;
+  align-items:center;
+  gap:9px;
+  flex-wrap:wrap;
+  margin-top:21px}
+.relationship-actions .button {
+  font-size:12px;
+  min-height:36px}
+.record-full-link {
+  display:flex;
+  gap:5px;
+  align-items:center;
+  font-size:12px;
+  margin-left:auto;
+  color:#6f4aa8}
+.relationship-tabs {
+  display:flex;
+  gap:22px;
+  padding:0 24px;
+  border-bottom:1px solid var(--rel-line)}
+.relationship-tabs button {
+  font-size:13px;
+  padding:13px 0;
+  border-bottom:2px solid transparent;
+  color:var(--rel-muted);
+  margin-bottom:-1px}
+.relationship-tabs button[aria-selected=true] {
+  color:#6c46a6;
+  border-color:#7953bb;
+  font-weight:600}
+.record-working-area {
+  display:grid;
+  grid-template-columns:minmax(0,1fr);
+  min-width:0}
+.record-feed {
+  padding:24px;
+  min-width:0}
+.record-feed-heading {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px}
+.record-feed-heading h3,.record-context h3,.relationship-profile h3,.record-related-grid h3 {
+  font-size:14px;
+  font-weight:650}
+.record-feed-heading>span {
+  font-size:11px;
+  color:var(--rel-muted)}
+.record-last-contact {
+  font-size:12px;
+  color:var(--rel-muted);
+  margin:10px 0 20px;
+  line-height:1.7}
+.record-feed .follow-up-row {
+  padding:15px 0}
+.record-feed .follow-up-row a {
+  font-size:13px}
+.record-feed .follow-up-row p {
+  font-size:12px;
+  line-height:1.7}
+.record-feed .follow-up-row>a {
+  font-size:12px;
+  display:inline-block;
+  margin-top:8px}
+.record-completed {
+  font-size:12px;
+  margin-top:20px}
+.record-completed summary {
+  cursor:pointer;
+  color:var(--rel-muted);
+  padding-block:6px}
+.timeline-heading {
+  margin-top:30px;
+  padding-top:24px;
+  border-top:1px solid var(--rel-line)}
+.relationship-timeline {
+  list-style:none;
+  padding:0;
+  margin-top:22px}
+.relationship-timeline>li {
+  display:grid;
+  grid-template-columns:30px minmax(0,1fr);
+  gap:12px;
+  position:relative;
+  padding-bottom:24px}
+.timeline-event-icon {
+  height:29px;
+  width:29px;
+  border:1px solid var(--rel-line);
+  background:#faf9fd;
+  color:#80669f;
+  display:grid;
+  place-items:center;
+  border-radius:50%}
+.relationship-timeline>li:not(:last-child):before {
+  content:'';
+  position:absolute;
+  left:14px;
+  top:31px;
+  bottom:2px;
+  width:1px;
+  background:var(--rel-line)}
+.timeline-event-meta {
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:space-between;
+  gap:8px;
+  font-size:11px;
+  color:var(--rel-muted);
+  margin:4px 0 9px}
+.relationship-timeline a {
+  font-size:13px;
+  font-weight:600;
+  line-height:1.6}
+.relationship-timeline p {
+  font-size:13px;
+  line-height:1.7;
+  margin-top:8px;
+  white-space:pre-wrap;
+  overflow-wrap:anywhere}
+.relationship-timeline details {
+  font-size:12px;
+  margin-top:8px;
+  color:var(--rel-muted)}
+.relationship-timeline summary {
+  cursor:pointer}
+.record-no-activity {
+  padding:30px 0;
+  color:var(--rel-muted)}
+.record-no-activity h3 {
+  font-size:14px;
+  margin:12px 0 8px}
+.record-no-activity p {
+  font-size:13px;
+  line-height:1.7}
+.record-context {
+  border-top:1px solid var(--rel-line);
+  padding:24px;
+  background:#fcfcfe;
+  min-width:0}
+.record-context dl {
+  margin:16px 0 24px}
+.record-context dt {
+  font-size:12px;
+  color:var(--rel-muted);
+  margin-top:14px}
+.record-context dd {
+  font-size:13px;
+  margin-top:5px;
+  overflow-wrap:anywhere}
+.record-context-heading {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  margin-bottom:12px}
+.record-context-heading>a {
+  font-size:12px}
+.record-person {
+  display:block;
+  padding:12px 0;
+  border-bottom:1px solid var(--rel-line)}
+.record-person strong {
+  font-size:13px;
+  font-weight:600;
+  display:block}
+.record-person span {
+  display:block;
+  font-size:12px;
+  color:var(--rel-muted);
+  margin-top:6px;
+  line-height:1.6}
+.record-context>h3:not(:first-child) {
+  margin-top:22px}
+.record-notes {
+  white-space:pre-wrap;
+  font-size:13px;
+  line-height:1.8;
+  margin-top:12px;
+  overflow-wrap:anywhere}
+.relationship-profile {
+  padding:24px}
+.relationship-profile>h3 {
+  margin-bottom:22px}
+.relationship-profile dt {
+  font-size:12px!important;
+  text-transform:none!important;
+  font-weight:500!important;
+  letter-spacing:0!important}
+.relationship-profile dd {
+  font-size:14px;
+  line-height:1.7}
+.record-provenance {
+  font-size:12px;
+  margin:24px 0 12px;
+  color:var(--rel-muted)}
+.relationship-profile>a {
+  font-size:13px}
+.record-related-grid {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  padding:24px;
+  gap:20px}
+.record-related-grid>section {
+  border:1px solid var(--rel-line);
+  border-radius:7px;
+  padding:18px;
+  min-width:0}
+.record-related-grid ul {
+  list-style:none;
+  padding:0;
+  margin:12px 0}
+.record-related-grid li {
+  padding:12px 0;
+  border-bottom:1px solid var(--rel-line)}
+.record-related-grid li>a {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  font-size:13px;
+  font-weight:550;
+  overflow-wrap:anywhere}
+.record-related-grid li>span {
+  display:block;
+  font-size:12px;
+  line-height:1.6;
+  margin-top:6px;
+  color:var(--rel-muted)}
+.record-related-grid p {
+  font-size:13px;
+  line-height:1.8;
+  margin:16px 0}
+.related-source-link {
+  font-size:12px;
+  display:inline-block;
+  margin-top:12px}
+.relationship-loading {
+  display:grid;
+  gap:16px;
+  padding:24px;
+  font-size:13px;
+  color:#607086}
+.relationship-edit-dialog {
+  margin:auto;
+  padding:0;
+  border:1px solid #dedee8;
+  border-radius:10px;
+  width:min(580px,calc(100vw - 32px));
+  max-height:90dvh;
+  color:#243047;
+  background:#fff;
+  box-shadow:0 24px 100px #111b2e33;
+  overflow:auto}
+.relationship-edit-dialog::backdrop {
+  background:#111b2e66;
+  backdrop-filter:blur(2px)}
+.relationship-edit-dialog header {
+  display:flex;
+  align-items:start;
+  justify-content:space-between;
+  padding:22px;
+  border-bottom:1px solid #e2e7ee;
+  gap:16px}
+.relationship-edit-dialog h2 {
+  font-size:19px;
+  font-weight:650}
+.relationship-edit-dialog p {
+  font-size:13px;
+  line-height:1.7;
+  margin-top:6px}
+.relationship-edit-dialog header button {
+  font-size:24px;
+  min-width:32px;
+  min-height:32px}
+.quick-edit-fields {
+  padding:22px;
+  display:grid;
+  gap:16px}
+.quick-edit-fields label {
+  font-size:13px}
+.quick-edit-fields input,.quick-edit-fields select,.quick-edit-fields textarea {
+  font-size:14px}
+.quick-edit-fields textarea {
+  min-height:100px}
+.relationship-edit-dialog footer {
+  position:sticky;
+  bottom:0;
+  background:white;
+  display:flex;
+  gap:10px;
+  align-items:center;
+  padding:18px 22px;
+  border-top:1px solid #e2e7ee}
+.relationship-edit-dialog footer>a {
+  margin-right:auto;
+  font-size:12px}
+.relationship-edit-dialog .quick-edit-error,.relationship-edit-dialog .quick-edit-success {
+  margin:16px 22px 0;
+  padding:12px;
+  border-radius:6px}
+.quick-edit-error {
+  background:#fff4f5;
+  color:#9b3349;
+  border:1px solid #eed0d7}
+.quick-edit-success {
+  background:#f0faf4;
+  color:#256044;
+  border:1px solid #cee9da}
+
+@media(min-width:1500px) {
+  .record-working-area {
+  grid-template-columns:minmax(0,1fr) 240px}
+.record-context {
+  border-top:0;
+  border-left:1px solid var(--rel-line)}
+}
+
+@media(max-width:1100px) and (min-width:801px) {
+  .relationship-split {
+  grid-template-columns:270px minmax(0,1fr)}
+.directory-stage {
+  display:none}
+.record-related-grid {
+  grid-template-columns:1fr}
+.relationship-toolbar {
+  flex-wrap:wrap}
+.directory-count {
+  margin-left:auto}
+.record-full-link {
+  margin-left:0}
+}
+
+@media(max-width:800px) {
+  .relationship-page-heading {
+  align-items:start;
+  flex-wrap:wrap;
+  margin-bottom:18px}
+.relationship-page-heading h1 {
+  font-size:25px}
+.relationship-page-heading p {
+  font-size:13px;
+  line-height:1.7}
+.relationship-page-heading .button {
+  min-height:44px;
+  font-size:13px}
+.relationship-toolbar {
+  padding:12px;
+  flex-wrap:wrap;
+  gap:10px}
+.directory-search {
+  max-width:none;
+  flex-basis:100%}
+.directory-search input {
+  min-height:44px}
+.relationship-toolbar select {
+  min-height:44px;
+  max-width:205px;
+  font-size:12px}
+.directory-view>summary {
+  min-height:44px}
+.directory-count {
+  width:100%;
+  font-size:12px}
+.relationship-split {
+  display:block;
+  min-height:0}
+.relationship-list {
+  border:0}
+.relationship-selection {
+  display:none}
+.has-selection .relationship-list {
+  display:none}
+.has-selection .relationship-selection {
+  display:block}
+.has-selection .relationship-toolbar {
+  display:none}
+.return-results {
+  display:flex;
+  align-items:center;
+  gap:7px;
+  min-height:48px;
+  padding:12px 18px;
+  border-bottom:1px solid var(--rel-line);
+  font-size:13px}
+.return-results svg {
+  transform:rotate(180deg)}
+.relationship-record-header {
+  padding:20px 18px}
+.relationship-record-header h2 {
+  font-size:22px}
+.relationship-record-header>p {
+  font-size:13px}
+.relationship-actions .button {
+  min-height:44px}
+.record-full-link {
+  margin-left:0;
+  min-height:44px}
+.relationship-tabs {
+  padding:0 18px;
+  gap:20px}
+.relationship-tabs button {
+  min-height:48px;
+  font-size:13px}
+.record-feed,.record-context,.relationship-profile {
+  padding:20px 18px}
+.record-related-grid {
+  grid-template-columns:1fr;
+  padding:20px 18px}
+.directory-record {
+  min-height:100px}
+.directory-pagination button {
+  min-height:44px;
+  min-width:44px}
+.record-feed .follow-up-row>a {
+  min-height:36px;
+  padding-block:9px}
+.directory-clear {
+  min-height:44px}
+.directory-list-heading span:last-child {
+  display:none}
+.relationship-edit-dialog footer {
+  flex-wrap:wrap}
+.relationship-edit-dialog .button {
+  min-height:44px}
+.quick-edit-fields input,.quick-edit-fields select {
+  min-height:44px}
+}
+
+.relationship-selection { container-type: inline-size; container-name: record; }
+@container record (min-width: 650px) {
+  .record-working-area { grid-template-columns: minmax(0, 1fr) 220px; }
+  .record-context { border-top: 0; border-left: 1px solid var(--rel-line); padding: 22px 18px; }
+}
+.relationship-selection [role=tabpanel]:focus-visible { outline-offset: -3px; }
+/* Canonical record routes now offer both quick and full editing. */
+.detail-hero .hero-actions { flex-wrap: wrap; }
+@media (max-width: 800px) {
+  .relationship-surface:has(.has-selection) .relationship-page-heading { display: none; }
+}
