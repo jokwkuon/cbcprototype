@@ -21,3 +21,7 @@ test('REQ-013: failed, truncated and changing record reads never become empty re
  await assert.rejects(readAll(()=>Promise.resolve({data:[{id:1},{id:1}],count:2,error:null})));
  let page=0;await assert.rejects(readAll(()=>Promise.resolve({data:[{id:page}],count:++page===1?2:3,error:null})));
 });
+
+test('REQ-013: oversized reads fail before transferring further pages',async()=>{
+ let calls=0;await assert.rejects(readAll(()=>{calls++;return Promise.resolve({data:[{id:1}],count:10001,error:null});}),/record limit/);assert.equal(calls,1);
+});

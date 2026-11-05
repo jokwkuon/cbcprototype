@@ -22,6 +22,7 @@ jobs:
           cache: npm
           cache-dependency-path: apps/frontend/package-lock.json
       - run: npm ci
+      - run: node --test ../../scripts/import/preview.test.mjs
       - run: npm test
       - run: npm run typecheck
       - run: npm run lint
@@ -33,6 +34,10 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: node scripts/schema/compare.test.mjs
       - name: Start disposable PostgreSQL
         run: docker run --name cbc-day1-db -e POSTGRES_PASSWORD=fictional-ci-only -d postgres:17
       - name: Wait for PostgreSQL
@@ -44,3 +49,44 @@ jobs:
           exit 1
       - name: SQL integrity and role regressions
         run: bash database/tests/run.sh
+      - name: Canonical versus reconciliation structural drift
+        run: node scripts/schema/rehearse.mjs
+      - name: Synthetic logical restore drill
+        run: node scripts/schema/restore-rehearsal.mjs
+  integration:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      CBC_DEMO_INSTANCE: test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: apps/frontend/package-lock.json
+      - run: npm ci
+        working-directory: apps/frontend
+      - run: npx playwright install --with-deps chromium
+        working-directory: apps/frontend
+      - name: Start isolated native Supabase Auth and PostgREST
+        run: node scripts/demo/stack.mjs start
+      - run: node scripts/demo/stack.mjs migrate
+      - run: node scripts/demo/seed.mjs
+      - name: Real Auth, RLS and financial API checks
+        run: |
+          node scripts/demo/verify-api.mjs
+          node scripts/demo/verify-giving.mjs
+          node scripts/demo/verify-interests.mjs
+          node scripts/demo/verify-programs.mjs
+          node scripts/demo/verify-membership.mjs
+          node scripts/demo/verify-mentorship.mjs
+          node scripts/demo/verify-documents.mjs
+          node scripts/demo/verify-reports.mjs
+      - name: Real browser workflows and session regressions
+        run: npm run test:integration
+        working-directory: apps/frontend
+      - name: Stop isolated services
+        if: always()
+        run: node scripts/demo/stack.mjs stop
+      # Private runtime files contain synthetic credentials; never upload .local.

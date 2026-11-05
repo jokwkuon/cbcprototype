@@ -1,7 +1,9 @@
+import {diagnostic} from '../../../lib/diagnostics';
 import {crmContext} from '../../../lib/crm-context';
 import {searchFilter,searchTerm} from '../../../lib/search-query';
 const headers = {'Cache-Control':'private, no-store'};
 export async function GET(request:Request) {
+  const started=performance.now();
   try {
     const {client} = await crmContext();
     const q = searchTerm(new URL(request.url).searchParams.get('q') || '');
@@ -22,6 +24,7 @@ export async function GET(request:Request) {
     ];
     return Response.json({results},{headers});
   } catch {
-    return Response.json({error:'Search unavailable.'},{status:503,headers});
+    const correlationId=diagnostic('search_failed',started);
+    return Response.json({error:'Search unavailable.',correlationId},{status:503,headers});
   }
 }
