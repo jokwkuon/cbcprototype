@@ -25,7 +25,7 @@ async function saveRecord(kind: "organization" | "contact", editing: boolean, fo
       const message = error?.code === "23503" ? "A linked record is invalid or the primary contact belongs to another organization. Clear the primary contact before moving that person."
         : error?.code === "42501" ? "This ownership assignment or operation is not permitted."
         : error?.code === "23514" ? "A value is invalid. Owners must be active Staff members."
-        : "Unable to save the record. Check access, linked records and migration setup, then try again.";
+        : "Unable to save this record. Review the highlighted fields and linked records, or try again.";
       throw new Error(message);
     }
     id = data.id;

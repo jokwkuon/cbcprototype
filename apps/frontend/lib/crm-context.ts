@@ -7,7 +7,11 @@ export const crmContext = cache(async () => {
   const { data: { user }, error } = await client.auth.getUser();
   if (error || !user) throw new Error("Sign in to continue.");
   const { data: profile, error: profileError } = await client.from("profiles").select("role,is_active").eq("id", user.id).single();
-  if (profileError || !profile?.is_active) throw new Error("Active profile access is required. Apply the Day 1 migrations in your synthetic demo environment.");
+  if (profileError || !profile?.is_active) {
+    // Codes only: database messages can contain record values or identifiers.
+    console.error(JSON.stringify({ event: "workspace_access_failed", code: profileError?.code ?? "inactive_profile" }));
+    throw new Error("Your account isn't ready to access this workspace. Contact your administrator.");
+  }
   return { client, user, profile, canWrite: ["admin", "staff"].includes(profile.role) };
 });
 export async function ownerOptions(client: Awaited<ReturnType<typeof createClient>>) {
