@@ -16,7 +16,7 @@ function run(program,args,input){
 const query=(db,input)=>run('psql',['-X','-q','-A','-t','-v','ON_ERROR_STOP=1','-d',db],input).trim();
 const read=n=>readFileSync(resolve(root,n),'utf8');
 for(const db of names)run('createdb',[db]);
-query(names[0],read('database/tests/bootstrap.sql')+readdirSync(resolve(root,'database/migrations')).filter(n=>n.endsWith('.sql')).sort().map(n=>read(`database/migrations/${n}`)).join('\n')+read('database/tests/fixtures.sql'));
+query(names[0],read('database/tests/bootstrap.sql')+readdirSync(resolve(root,'database/migrations')).filter(n=>n.endsWith('.sql')).sort().map(n=>read(`database/migrations/${n}`)).join('\n')+read('database/tests/fixtures.sql')+read('database/tests/restore-fixture.sql'));
 const dump=run('pg_dump',['-d',names[0]]);
 const directory=mkdtempSync(resolve(tmpdir(),'cbc-synthetic-restore-'));writeFileSync(resolve(directory,'snapshot.sql'),dump,{mode:0o600});
 query(names[1],dump);
@@ -30,5 +30,10 @@ for(const table of tables){
  const select=`select coalesce(jsonb_agg(to_jsonb(t) order by to_jsonb(t)::text),'[]') from ${table} t;`;
  const values=names.map(db=>query(db,select));if(values[0]!==values[1])throw new Error(`Restored rows differ: ${table}`);rows+=JSON.parse(values[0]).length;
 }
+const finance=query(names[1],`begin;set local role authenticated;select set_config('request.jwt.claim.sub','10000000-0000-4000-8000-000000000001',true);select cash_received::numeric=100.10 and outstanding::numeric=100.10 from public.contribution_details where id='c4000000-0000-4000-8000-000000000001';rollback;`).split('\n').at(-1);
+if(finance!=='t')throw new Error('Restored exact-cent partial/void reconciliation failed');
+const denied=query(names[1],`begin;set local role authenticated;select set_config('request.jwt.claim.sub','10000000-0000-4000-8000-000000000006',true);select count(*)=0 from public.organizations;rollback;`).split('\n').at(-1);
+if(denied!=='t')throw new Error('Restored inactive-profile denial failed');
+console.log('PASS: restored exact-cent partial/void balances and inactive-profile denial.');
 console.log(`PASS: synthetic logical restore; ${tables.length} tables, ${rows} complete rows and ${Object.keys(catalogs[0]).length} public catalog objects reconciled. Snapshot retained privately in ${directory}.`);
 console.log('Excludes real Supabase Auth/platform configuration, secrets, storage and hosting. No production recovery claim.');
