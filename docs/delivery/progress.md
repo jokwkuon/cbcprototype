@@ -404,3 +404,7 @@ REQ-001/002/004/005/006/008/009/010/011/012/013/014; branch `feature/version3-vi
 - **Automated verification:** 32 unit, 285 SQL/RLS, 335 API, 52 real browser and 37 synthetic browser checks passed; 17 finance/membership/report checks repeated after final labels. Lint/typecheck/production build passed. Exact commands and evidence are in [verification](version-3-visual-data-quality-verification.md).
 - **Demo evidence:** private desktop/mobile before/after gallery (124 screenshots); all major modules and six reports represented. [Audit, design system, safe reset and meeting walkthrough](../design/version-3-visual-data-quality.md).
 - **Approval:** named CBC/instructor acceptance remains pending. Optional dark theme, unsupported metrics and binary storage remain deferred. No merge or hosted change was performed for this task.
+
+## Version 3 reliability increment
+
+REQ-001/002/004/005/006/007/008/013: [implementation findings](../audits/version3-engineering-remediation.md), [current executed evidence and limitations](version3-reliability-verification.md), [release/recovery](../architecture/release-and-recovery.md). Code presence, local runtime verification, screenshots, remote CI and CBC approval remain separately recorded. No production acceptance is implied.

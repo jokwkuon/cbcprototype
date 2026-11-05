@@ -1,5 +1,8 @@
 # Proposed conceptual architecture
 
+> Historical planning/audit content below. Current observed architecture and operational limits: [release/recovery](release-and-recovery.md), [engineering findings](../audits/version3-engineering-remediation.md) and [executed verification](../delivery/version3-reliability-verification.md). Existing implementation does not settle CBC/instructor approval.
+
+
 ```text
 WordPress          Legacy HubSpot          Finance exports          Google Drive
 (public site)      (contacts / forms)      (small CSV or JSON)      (documents)

@@ -250,3 +250,15 @@ REQ-001/002/004/005/006/008/009/010/011/012/013/014. [Verification](version-3-vi
 - [x] Main relationship/follow-up walkthrough, financial receipts and report source/export verification.
 - [ ] Named CBC/instructor acceptance and manual accessibility sign-off.
 - [ ] Review/merge approval; hosted deployment remains separate.
+
+## Reliability and handoff additions
+
+- [ ] Run the current reliability verification commands on the isolated test stack; preserve presentation records/seal.
+- [ ] Demonstrate sign-in → relationship/contact → interaction → assigned task → queue → completion/history; Giving receipt/void → report/filter/export → logout/denial.
+- [ ] Review current screenshots at desktop/mobile and verify keyboard navigation/no overflow.
+- [ ] Assign CBC primary/deputy owners for GitHub/reviews, Supabase/Auth/access, hosting, migrations, backups/restore drills, security updates and support.
+- [ ] Approve student access/export/consent/retention/audit/mentorship decisions and instructor stack requirements.
+- [ ] Resolve previously tracked restricted PDF publication/history exposure with repository owner.
+- [ ] Confirm durable recovery, staging acceptance, current hosted structural comparison and release approvals before live use.
+
+Executed evidence is in [the reliability ledger](version3-reliability-verification.md); unchecked acceptance/handoff steps remain open.

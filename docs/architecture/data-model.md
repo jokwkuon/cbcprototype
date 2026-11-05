@@ -1,5 +1,8 @@
 # Data model audit and proposal
 
+> Historical planning/audit content below. Current observed architecture and operational limits: [release/recovery](release-and-recovery.md), [engineering findings](../audits/version3-engineering-remediation.md) and [executed verification](../delivery/version3-reliability-verification.md). Existing implementation does not settle CBC/instructor approval.
+
+
 Audit: 2026-10-26. This document supplements [conceptual ERD](erd.md), [overview](overview.md), [data dictionary](../data/data-dictionary.csv), and the [field matrix](../requirements/field-matrix.md). It does not replace open decisions or authorize migrations. All PDF references are physical pages.
 
 ## Observed repository schema

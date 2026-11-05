@@ -1,19 +1,14 @@
 # CBC CRM frontend
 
-**Current verification: 2026-11-01.** The historical setup/checkpoint sections below retain earlier counts and limitations; use the guarded real local Supabase setup and [current delivery evidence](../../docs/delivery/progress.md#current-field-audit) for current commands/results. Seven canonical migrations and Programs & Recipients are verified locally. Do not treat the original baseline-only setup as a migration plan for an existing hosted project.
+**Current Version 3 status:** see [reliability verification](../../docs/delivery/version3-reliability-verification.md) for executed results and limitations, and [release/recovery](../../docs/architecture/release-and-recovery.md) for current runtime/operations requirements. The checkpoint sections below are historical.
 
-## Local setup
+## Current local setup
 
-1. Copy `.env.example` to `.env.local` and add the Supabase project URL and anon key.
-2. Apply `../../database/migrations/202610130001_initial_crm.sql` in the Supabase SQL editor or through the Supabase CLI.
-3. Create approved synthetic users in Supabase Auth. The signup trigger creates a viewer profile; an administrator must assign `admin` or `staff` in the database using a trusted SQL session.
-4. Run `npm install`, then `npm run dev`.
+Use Node 22+, `npm ci` in this directory, and the guarded scripts from repository root. Set `CBC_DEMO_INSTANCE=test` for tests (API 56421/app 3142) and `presentation` for demonstrations (API 55421/app 3140). Start, migrate and seed with `scripts/demo/stack.mjs` and `seed.mjs`; never point these scripts at hosted Supabase. Generated credentials stay in ignored mode-600 runtime files. Do not reset/reseed the presentation environment to run tests. No real CBC records are authorized.
 
-The browser only receives the Supabase anon key. Never add a service-role key to `.env.local`, client code, or this repository.
+Run `npm test`, `npm run typecheck`, `npm run lint`, `npm run test:e2e`, then `CBC_DEMO_INSTANCE=test npm run test:integration` sequentially (browser suites build the same `.next` output). Real integration requires the isolated test stack and private accounts. See root README for script commands. Full report reads are limited to 10,000 rows per source dataset; errors require narrower filters rather than returning partial financial totals. History uses 25-record keyset pages, with exact counts and DB Last Contact.
 
-## Verification
-
-`npm run typecheck` and `npm run lint` are the local static checks. `npm run build` requires a compatible TypeScript/Next dependency install; use the lockfile and a network-enabled environment when dependency resolution is available.
+The Next 16 `proxy.ts` preserves all refresh cookies, options and no-cache headers across redirects. It does not replace independent Server Action/API authentication and database RLS. No user/session object is cached across requests. Browser variables contain only Supabase URL/public key. Production deployment remains unapproved.
 
 ## Next.js security maintenance
 
@@ -26,7 +21,7 @@ Verified with npm install, `npm exec -- next --version`, `npm run lint`,
 `npm run typecheck`, `NODE_ENV=production npm run build`, and `npm audit`
 (zero vulnerabilities). Use a standard `NODE_ENV`: the inherited nonstandard
 value caused a prerender failure that disappeared with `production`.
-The existing middleware deprecation warning remains.
+The historical middleware warning was resolved by the Version 3 Proxy migration.
 
 Demo verification: start the production build on localhost with synthetic
 configuration, open `/login` and confirm the sign-in form renders; unauthenticated

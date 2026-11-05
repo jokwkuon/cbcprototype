@@ -1,5 +1,11 @@
 # Database setup and synthetic verification
 
+**Current Version 3:** 15 canonical migrations, 24 public tables and 10 invoker views. This increment adds a permission-equivalent activity SELECT initplan optimization, applied to the isolated test database only. Hosted history previously reconciled 14 versions; the new migration is not applied there. See [hosted baseline evidence](../docs/delivery/hosted-version3-verification.md), [current reliability results](../docs/delivery/version3-reliability-verification.md) and [release/recovery](../docs/architecture/release-and-recovery.md). Earlier setup/hosted observations below are historical, not current operator instructions.
+
+Structural comparison: `node scripts/schema/rehearse.mjs` builds canonical/reconciled paths in two new disposable PostgreSQL databases (Docker test container or dedicated `CBC_PG_BIN` connection). `scripts/schema/catalog.sql` is read-only; capture expected/actual JSON privately and run `node scripts/schema/compare.mjs expected.json actual.json`. It reports missing/unexpected/changed objects and exits nonzero on drift, without modifying either target. Version/checksum checks remain separate. Auth/platform/storage and row data are outside this catalog. Actual hosted structural comparison is still pending.
+
+`node scripts/schema/restore-rehearsal.mjs` restores a full fictional disposable database dump into another new database and reconciles public catalogs and complete public/test-Auth rows. It is not a hosted recovery tool. No existing database is reset or dropped.
+
 REQ-001/002/008. Apply files in `migrations/` in filename order to a new isolated Supabase demo environment. The original migration creates the three CRM tables; the two Day 1 migrations add ownership enforcement, restricted staff directory and manual organization/contact fields. Do not apply the original migration a second time to an existing schema.
 
 The connected project was inspected read-only: it has the original columns/policies but reports no migration history. **No hosted changes were made.** Before applying incremental migrations there, reconcile the existing baseline/history and review with the operator. Do not use reset, drop, or replay the initial migration to fix history. This task prepares and tests migration files; it does not deploy them.
