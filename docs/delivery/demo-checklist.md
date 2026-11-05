@@ -221,3 +221,16 @@ Walkthrough: sign in as Jordan Ellis; open Dashboard and compare Assigned to me,
 
 - [x] Operational edge checks: real full-name search and out-of-range page recovery passed; six synthetic desktop/mobile screenshots captured with zero runtime/console errors or horizontal overflow.
 - [x] Render reuse instrumented in local fixture: one profile request per document render; middleware/SDK authentication calls remain independently counted.
+
+## Authorized hosted database checkpoint — 2026-11-04
+
+- [x] Owner explicitly authorizes existing hosted baseline reconciliation and upgrade.
+- [x] Original data/catalog snapshot stays private outside Git; original counts/field fingerprints preserved.
+- [x] Existing baseline adopted, incremental migrations applied, fourteen versions reconciled with canonical receipts.
+- [x] Hosted rollback-only fictional role/financial/affiliation smoke and anonymous HTTPS/Auth health checks pass.
+- [x] Database advisor findings cleared; remaining Free-plan Auth warning and unused-index INFO documented.
+- [ ] Authenticated hosted browser walkthrough and named CBC/instructor acceptance.
+- [ ] Paid-plan decision/Auth leaked-password protection, if required; no billing change authorized here.
+- [ ] Durable backup/restore acceptance and application deployment authorization.
+
+See [hosted results and limits](hosted-version3-verification.md). This does not check off the earlier sensitive-data/business-rule or production gates.
