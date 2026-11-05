@@ -1,12 +1,15 @@
 import { createClient } from "./supabase/server";
-export async function crmContext() {
+import { cache } from "react";
+
+// React render/request scope only: never persist an authenticated context across users.
+export const crmContext = cache(async () => {
   const client = await createClient();
   const { data: { user }, error } = await client.auth.getUser();
   if (error || !user) throw new Error("Sign in to continue.");
   const { data: profile, error: profileError } = await client.from("profiles").select("role,is_active").eq("id", user.id).single();
   if (profileError || !profile?.is_active) throw new Error("Active profile access is required. Apply the Day 1 migrations in your synthetic demo environment.");
   return { client, user, profile, canWrite: ["admin", "staff"].includes(profile.role) };
-}
+});
 export async function ownerOptions(client: Awaited<ReturnType<typeof createClient>>) {
   const { data, error } = await client.from("staff_directory").select("id,display_name").order("display_name");
   if (error) throw new Error("Unable to load the restricted staff directory.");

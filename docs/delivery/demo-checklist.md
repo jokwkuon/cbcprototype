@@ -201,3 +201,23 @@ Suggested demonstration: find Prairie Lantern Ventures, inspect its next steps/a
 
 - [x] Final complete suites: 51 real-local browser and 36 fixture-browser scenarios pass; 30 unit/validation tests, 279 SQL assertions, 20 Auth/API checks, three readiness guards, static/production checks and zero local advisor findings.
 - [x] Final private comparison: 62 frozen-Version-2 + 62 Version-3 screenshots; zero runtime/console/hydration errors or document overflow. Original audit screenshots separately preserved; no generated artifacts staged.
+
+## Version 3 operational foundation — separate local checkpoint
+
+REQ-001/002/005/008; feature branch `feature/version3-operational-upgrade`. [Evidence and limits](version-3-operational-verification.md).
+
+- [x] Source audit confirms the requested concerns and independently records additional completeness/auth/import risks.
+- [x] Local SQL-filtered directory pages preserve working CRUD, direct selection, grouping and role restrictions.
+- [x] Assigned/team/unassigned queue exposes actual existing tasks and edit workflows; no invented scores/alerts.
+- [x] Same-environment synthetic query/payload/latency benchmark saved privately and summarized in evidence.
+- [x] CI definition and local real SQL/API/browser regression checks added or rerun; GitHub-hosted execution remains unobserved.
+- [x] Policy-dependent workflow specifications, proposed access matrix, migration contracts and acceptance cases prepared.
+- [ ] Human CBC demonstration and named approval of this increment.
+- [ ] Complete subsequent safe UX/performance phases (history/selectors/saved views/module layouts).
+- [ ] Approve student/mentorship/award/event/import rules and sensitive-access changes before implementing them.
+- [ ] Approve and reconcile hosted baseline/remediation before any hosted migration or deployment.
+
+Walkthrough: sign in as Jordan Ellis; open Dashboard and compare Assigned to me, Team actions and Unassigned, then page through deadlines and open a real follow-up editor. Search Prairie Lantern Ventures in Organizations; select, group/sort and reload without losing context. Search Amara Okafor globally and inspect contact affiliation/history; repeat as Viewer to confirm read-only controls and restricted documents. Review the desktop/mobile evidence and measured performance scope. Record reviewer/date/commit/environment, observed failures and approval reference; automated checks do not fill the approval boxes.
+
+- [x] Operational edge checks: real full-name search and out-of-range page recovery passed; six synthetic desktop/mobile screenshots captured with zero runtime/console errors or horizontal overflow.
+- [x] Render reuse instrumented in local fixture: one profile request per document render; middleware/SDK authentication calls remain independently counted.

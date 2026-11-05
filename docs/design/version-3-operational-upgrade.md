@@ -1,0 +1,81 @@
+# Version 3 operational upgrade — audit and phased specification
+
+2026-11-04. Base: `version3`; working branch: `feature/version3-operational-upgrade`. Requirements: REQ-001–014; authority: requirements register and ADR-010–018 (where present). This is an owner-authorized local improvement of the observed stack, not instructor stack acceptance, CBC policy approval, or hosted release approval. All fixture and screenshot identities are fictional. Public CBC website remains business context; no integration or redesign is proposed.
+
+## Public business context only
+
+CBC describes mentorship, scholarships and fellowship as connected pillars in its [About page](https://calgaryblackchambers.ca/about/). Its [mentorship page](https://calgaryblackchambers.ca/mentorship/) describes professionals supporting students, school referrals and parental authorization for some participants; this supports reviewing cross-organization pairing and safeguarding access, without proving an approved internal affiliation/eligibility rule. Its [scholarship page](https://calgaryblackchambers.ca/scholarship/) describes donor-supported awards and adjudication, motivating separate application, review and award records. Read on 2026-11-04; public copy may change. No public applicant/contact details, scholarship amounts or eligibility thresholds were imported into fixtures or encoded as product rules. Internal administrators, program coordinators, partnership staff, reviewers and financial staff are workflow responsibility proposals, not an assertion of CBC's current staffing structure.
+
+## Source-based findings
+
+Reviewed frontend routes/components/loaders/actions, all ten baseline canonical migrations and cumulative RLS, SQL verifiers, browser suites, existing architecture/security/field mapping, dependency manifests, delivery notes and decision log. The architecture PDF was not opened or copied during this audit.
+
+| Concern | Evidence / assessment | Treatment |
+|---|---|---|
+| Directory scale | `lib/relationship-directory.ts` used `readAll`, then JS search/group/sort/page; Contacts also read all organization records for labels | New invoker projections filter/sort/page in SQL; ten directory records transferred. Contact affiliation select still fetches complete minimal ID/name labels; searchable remote picker remains follow-up |
+| Global search scale | `app/api/search/route.ts` paged every accessible organization/contact/program/document before JS filtering | Four scoped, ordered, maximum-six-result reads, no exact counts; filter punctuation neutralized; no privileged client |
+| Repeated auth | Shell independently fetched user/profile; every `crmContext` call created another client and profile request | React render-scope memoized `crmContext`, reused by shell/queue. Middleware authentication remains separate; route handlers do not get an assumed persistent React cache |
+| Queue relevance/completeness | `ActionQueue` loaded all follow-ups, then filtered; `followUps` had no paging and could silently hit API cap | Dashboard starts with assigned work; explicit Team/Unassigned scopes; SQL open/date/owner predicates, exact count and bounded displayed rows; edits use existing action forms |
+| Relationship history | `relationship-history.ts` fetches all activity links, activities and tasks; large `in` URL lists. Related tabs are rendered eagerly and some canonical detail loaders still use capped reads | Still unresolved. Require database-side relationship timeline/task queries with keyset pagination; maintain independent complete next-action query and last-contact RPC. Do not truncate and report a false history total |
+| Mentorship affiliation | `20261102233407_mentorship.sql`: composite organization/mentor and organization/mentee FKs | Same-organization rule confirmed; unchanged pending explicit approval of cross-organization proposal |
+| Student privacy | Programs/mentorship tables grant four active roles broad read; no assignment, sensitive-field partition or consent/retention controls | Safe only for the authorized synthetic demo; proposed access matrix below, no real student import |
+| Hosted drift | Read-only MCP catalog on 2026-11-04: only contacts/organizations/profiles in public; migration list empty | Verified older baseline; never replay local migrations blindly against existing tables. Reconciliation/backup/owner approval required |
+| Hosted advisors | Mutable search path on `touch_updated_at`; anon/authenticated callable definer `current_role` and `handle_new_user`; leaked-password protection disabled. Performance: owner FK unindexed, profile auth initplan, overlapping policies, four unused-index notices | Read-only findings recorded; no hosted remediation performed. Unused index notice alone does not justify dropping an index |
+| CI | `.github` had templates but no workflow | Added least-privilege frontend/build/mock-browser and disposable PostgreSQL SQL/RLS jobs, without hosted secrets |
+| Dependencies | Multiple `latest` / range declarations with lockfile | Pin to existing resolved versions, preserve lockfile. No dependency upgrade or claim of zero vulnerabilities |
+| CSS/accessibility | `globals.css` has broad overrides/`!important`; relationship styles are scoped but compressed JSX and tiny metadata remain | Preserve visual baseline, keyboard tabs/list/focus and mobile return pattern. Component-scoped CSS migration should follow screenshots; no broad CSS rewrite in performance slice |
+| Additional auth issue | Middleware refresh callback reconstructs response per cookie, potentially losing earlier response cookies | Requires regression around multi-cookie refresh before refactoring; not fixed by render memoization |
+| Additional completeness issue | Dashboard stage distribution still reads all organization rows; reports/export intentionally use complete datasets; several form selections rely on API default caps | Aggregate dashboard query and async selectors are subsequent performance work. Complete financial reconciliation must not be replaced by capped detail reads |
+| Administration gap | Metadata timestamps do not constitute immutable actor audit; no duplicate merge/import execution or access administration UI | Specify below, never introduce destructive automated merge |
+| Delivery risk | Source PDF already tracked; historic decisions and delivery notes contain outdated migration counts | No republishing/history rewrite; repository owner must resolve PDF and publication handling. New evidence does not supersede untested historical claims |
+
+## Intended workflows and module-specific experience
+
+| Workflow / IDs | Existing support | Missing behavior / proposed layout | Decisions before policy-dependent implementation |
+|---|---|---|---|
+| Relationships REQ-001/002/005 | Organization/contact CRUD, recorded stage, restricted owner, activity links, tasks, quick edits and split workspace | Preserve split directory; next action and owner first; paged timeline; renewal links point to concrete agreement/membership; save useful filtered URLs | Stage entry/exit rules, ownership exceptions, whether partnership renewal differs from agreement renewal |
+| Mentorship REQ-011/008 | Explicit pair, organization/program/cohort, dates/status, check-ins and feedback | Availability roster → eligibility/review inbox → approved assignment → pair workspace with check-ins, follow-up task links and explicit completion review | Cross-org affiliation; eligibility authority; safeguarding/consent; availability units; reviewer versus assigner; cadence and completion criteria |
+| Scholarships/programs REQ-010/008 | Program/cohort/recipient/enrollment, declared support and manual outcomes | Application inbox and review panel separate from cohort roster; decisions/history and recorded awards separated from support estimates; outcome follow-up task | Application identity, reviewer conflicts, eligibility rubric, decision authority, sensitive fields, award/disbursement ledger/currency and retention. Existing support is not cash paid |
+| Sponsorship/giving REQ-003/004 | Opportunity reference/estimate; contributions, receipts, voids, agreement/renewal dates; exact approved synthetic cash reconciliation | Opportunity/commitment workspace with receipt ledger, agreement dates and outstanding list; contextual receipt entry only for existing financial writers | Pipeline stages/transition approvals, accounting receipts versus tax receipts, refunds, write-off, agreement renewal scheduling. Never mix pledged/received/in-kind |
+| Membership REQ-009 | Explicit member terms, manual fee/payment labels and date statuses | Term workspace, renewal queue by recorded dates, linked engagement and staff follow-up tasks | Responsible-staff identity (new membership owner or existing relationship owner), grace/entitlement/lapse, renewal lead time, fees versus actual cash |
+| Events/fellowship proposed REQ-015 | Typed Giving Event reference and free-text activities; no operational event/attendance ledger | Internal session roster, attendance entry and participant history, task follow-ups. No website sync or fabricated attendance chart | Session/program scope, participant identity/access, attendance states/corrections, capacity/cancellation, fellowship eligibility and outcome definitions |
+| Administration REQ-007/008/012 | Active roles, restricted owner directory, Internal/Admin-only document metadata; no browser profile-role writes | Data-quality inbox; candidate duplicate comparison; import preview/dry run with per-row errors, explicit commit and result file; actor audit explorer under approved access | Merge authority/conflict resolution; source lawful use; retention; import rollback; audit contents/access; trusted operator provisioning. No arbitrary role editor |
+
+Every control in an implemented phase must navigate, filter or mutate real authorized data. Do not ship disabled future modules as working controls, decorative charts or invented indicators. Use module-specific review/ledger/roster layouts once each workflow is approved; retain all existing routes and CRUD.
+
+## Phase order and acceptance
+
+1. **Safe foundation (implemented locally, verification tracked separately):** request auth reuse; directory SQL pagination; bounded global search; assigned/team/unassigned action queue; locked versions; automated CI. No mentorship, eligibility, finance formula or base-table policy changes. Preserve route/filter/group/selection, optimistic concurrency, error recovery and read-only UI.
+2. **Bounded history and interaction polish (specified, pending implementation):** SQL-scoped timeline pages (50, cursor `(occurred_at,id)`), independently paged open/completed tasks, exact total or explicitly partial labels; server-render related tab only on request; searchable affiliation/form selectors; URL saved views with an explicit Save view operation and accessible management. Retry retains filters and unsaved input. Benchmark long-history fixtures and verify oldest pending task survives timeline paging.
+3. **Policy review package:** approve individual rules/access matrix and migration contract below, then implement one workflow slice at a time with realistic fixtures, negative RLS/API tests and module-specific desktop/mobile demo. No elapsed time or unanswered review implies approval.
+4. **Release gate:** hosted baseline reconciliation, backup/restore rehearsal, migration plan and advisor remediation, CBC demonstration/approval, instructor stack/deliverable reconciliation, explicit deployment authorization. Local success alone is insufficient.
+
+## Proposed sensitive-data access matrix — NOT APPROVED OR APPLIED
+
+These are proposed capabilities, not reinterpretations of the existing four roles. Implement through explicit subject/program assignments and field separation, after CBC approval; do not infer access from a UI filter, JWT user metadata or general CRM ownership.
+
+| Data | Admin/operator | Assigned program staff | Unassigned Staff / Viewer | Finance | Assigned reviewer |
+|---|---|---|---|---|---|
+| General CRM | Existing access | Existing access | Existing access | Existing access | No new implicit access |
+| Application identity/contact | Explicit authorized program operator | Assigned program only | Deny | Only approved award/payment identity | Assigned application, minimum fields |
+| Eligibility/education/supporting documents | Separate explicit sensitive capability | Approved subset | Deny | Deny unless separately justified | Rubric-required subset only |
+| Review notes/conflicts | Policy-defined administrator | Own permitted scope | Deny | Deny | Own reviews; others only after review closure if approved |
+| Award/payment records | Approved operational scope | Decision metadata; no financial write expansion | Deny student details | Approved financial scope | Decision metadata only |
+| Check-in safeguarding notes | Explicit safeguarding capability | Explicitly assigned capability | Deny | Deny | Deny |
+| Audit/import source | Trusted operator, minimum necessary | Own permitted scope if approved | Deny | Approved finance audit subset | Deny |
+
+All anonymous/inactive access denied. Exports/search/embeds/views/RPCs use the same capabilities and underlying RLS. Metadata like names/counts must not leak through joins or global search. Service-role UI bypass is forbidden.
+
+## Acceptance specifications for gated rules
+
+- **MENT-01:** Given contacts in different organizations, current create/update and reparent guards continue rejecting invalid affiliation. After explicit cross-org approval, two independent valid contact FKs accept that pairing; self-pair, orphan and invalid program/cohort remain rejected. Existing pairs migrate without loss; concurrent edits are detected.
+- **MENT-02:** Given no approved eligibility review or consent, assignment cannot become effective; a reviewer cannot approve their own conflict where policy forbids it. Staff cannot infer eligibility from recorded graduation/employment labels.
+- **STUD-01:** Unassigned Staff, Viewer, Finance and anonymous receive no restricted application/document/review rows through direct SQL, REST, search, export, invoker views or guessed IDs. Revoked assignments deny the next request; inactive profiles deny everything under existing semantics.
+- **AWARD-01:** An application decision is neither cash received nor paid. Multiple recorded awards have distinct IDs and approved currency; rollback of an invalid decision+award transaction leaves no partial award. No sum changes existing Giving totals without an approved accounting link.
+- **FIN-01:** Pledge with no receipt increases approved commitment balances only; partial/void/overpaid receipts retain current exact CAD behavior. Renewal-date edits do not create commitments, cash or automatic tasks.
+- **MEM-01:** Recorded term boundaries retain existing date status until CBC approves any grace rule. New responsible staff must satisfy approved role/active scope; task ownership never silently changes organization ownership.
+- **EVENT-01:** Internal session attendance has unique session/participant identity and explicit corrected history. An unknown attendance value is not absence. Person history excludes unauthorized participants and has stable cursor pagination.
+- **IMPORT-01:** Preview makes no writes; malformed/missing identities and duplicate candidates are reported per row. Commit is atomic or explicitly resumable with an idempotency key; rerun cannot double-create records. A duplicate proposal cannot merge financial/student identities without the approved reviewer and retained references.
+- **AUDIT-01:** Authorized changes record actor, operation, record ID, time and approved minimized fields; client cannot forge actor or edit/delete events. Failure rolls back the business mutation if required by approved policy. No secrets/free-form private document content enters logs.
+
+See [migration contracts](version-3-operational-migrations.md) and [evidence](../delivery/version-3-operational-verification.md). Approval owners: CBC Programs/Mentorship, Finance, Membership, CBC data/access administrator, instructor and repository owner as appropriate. These specifications do not constitute their approval.

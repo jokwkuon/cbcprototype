@@ -13,3 +13,4 @@ REQ-011,Mentorship,Manage pairs and check-ins,LATER,PROVISIONAL_MVP,Mentorship l
 REQ-012,Documents,Manage linked file records,LATER,PROVISIONAL_MVP,CBC admin,Files protected by approved access rules; local synthetic implementation authorized 2026-11-02; CBC acceptance pending
 REQ-013,Reports,Provide six functional report categories,LATER,PROVISIONAL_MVP,Leadership,Reports match approved examples; local synthetic implementation authorized 2026-11-02; CBC acceptance pending
 REQ-014,Sponsor Interests,Represent sponsor priorities and explicit program discussion opportunity and follow-up links,MUST,PROVISIONAL_MVP,Partnerships,AT-07 AT-14 AT-15 and AT-16 verified locally under ADR-013; CBC approval pending
+REQ-015,Events and fellowship,Manage internal sessions attendance and participant follow-ups,LATER,NEEDS_DEFINITION,CBC programs lead,Approve session and participant access rules before implementing EVENT-01; no public website integration

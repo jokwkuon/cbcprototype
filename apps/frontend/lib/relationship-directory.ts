@@ -1,5 +1,6 @@
 import type {crmContext} from './crm-context';
 import {readAll} from './read-all';
+import {validId} from './crm-validation';
 
 export type RelationshipKind = 'organization' | 'contact';
 export type DirectoryRecord = {
@@ -16,19 +17,50 @@ export type DirectoryRecord = {
 export type DirectoryParams = {q?: string; status?: string; group?: string; sort?: string; page?: string; selected?: string};
 
 type Client = Awaited<ReturnType<typeof crmContext>>['client'];
-export async function relationshipDirectory(client: Client, kind: RelationshipKind): Promise<DirectoryRecord[]> {
-  if (kind === 'organization') {
-    const rows = await readAll<{id:string; name:string; industry:string|null; relationship_status:string; organization_type:string|null; priority_level:string; location:string|null}>((a,b) =>
-      client.from('organizations').select('id,name,industry,relationship_status,organization_type,priority_level,location', {count:'exact'}).order('id').range(a,b));
-    return rows.map(r => ({id:r.id, name:r.name, context:r.industry || 'Industry not recorded', status:r.relationship_status, category:r.organization_type || 'Type not recorded', categoryId:r.organization_type || '', location:r.location || '', priority:r.priority_level}));
+export async function relationshipDirectory(client: Client, kind: RelationshipKind, view: DirectoryParams = {}) {
+  const table = kind === 'organization' ? 'organization_directory' : 'contact_directory';
+  const requested = Number(view.page);
+  let page = Number.isSafeInteger(requested) && requested > 0 ? Math.min(requested,1000000) : 1;
+  function query(head=false) {
+    let query = client.from(table).select('id,name,context,status,category,categoryId,email,location,priority',{count:'exact',head});
+    if(view.q?.trim()) query = query.ilike('search_text',`%${view.q.trim().slice(0,80).replace(/[\\%_]/g, '\\$&')}%`);
+    if(view.status) query = query.eq(kind === 'organization' ? 'status' : 'categoryId',view.status === 'unlinked' ? '' : view.status);
+    if(view.group === 'category' || view.group === 'status') query = query.order(view.group);
+    return query.order('name',{ascending:view.sort !== 'desc'}).order('id');
   }
-  const [contacts, organizations] = await Promise.all([
-    readAll<{id:string; first_name:string; last_name:string; title:string|null; email:string|null; organization_id:string|null; contact_type:string|null}>((a,b) =>
-      client.from('contacts').select('id,first_name,last_name,title,email,organization_id,contact_type', {count:'exact'}).order('id').range(a,b)),
-    readAll<{id:string; name:string}>((a,b) => client.from('organizations').select('id,name', {count:'exact'}).order('id').range(a,b)),
-  ]);
-  const names = new Map(organizations.map(o => [o.id,o.name]));
-  return contacts.map(c => ({id:c.id, name:`${c.first_name} ${c.last_name}`, context:c.title || 'Title not recorded', status:c.contact_type || 'Type not recorded', category:names.get(c.organization_id || '') || 'Not linked', categoryId:c.organization_id || '', email:c.email || ''}));
+  // A direct selected-record link opens the page containing it, preserving V3 behavior.
+  if(!view.page && view.selected && validId(view.selected)) {
+    const selected = await query().eq('id',view.selected).maybeSingle();
+    if(selected.error) throw new Error('Unable to locate the selected record.');
+    if(selected.data) {
+      const row = selected.data as DirectoryRecord;
+      const literal = (value:string) => `"${value.replaceAll('\\','\\\\').replaceAll('"','\\"')}"`;
+      const direction = view.sort === 'desc' ? 'gt' : 'lt';
+      const nameBefore = `name.${direction}.${literal(row.name)}`;
+      const tiedName = `and(name.eq.${literal(row.name)},id.lt.${row.id})`;
+      const group = view.group === 'category' || view.group === 'status' ? view.group : null;
+      const before = group ? `${group}.lt.${literal(row[group])},and(${group}.eq.${literal(row[group])},or(${nameBefore},${tiedName}))` : `${nameBefore},${tiedName}`;
+      const rank = await query(true).or(before);
+      if(rank.error || rank.count === null) throw new Error('Unable to locate the selected results page.');
+      page = Math.floor(rank.count/10)+1;
+    }
+  }
+  let result = await query().range((page-1)*10,page*10-1);
+  if(result.error?.code === 'PGRST103') {
+    const total = await query(true);
+    if(total.error || total.count === null) throw new Error('Unable to load directory. Reload to retry.');
+    page=Math.max(1,Math.ceil(total.count/10));
+    result=await query().range((page-1)*10,page*10-1);
+  }
+  if(result.error || result.count === null) throw new Error('Unable to load directory. Reload to retry.');
+  const pages = Math.max(1,Math.ceil(result.count/10));
+  if(page > pages) {page=pages;result=await query().range((page-1)*10,page*10-1);}
+  if(result.error || result.count === null) throw new Error('Unable to load directory. Reload to retry.');
+  // Only minimal labels for the existing affiliation picker, never full contact/organization records.
+  const options = kind === 'organization'
+    ? ['Prospect','Cultivate','Proposal','Committed','Active','Lapsed'].map(value=>[value,value] as [string,string])
+    : [['unlinked','Not linked'] as [string,string],...(await readAll<{id:string;name:string}>((a,b)=>client.from('organizations').select('id,name',{count:'exact'}).order('id').range(a,b))).map(row=>[row.id,row.name] as [string,string]).sort((a,b)=>a[1].localeCompare(b[1]))];
+  return {rows:(result.data || []) as DirectoryRecord[],total:result.count,page,options};
 }
 
 export function directoryRows(rows: DirectoryRecord[], kind: RelationshipKind, view: DirectoryParams) {

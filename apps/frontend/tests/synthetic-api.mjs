@@ -6,6 +6,7 @@ const id = n => `10000000-0000-4000-8000-${String(n).padStart(12,"0")}`;
 const profiles = ["admin","staff","staff","finance","viewer"].map((role,i)=>({id:id(i+1),role,is_active:true,full_name:["Morgan Hayes","Jordan Ellis","Simone Clarke","Evelyn Brooks","Noah Bennett"][i]}));
 const emptyTables=()=>({organizations:[],contacts:[],activities:[],activity_contacts:[],tasks:[],programs:[],program_cohorts:[],program_enrollments:[],program_enrollment_details:[],membership_details:[],mentorship_details:[],sponsor_interests:[],documents:[]});
 let tables=emptyTables();
+let requestCounts={};
 let failActivities=false;
 let relationshipBehavior={};
 let failDashboard="";
@@ -24,6 +25,9 @@ const server=http.createServer(async(req,res)=>{
   const send=(status,body)=>{res.writeHead(status,{"Content-Type":"application/json"});res.end(req.method==="HEAD"?undefined:JSON.stringify(body));};
   if(req.method==="OPTIONS")return send(200,{});
   let raw="";for await(const chunk of req)raw+=chunk;const body=raw?JSON.parse(raw):{};
+  if(url.pathname==="/__metrics-reset"){requestCounts={};return send(200,{});}
+  if(url.pathname==="/__metrics")return send(200,requestCounts);
+  requestCounts[url.pathname]=(requestCounts[url.pathname]||0)+1;
   if(url.pathname==="/__reset"){ tables=emptyTables(); relationshipBehavior={}; failActivities=false; failDashboard=""; emptyFinancialSummary=false; reportFixture=null; return send(200,{}); }
   if(url.pathname==="/__report-fixture"){reportFixture=body;return send(200,{});}
   if(url.pathname==="/__empty-financial-summary"){emptyFinancialSummary=body.enabled===true;return send(200,{});}
@@ -79,9 +83,28 @@ const server=http.createServer(async(req,res)=>{
   }
   const taskRows=tables.tasks.map(task=>{const a=tables.activities.find(a=>a.id===task.activity_id);return {...task,status:task.completed_at?"Complete":task.due_date&&task.due_date<today()?"Overdue":"Open",organization_id:a?.organization_id,organization_name:tables.organizations.find(o=>o.id===a?.organization_id)?.name??null,activity_purpose:a?.purpose??null,activity_type:a?.activity_type,owner_name:profiles.find(p=>p.id===task.owner_id&&p.role==="staff"&&(profile.role==="admin"||p.id===profile.id&&profile.role==="staff"))?.full_name??null};});
   let rows=table==="profiles"?[profile]:table==="staff_directory"?profiles.filter(p=>p.role==="staff"&&(profile.role==="admin"||p.id===profile.id&&profile.role==="staff")).map(p=>({id:p.id,display_name:p.full_name})):table==="follow_ups"?taskRows:tables[table];
+  if(table==="organization_directory") rows=tables.organizations.map(r=>({...r,name:r.name,context:r.industry||"Industry not recorded",status:r.relationship_status||"Prospect",category:r.organization_type||"Type not recorded",categoryId:r.organization_type||"",location:r.location||"",priority:r.priority_level||"Medium",email:"",search_text:[r.name,r.industry,r.organization_type,r.location,r.id].filter(Boolean).join(" ")}));
+  if(table==="contact_directory") rows=tables.contacts.map(r=>{const o=tables.organizations.find(o=>o.id===r.organization_id);return {...r,name:`${r.first_name} ${r.last_name}`,context:r.title||"Title not recorded",status:r.contact_type||"Type not recorded",category:o?.name||"Not linked",categoryId:r.organization_id||"",email:r.email||"",location:"",priority:"",search_text:[r.first_name,r.last_name,r.title,o?.name,r.email,r.id].filter(Boolean).join(" ")};});
   if(!rows)return send(404,{message:"Unknown synthetic table"});
+  function splitClauses(expression) {
+    let depth=0,quoted=false,escaped=false,start=0;const parts=[];
+    for(let i=0;i<expression.length;i++) {const c=expression[i];if(escaped){escaped=false;continue;}if(c==='\\'){escaped=true;continue;}if(c==='"')quoted=!quoted;if(quoted)continue;if(c==='(')depth++;if(c===')')depth--;if(c===','&&depth===0){parts.push(expression.slice(start,i));start=i+1;}}
+    parts.push(expression.slice(start));return parts;
+  }
+  function matches(row,clause) {
+    if(clause.startsWith('and('))return splitClauses(clause.slice(4,-1)).every(part=>matches(row,part));
+    if(clause.startsWith('or('))return splitClauses(clause.slice(3,-1)).some(part=>matches(row,part));
+    const match=clause.match(/^([a-zA-Z_]+)\.(ilike|eq|lt|gt|lte|is)\.(.*)$/);if(!match)return false;
+    const [,key,op,raw]=match,value=raw.startsWith('"')?JSON.parse(raw):raw,current=row[key];
+    if(op==='is')return value==='null'&&current==null;
+    if(op==='ilike')return String(current??'').toLowerCase().includes(value.replaceAll('%','').toLowerCase());
+    if(op==='eq')return String(current)===value;
+    return current!=null&&(op==='lt'?current<value:op==='gt'?current>value:current<=value);
+  }
+  const or=url.searchParams.get('or');if(or)rows=rows.filter(row=>splitClauses(or.slice(1,-1)).some(clause=>matches(row,clause)));
   for(const [key,value] of url.searchParams){
     if(value.startsWith("in.(")){const ids=value.slice(4,-1).split(",");rows=rows.filter(row=>ids.includes(String(row[key])));}
+    if(value==="is.null")rows=rows.filter(row=>row[key]==null);
     if(value.startsWith("eq."))rows=rows.filter(row=>String(row[key])===value.slice(3));
     if(value.startsWith("ilike."))rows=rows.filter(row=>String(row[key]).toLowerCase().includes(value.slice(6).replaceAll("%","").toLowerCase()));
   }
@@ -104,7 +127,7 @@ const server=http.createServer(async(req,res)=>{
   const ordering=(url.searchParams.get("order")??"").split(",").filter(Boolean);
   if(ordering.length)rows=[...rows].sort((a,b)=>{for(const part of ordering){const [key,dir,...flags]=part.split(".");const av=a[key],bv=b[key];if(av===bv)continue;if(av==null)return flags.includes("nullslast")?1:-1;if(bv==null)return flags.includes("nullslast")?-1:1;return (av<bv?-1:1)*(dir==="desc"?-1:1);}return 0;});
   const count=rows.length;res.setHeader("Content-Range",`0-${Math.max(count-1,0)}/${count}`);
-  const limit=Number(url.searchParams.get("limit")??count);rows=rows.slice(0,limit);
+  const limit=Number(url.searchParams.get("limit")??count);const offset=Number(url.searchParams.get("offset")??0);rows=rows.slice(offset,offset+limit);
   if(req.headers.accept?.includes("vnd.pgrst.object+json"))return rows.length===1?send(200,rows[0]):send(406,{code:"PGRST116",details:`The result contains ${rows.length} rows`});
   return send(200,rows);
 });
