@@ -10,7 +10,9 @@ import type {RelationshipKind} from '../lib/relationship-directory';
 import {FollowUpList} from './follow-up-list';
 import {Icon} from './icons';
 export function HistorySectionFeed({kind,id,section,initial,canWrite=false}:{kind:RelationshipKind;id:string;section:HistorySection;initial:HistoryPage<Activity|FollowUp>;canWrite?:boolean}) {
-  const [page,setPage]=useState(initial),[loading,setLoading]=useState(false),[error,setError]=useState('');
+  const [page,setPage]=useState(initial),[previousInitial,setPreviousInitial]=useState(initial),[loading,setLoading]=useState(false),[error,setError]=useState('');
+  // A refreshed server render must replace loaded task state after a mutation.
+  if(previousInitial!==initial){setPreviousInitial(initial);setPage(initial);setError('');}
   const activity=section==='activities';
   async function more() {
     if(!page.next||loading)return;
@@ -20,7 +22,7 @@ export function HistorySectionFeed({kind,id,section,initial,canWrite=false}:{kin
       const response=await fetch(`/api/relationships/history?${params}`,{cache:'no-store'});
       if(!response.ok)throw new Error();
       const next=await response.json() as HistoryPage<Activity|FollowUp>;
-      setPage(current=>({...current,rows:[...current.rows,...next.rows.filter(row=>!current.rows.some(old=>old.id===row.id))],next:next.next}));
+      setPage(current=>current===page?({...current,rows:[...current.rows,...next.rows.filter(row=>!current.rows.some(old=>old.id===row.id))],next:next.next}):current);
     } catch {setError('More history could not be loaded. Try again.');} finally {setLoading(false);}
   }
   return <section><div className="record-feed-heading"><h3>{activity?'Activity timeline':section==='open'?'Next steps':'Completed follow-ups'}</h3><span>{initial.total} {activity?'recorded':section==='open'?'open':'completed'}</span></div>
