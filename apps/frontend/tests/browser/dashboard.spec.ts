@@ -14,7 +14,7 @@ for(const query of ['organizations','contacts','statuses','recent'])test(`REQ-00
  await expect(page.getByRole('alert').filter({hasText:'Relationship dashboard unavailable'})).toBeVisible();
  await expect(page.getByText('Total organizations',{exact:true})).toHaveCount(0);
  await expect(page.getByText('No organizations yet.',{exact:true})).toHaveCount(0);
- await expect(page.getByRole('heading',{name:'Action Queue — overdue and next 7 days',exact:true})).toBeVisible();
+ await expect(page.getByRole('heading',{name:'Your upcoming work',exact:true})).toBeVisible();
  await request.post(`${api}/__fail-dashboard`,{data:{query:''}});await page.reload();await expect(page.getByText('Total organizations',{exact:true})).toBeVisible();
 });
 
@@ -22,7 +22,7 @@ test('REQ-006/004: successful zero financial summary differs from failed RPC',as
  await request.post(`${api}/__empty-financial-summary`,{data:{enabled:true}});await login(page);
  const summary=page.getByRole('region',{name:'Financial summary'});
  await expect(summary).toBeVisible();
- await expect(summary.locator('dt').getByText('Current-Year Giving / annual cash received',{exact:true}).locator('..').locator('dd')).toHaveText('CAD 0.00');
+ await expect(summary.locator('dt').getByText('Cash received this year',{exact:true}).locator('..').locator('dd')).toHaveText('CAD 0.00');
  await request.post(`${api}/__empty-financial-summary`,{data:{enabled:false}});await page.reload();
  await expect(page.getByRole('status').filter({hasText:'Financial summary unavailable'})).toBeVisible();
  await expect(summary).toHaveCount(0);

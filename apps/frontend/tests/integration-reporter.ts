@@ -11,7 +11,7 @@ export default class PrivateReporter implements Reporter {
   console.log(`${result.status==='passed'?'PASS':'FAIL'}: ${test.title}`);
  }
  onEnd(result:FullResult){
-  const directory=resolve(__dirname,"../../../.local/cbc-demo");mkdirSync(directory,{recursive:true,mode:0o700});
+  const directory=(process.env.CBC_DEMO_DIRECTORY || resolve(__dirname,"../../../.local/cbc-test"));mkdirSync(directory,{recursive:true,mode:0o700});
   writeFileSync(resolve(directory,"browser-verification.json"),JSON.stringify({status:result.status,tests:this.results,globalErrors:this.globalErrors},null,2),{mode:0o600});
   console.log(`Local real-Supabase browser suite: ${result.status}. Private diagnostics saved; no credential values printed.`);
  }

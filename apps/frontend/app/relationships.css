@@ -15,7 +15,7 @@
   gap:16px;
   margin-bottom:24px}
 .relationship-eyebrow {
-  font-size:12px;
+  font-size:13px;
   color:#69538d;
   margin-bottom:7px}
 .relationship-page-heading h1 {
@@ -71,7 +71,7 @@
   border:1px solid var(--rel-line);
   border-radius:3px;
   padding:0 5px;
-  font-size:11px}
+  font-size:13px}
 .relationship-toolbar>label:not(.directory-search) {
   max-width:200px;
   margin:0}
@@ -100,17 +100,17 @@
   border-radius:8px;
   z-index:8}
 .directory-view label {
-  font-size:12px;
+  font-size:13px;
   margin-bottom:12px}
 .directory-view select {
   margin-top:6px}
 .directory-clear {
-  font-size:12px;
+  font-size:13px;
   color:#6d46a8;
   text-decoration:underline;
   white-space:nowrap}
 .directory-count {
-  font-size:12px;
+  font-size:13px;
   color:var(--rel-muted);
   white-space:nowrap}
 .relationship-split {
@@ -123,7 +123,7 @@
   display:flex;
   flex-direction:column}
 .directory-list-heading {
-  font-size:11px;
+  font-size:13px;
   text-transform:uppercase;
   letter-spacing:.7px;
   color:var(--rel-muted);
@@ -159,7 +159,7 @@
   background:#f8f5fd;
   display:grid;
   place-items:center;
-  font-size:11px;
+  font-size:13px;
   color:#735496;
   flex-shrink:0}
 .directory-identity {
@@ -173,13 +173,13 @@
   display:block}
 .directory-identity>span {
   display:block;
-  font-size:12px;
+  font-size:13px;
   line-height:1.6;
   color:var(--rel-muted);
   margin-top:3px}
 .directory-identity small {
   display:block;
-  font-size:11px;
+  font-size:13px;
   line-height:1.6;
   color:var(--rel-muted);
   margin-top:3px}
@@ -187,10 +187,10 @@
   flex-shrink:0;
   max-width:90px}
 .directory-stage .pill {
-  font-size:10px}
+  font-size:13px}
 .directory-group {
   background:#f8f9fc;
-  font-size:12px;
+  font-size:13px;
   padding:10px 16px;
   color:var(--rel-muted);
   font-weight:600}
@@ -201,7 +201,7 @@
   align-items:center;
   padding:12px 16px;
   border-top:1px solid var(--rel-line);
-  font-size:12px;
+  font-size:13px;
   color:var(--rel-muted)}
 .directory-pagination>span:first-child {
   margin-right:auto}
@@ -239,7 +239,7 @@
   color:var(--rel-muted);
   margin:12px auto 24px}
 .directory-welcome small {
-  font-size:12px;
+  font-size:13px;
   color:var(--rel-muted)}
 .directory-empty {
   padding:48px 24px;
@@ -261,7 +261,7 @@
 .selection-notice {
   padding:12px 22px;
   background:#fff9ed;
-  font-size:12px;
+  font-size:13px;
   border-bottom:1px solid #eee3ce}
 .relationship-record-header {
   padding:24px 24px 18px}
@@ -269,7 +269,7 @@
   display:flex;
   gap:7px;
   align-items:center;
-  font-size:11px;
+  font-size:13px;
   color:var(--rel-muted);
   margin-bottom:14px}
 .record-type>span {
@@ -291,7 +291,7 @@
   flex-wrap:wrap;
   align-items:center;
   margin-top:13px;
-  font-size:12px;
+  font-size:13px;
   color:var(--rel-muted)}
 .relationship-actions {
   display:flex;
@@ -300,13 +300,13 @@
   flex-wrap:wrap;
   margin-top:21px}
 .relationship-actions .button {
-  font-size:12px;
+  font-size:13px;
   min-height:36px}
 .record-full-link {
   display:flex;
   gap:5px;
   align-items:center;
-  font-size:12px;
+  font-size:13px;
   margin-left:auto;
   color:#6f4aa8}
 .relationship-tabs {
@@ -340,10 +340,10 @@
   font-size:14px;
   font-weight:650}
 .record-feed-heading>span {
-  font-size:11px;
+  font-size:13px;
   color:var(--rel-muted)}
 .record-last-contact {
-  font-size:12px;
+  font-size:13px;
   color:var(--rel-muted);
   margin:10px 0 20px;
   line-height:1.7}
@@ -352,14 +352,14 @@
 .record-feed .follow-up-row a {
   font-size:13px}
 .record-feed .follow-up-row p {
-  font-size:12px;
+  font-size:13px;
   line-height:1.7}
 .record-feed .follow-up-row>a {
-  font-size:12px;
+  font-size:13px;
   display:inline-block;
   margin-top:8px}
 .record-completed {
-  font-size:12px;
+  font-size:13px;
   margin-top:20px}
 .record-completed summary {
   cursor:pointer;
@@ -401,7 +401,7 @@
   flex-wrap:wrap;
   justify-content:space-between;
   gap:8px;
-  font-size:11px;
+  font-size:13px;
   color:var(--rel-muted);
   margin:4px 0 9px}
 .relationship-timeline a {
@@ -415,7 +415,7 @@
   white-space:pre-wrap;
   overflow-wrap:anywhere}
 .relationship-timeline details {
-  font-size:12px;
+  font-size:13px;
   margin-top:8px;
   color:var(--rel-muted)}
 .relationship-timeline summary {
@@ -437,7 +437,7 @@
 .record-context dl {
   margin:16px 0 24px}
 .record-context dt {
-  font-size:12px;
+  font-size:13px;
   color:var(--rel-muted);
   margin-top:14px}
 .record-context dd {
@@ -451,7 +451,7 @@
   gap:10px;
   margin-bottom:12px}
 .record-context-heading>a {
-  font-size:12px}
+  font-size:13px}
 .record-person {
   display:block;
   padding:12px 0;
@@ -462,7 +462,7 @@
   display:block}
 .record-person span {
   display:block;
-  font-size:12px;
+  font-size:13px;
   color:var(--rel-muted);
   margin-top:6px;
   line-height:1.6}
@@ -479,7 +479,7 @@
 .relationship-profile>h3 {
   margin-bottom:22px}
 .relationship-profile dt {
-  font-size:12px!important;
+  font-size:13px!important;
   text-transform:none!important;
   font-weight:500!important;
   letter-spacing:0!important}
@@ -487,7 +487,7 @@
   font-size:14px;
   line-height:1.7}
 .record-provenance {
-  font-size:12px;
+  font-size:13px;
   margin:24px 0 12px;
   color:var(--rel-muted)}
 .relationship-profile>a {
@@ -519,7 +519,7 @@
   overflow-wrap:anywhere}
 .record-related-grid li>span {
   display:block;
-  font-size:12px;
+  font-size:13px;
   line-height:1.6;
   margin-top:6px;
   color:var(--rel-muted)}
@@ -528,7 +528,7 @@
   line-height:1.8;
   margin:16px 0}
 .related-source-link {
-  font-size:12px;
+  font-size:13px;
   display:inline-block;
   margin-top:12px}
 .relationship-loading {
@@ -590,7 +590,7 @@
   border-top:1px solid #e2e7ee}
 .relationship-edit-dialog footer>a {
   margin-right:auto;
-  font-size:12px}
+  font-size:13px}
 .relationship-edit-dialog .quick-edit-error,.relationship-edit-dialog .quick-edit-success {
   margin:16px 22px 0;
   padding:12px;
@@ -652,12 +652,12 @@
 .relationship-toolbar select {
   min-height:44px;
   max-width:205px;
-  font-size:12px}
+  font-size:13px}
 .directory-view>summary {
   min-height:44px}
 .directory-count {
   width:100%;
-  font-size:12px}
+  font-size:13px}
 .relationship-split {
   display:block;
   min-height:0}
@@ -734,3 +734,6 @@
 @media (max-width: 800px) {
   .relationship-surface:has(.has-selection) .relationship-page-heading { display: none; }
 }
+
+/* The selected relationship is the primary work surface. */
+.relationship-record-header{background:#111b2e;color:white;border-bottom:4px solid #7447e6}.relationship-record-header h2{font-size:30px;color:white}.relationship-record-header>p,.relationship-record-meta,.record-type{color:#c9d4e8}.relationship-record-header .button-secondary{color:#182238;background:white}.record-type{font-size:13px}.record-context{background:#eef1f8}.record-context dt,.record-context dd{font-size:14px}.directory-record strong{font-size:16px}.directory-record[aria-selected=true]{background:#efe8ff;border-left:4px solid #7447e6}.relationship-tabs button{font-size:14px;min-height:48px}.relationship-tabs button[aria-selected=true]{color:#6036cf;border-bottom:3px solid #7447e6}.record-feed h3,.record-context h3{font-size:18px}.relationship-timeline a{font-size:15px}.relationship-timeline p{font-size:14px}.relationship-toolbar select{font-size:14px}.record-related-grid>section{background:#f8f9fc;border:0;border-top:3px solid #d8deea}.relationship-record-header .record-full-link{color:#d5c3ff}@media(max-width:800px){.relationship-record-header h2{font-size:26px}}

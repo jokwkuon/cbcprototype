@@ -77,7 +77,7 @@ export function RelationshipDirectory({kind, rows, total, page, options, params,
             <Link data-record href={href({selected:r.id})} scroll={false} aria-current={selected === r.id ? 'true' : undefined} className="directory-record">
               <span className="directory-avatar">{r.name.split(' ').slice(0,2).map(w => w[0]).join('')}</span>
               <span className="directory-identity"><strong>{r.name}</strong><span>{r.context}</span><small>{kind === 'organization' ? r.location || r.category : r.category} · Ref {recordReference(r.id)}</small></span>
-              <span className="directory-stage">{kind === 'organization' ? <StatusBadge value={r.status}/> : <Icon name="chevron" size={15}/>}</span>
+              <span className="directory-stage">{kind === 'organization' ? <StatusBadge domain="relationship" value={r.status}/> : <Icon name="chevron" size={15}/>}</span>
             </Link>
           </li>)}
         </ul>

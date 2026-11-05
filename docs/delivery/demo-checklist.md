@@ -234,3 +234,19 @@ Walkthrough: sign in as Jordan Ellis; open Dashboard and compare Assigned to me,
 - [ ] Durable backup/restore acceptance and application deployment authorization.
 
 See [hosted results and limits](hosted-version3-verification.md). This does not check off the earlier sensitive-data/business-rule or production gates.
+
+## Version 3 visual/data-quality — 2026-11-04
+
+REQ-001/002/004/005/006/008/009/010/011/012/013/014. [Verification](version-3-visual-data-quality-verification.md) and [meeting walkthrough/reset procedure](../design/version-3-visual-data-quality.md).
+
+- [x] Source-based UI/data audit; no new business formulas or schema/security rules.
+- [x] Readable typography, vibrant CBC identity, stronger semantic indicators and work/context surfaces.
+- [x] Dashboard/Organizations focus; mentorship roster and table; report/form/module refinements.
+- [x] Isolated presentation and regression instances; natural fictional names and reserved domains.
+- [x] Exact private contamination inventory; unknown legacy/manual/hosted records retained.
+- [x] Guarded dry-run/reset/reseed and refusal when rows differ from the sealed fixture.
+- [x] Unit, SQL/RLS, API, real/synthetic browser, lint, typecheck and production build checks.
+- [x] Desktop/mobile captures and visual inspection; zero recorded runtime/console errors or body overflow.
+- [x] Main relationship/follow-up walkthrough, financial receipts and report source/export verification.
+- [ ] Named CBC/instructor acceptance and manual accessibility sign-off.
+- [ ] Review/merge approval; hosted deployment remains separate.

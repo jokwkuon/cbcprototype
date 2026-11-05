@@ -1,7 +1,7 @@
 import {test,expect} from '@playwright/test';
 import {readFileSync,mkdirSync,chmodSync,writeFileSync} from 'node:fs';
 import {resolve} from 'node:path';
-const local=resolve(__dirname,'../../../../.local/cbc-demo');
+const local=(process.env.CBC_DEMO_DIRECTORY || resolve(__dirname,'../../../../.local/cbc-test'));
 const accounts=JSON.parse(readFileSync(resolve(local,'accounts.json'),'utf8'));
 test('REQ-001/002/005/008 operational search, out-of-range paging and desktop/mobile evidence',async({page})=>{
  const account=accounts.find((a:{role:string})=>a.role==='admin');

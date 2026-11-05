@@ -19,9 +19,9 @@ export async function ActionQueue({compact=false,scope='team',requestedPage}:{co
     if(error || count===null) throw new Error('Queue query failed');
     result={today,until,tasks:(data || []) as FollowUp[],count};
   } catch { /* Query failure is displayed explicitly below. */ }
-  if(!result) return <section className="card my-5 p-6" role="alert"><h2 className="font-bold">Action Queue unavailable</h2><p>Unable to load follow-ups. No zero count is implied.</p><Link className="underline" href={`/dashboard?work=${scope}`}>Retry action queue</Link></section>;
+  if(!result) return <section className="card work-panel my-5 p-6" role="alert"><h2 className="font-bold">Action Queue unavailable</h2><p>Unable to load follow-ups. Retry to see your upcoming work.</p><Link className="underline" href={`/dashboard?work=${scope}`}>Retry action queue</Link></section>;
   const {today,until,tasks,count}=result;
-    return <section className="card my-5 p-6"><h2 className="mb-2 font-bold">Action Queue — overdue and next 7 days</h2>
+    return <section className="card work-panel my-5 p-6"><h2 className="mb-2 font-bold">Your upcoming work</h2>
       <p className="mb-4 text-sm">Calgary dates: {localDate(today)} to {localDate(until)}. Includes undated open actions; completed actions are excluded.</p>
       <nav className="flex flex-wrap gap-4 mb-4" aria-label="Action queue scope">{(['mine','team','unassigned'] as const).map(value=><Link key={value} aria-current={scope===value?'page':undefined} className="underline" href={`/dashboard?work=${value}`}>{value==='mine'?'Assigned to me':value==='team'?'Team actions':'Unassigned'}</Link>)}</nav>
       <div className="flex items-center justify-between mb-4"><span className="text-xs text-slate-500">Showing {tasks.length} of {count} actionable follow-ups</span><Link className="text-xs text-purple" href="/activities">View all activities →</Link></div>

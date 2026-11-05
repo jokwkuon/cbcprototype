@@ -2,7 +2,7 @@ import { createRequire } from "node:module";
 import { resolve } from "node:path";
 import { readFileSync,readdirSync,writeFileSync,chmodSync } from "node:fs";
 import { spawnSync } from "node:child_process";
-import { root,local,readStatus,requireLocalUrl } from "./prepare.mjs";
+import { root,local,supabaseHome,readStatus,requireLocalUrl } from "./prepare.mjs";
 const require=createRequire(resolve(root,"apps/frontend/package.json"));
 export const {createClient}=require("@supabase/supabase-js");
 export function check(ok,label){if(!ok)throw new Error(label);}
@@ -11,7 +11,7 @@ export function accounts(){return JSON.parse(readFileSync(resolve(local,"account
 export function client(key){const status=readStatus();return createClient(status.env.API_URL,key??status.env.ANON_KEY,{auth:{persistSession:false,autoRefreshToken:false,detectSessionInUrl:false}});}
 export async function login(role){const account=accounts().find(a=>a.role===role);check(account,`Missing ${role} demo account. Run seed first.`);const c=client();const {error}=await c.auth.signInWithPassword({email:account.email,password:account.password});check(!error,`${role} authentication failed.`);return c;}
 function findPsql(directory){for(const entry of readdirSync(directory,{withFileTypes:true})){const path=resolve(directory,entry.name);if(entry.isFile()&&entry.name==="psql")return path;if(entry.isDirectory()){const found=findPsql(path);if(found)return found;}}}
-export function psqlPath(){return process.env.CBC_PSQL_BIN??findPsql(resolve(local,"supabase-home/cache/stack/slim-services/postgres"));}
+export function psqlPath(){return process.env.CBC_PSQL_BIN??findPsql(resolve(supabaseHome,"cache/stack/slim-services/postgres"));}
 export function sql(query){
  const status=readStatus(),url=requireLocalUrl(status.env.DB_URL,54422);
  const executable=psqlPath();check(executable,"Local psql binary unavailable.");

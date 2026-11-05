@@ -3,7 +3,7 @@ import {readFileSync} from 'node:fs';
 import {resolve} from 'node:path';
 import {randomUUID} from 'node:crypto';
 import {createClient} from '@supabase/supabase-js';
-const local=resolve(__dirname,'../../../../.local/cbc-demo');
+const local=(process.env.CBC_DEMO_DIRECTORY || resolve(__dirname,'../../../../.local/cbc-test'));
 const accounts=JSON.parse(readFileSync(resolve(local,'accounts.json'),'utf8')) as {email:string;password:string;role:string}[];
 const status=JSON.parse(readFileSync(resolve(local,'status.json'),'utf8'));
 async function login(page:Page,role:string){const a=accounts.find(a=>a.role===role)!;await page.goto('/login');await page.getByLabel('Email',{exact:true}).fill(a.email);await page.getByLabel('Password',{exact:true}).fill(a.password);await page.getByRole('button',{name:'Sign in',exact:true}).click();await expect(page).toHaveURL(/\/dashboard$/);}
@@ -26,16 +26,16 @@ test('REQ-013: six report categories navigate; Financial report reconciles perio
  for(const title of ['Executive Performance','Sponsor Relationship','Scholarship Impact','Mentorship','Membership','Financial Performance'])await expect(page.locator('main').getByRole('link',{name:title,exact:true})).toBeVisible();
  for(const slug of ['executive','scholarship','mentorship','membership']){await page.goto(`/reports/${slug}`);await expect(page.getByRole('heading',{name:'Report overview',exact:true})).toBeVisible();await expect(page.getByRole('alert').filter({hasText:'Report unavailable'})).toHaveCount(0);}
  await page.goto(`/reports/financial?year=2025&organization=${organization}`);
- for(const [label,amount] of [['Selected-period cash received','CAD 200.20'],['Lifetime Giving / cash received','CAD 300.30'],['Prior comparable cash','CAD 100.10'],['Pledged (all-time active cash commitments)','CAD 1,000.30'],['Outstanding Commitment (all-time)','CAD 700.00'],['In-kind declared value (separate)','CAD 500.00']])await expect(value(page,label)).toHaveText(amount);
+ for(const [label,amount] of [['Selected-period cash received','CAD 200.20'],['Lifetime cash received','CAD 300.30'],['Prior comparable cash','CAD 100.10'],['Active cash commitments','CAD 1,000.30'],['Outstanding cash balance','CAD 700.00'],['In-kind declared value (separate)','CAD 500.00']])await expect(value(page,label)).toHaveText(amount);
  await expect(page.getByLabel('Reporting year',{exact:true})).toHaveValue('2025');await expect(page.getByLabel('Report organization',{exact:true})).toHaveValue(organization);
  const ledger=page.getByRole('region',{name:'Received payments in period'});await expect(ledger.locator('tbody tr')).toHaveCount(1);await expect(ledger.locator('tfoot')).toContainText('CAD 200.20');await expect(page.getByText('Event ROI — Definition pending',{exact:true})).toBeVisible();
- await page.getByLabel('Reporting year',{exact:true}).fill('2024');await page.getByRole('button',{name:'Apply report filters',exact:true}).click();await expect(value(page,'Selected-period cash received')).toHaveText('CAD 100.10');await expect(value(page,'Outstanding Commitment (all-time)')).toHaveText('CAD 700.00');
+ await page.getByLabel('Reporting year',{exact:true}).fill('2024');await page.getByRole('button',{name:'Apply report filters',exact:true}).click();await expect(value(page,'Selected-period cash received')).toHaveText('CAD 100.10');await expect(value(page,'Outstanding cash balance')).toHaveText('CAD 700.00');
  await page.getByRole('region',{name:'Received payments in period'}).getByRole('link').first().click();await expect(page).toHaveURL(new RegExp(`/giving/${contribution}$`));await expect(page.getByRole('heading',{name:'Contribution · Jan 1, 2023',exact:true})).toBeVisible();
 });
 for(const role of ['admin','staff','viewer'])test(`REQ-013/008: ${role} reads Financial report; empty periods and scopes retain genuine zeroes`,async({page})=>{
  await login(page,role);await page.goto(`/reports/financial?year=2025&organization=${organization}`);await expect(value(page,'Selected-period cash received')).toHaveText('CAD 200.20');await expect(page.getByRole('link',{name:'Edit contribution',exact:true})).toHaveCount(0);
- await page.goto(`/reports/financial?year=2022&organization=${organization}`);await expect(value(page,'Selected-period cash received')).toHaveText('CAD 0.00');await expect(value(page,'Pledged (all-time active cash commitments)')).toHaveText('CAD 1,000.30');await expect(page.getByText('No received payments in this period.',{exact:true})).toBeVisible();
- await page.goto(`/reports/financial?year=2025&organization=${empty}`);await expect(value(page,'Pledged (all-time active cash commitments)')).toHaveText('CAD 0.00');await expect(page.getByText('No contributions recorded in this scope. Verified totals are zero.',{exact:true})).toBeVisible();
+ await page.goto(`/reports/financial?year=2022&organization=${organization}`);await expect(value(page,'Selected-period cash received')).toHaveText('CAD 0.00');await expect(value(page,'Active cash commitments')).toHaveText('CAD 1,000.30');await expect(page.getByText('No received payments in this period.',{exact:true})).toBeVisible();
+ await page.goto(`/reports/financial?year=2025&organization=${empty}`);await expect(value(page,'Active cash commitments')).toHaveText('CAD 0.00');await expect(page.getByText('No contributions recorded in this scope. Verified totals are zero.',{exact:true})).toBeVisible();
 });
 test('REQ-013: direct invalid report filters are explicit errors with no totals',async({page})=>{
  await login(page,'admin');

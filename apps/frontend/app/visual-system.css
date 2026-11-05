@@ -1,0 +1,394 @@
+/* V3 surface system: identity, work, context. Semantic pairs are contrast tested. */
+:root {
+  --cbc-navy:#111b2e;
+  --cbc-navy-raised:#1b2943;
+  --cbc-primary-hover:#6036cf;
+  --cbc-primary-light:#efe8ff;
+  --cbc-surface:#fff;
+  --cbc-surface-alt:#f8f9fc;
+  --cbc-success:#086447;
+  --cbc-success-light:#d9f5e8;
+  --cbc-warning:#854609;
+  --cbc-warning-light:#fff0cb;
+  --cbc-danger:#a32239;
+  --cbc-danger-light:#ffe1e7;
+  --cbc-info:#214fa8;
+  --cbc-info-light:#e1ecff;
+}
+h1,.page-header h1 {
+  font-size:32px;
+  letter-spacing:-.8px;
+}
+.page-header p {
+  font-size:15px;
+}
+.nav-item {
+  font-size:14px;
+  min-height:44px;
+  border-radius:8px;
+}
+.nav-group h2 {
+  font-size:12px;
+  color:#aab8d0;
+  letter-spacing:1px;
+}
+.nav-item:hover {
+  background:#1b2943;
+}
+.nav-item.is-active {
+  background:#7447e6;
+  color:#fff;
+  box-shadow:inset 3px 0 #d5c3ff;
+}
+.sidebar {
+  padding-top:28px;
+}
+.brand-name {
+  font-size:12px;
+}
+.brand-name>span {
+  font-size:12px;
+  color:#b5bfd0;
+}
+.sidebar-footer {
+  font-size:12px;
+  color:#b5bfd0;
+}
+.breadcrumbs {
+  font-size:13px;
+}
+.card {
+  border-radius:14px;
+  box-shadow:0 3px 14px #17263e06;
+}
+.button,.main-content form button:not(.icon-button):not([aria-label]),.page-actions>a {
+  font-size:14px;
+  min-height:42px;
+  padding:10px 16px;
+  border-radius:8px;
+}
+.button-primary:hover {
+  background:var(--cbc-primary-hover)!important;
+}
+.button:active {
+  transform:translateY(1px);
+}
+label {
+  font-size:14px;
+}
+small {
+  font-size:13px;
+}
+.main-content table {
+  font-size:14px;
+}
+.main-content th,.column-sort {
+  font-size:13px;
+  font-weight:650;
+  color:#526078;
+}
+.main-content th {
+  background:#eef1f8;
+}
+.main-content td {
+  padding:17px 16px!important;
+}
+.main-content dt {
+  font-size:13px!important;
+}
+.main-content dd {
+  font-size:15px;
+}
+.main-content section>h2,.section-title h2,.chart-card h2,.report-tile h2 {
+  font-size:20px!important;
+}
+.pill {
+  font-size:13px;
+  font-weight:650;
+  padding:5px 10px;
+  border-radius:999px;
+  line-height:1.4;
+}
+.pill:before {
+  width:6px;
+  height:6px;
+}
+.pill-success {
+  color:var(--cbc-success);
+  background:var(--cbc-success-light);
+  border-color:#a8dfc7;
+}
+.pill-warning {
+  color:var(--cbc-warning);
+  background:var(--cbc-warning-light);
+  border-color:#e8c77d;
+}
+.pill-danger {
+  color:var(--cbc-danger);
+  background:var(--cbc-danger-light);
+  border-color:#efadb9;
+}
+.pill-info {
+  color:var(--cbc-info);
+  background:var(--cbc-info-light);
+  border-color:#b4c9ee;
+}
+.pill-primary {
+  color:#5930ae;
+  background:#efe8ff;
+  border-color:#cbb7f4;
+}
+.pill-neutral {
+  color:#526078;
+  background:#edf0f6;
+  border-color:#d8deea;
+}
+.metric-grid {
+  gap:18px;
+}
+.main-content .metric-card {
+  padding:24px;
+  border-top:3px solid #7447e6;
+}
+.metric-top {
+  font-size:14px;
+  color:#526078;
+}
+.main-content .metric-card .metric-number {
+  font-size:36px;
+  font-weight:700;
+  margin:16px 0 10px;
+}
+.main-content .metric-card .metric-context {
+  font-size:13px;
+  color:#526078;
+}
+.metric-card .metric-icon {
+  background:#efe8ff;
+  color:#6036cf;
+}
+.metric-grid>a:first-child {
+  background:#111b2e;
+  border-color:#111b2e;
+}
+.metric-grid>a:first-child .metric-top,.metric-grid>a:first-child .metric-context {
+  color:#ccd6e9;
+}
+.main-content .metric-grid>a:first-child .metric-number {
+  color:#fff!important;
+}
+.chart-card {
+  padding:26px;
+}
+.cash-bar,.report-bars i {
+  background:#7447e6;
+}
+.cash-label,.chart-legend {
+  font-size:12px;
+  color:#526078;
+}
+.report-tile {
+  min-height:230px;
+  border-top:3px solid #7447e6;
+}
+.report-tile p {
+  font-size:15px;
+}
+.report-tile footer {
+  font-size:13px;
+}
+.summary-value {
+  background:#f8f9fc;
+  border-left:3px solid #7447e6;
+}
+.main-content .summary-value dd {
+  font-size:28px;
+  font-weight:700;
+}
+.board-panels section {
+  background:#f8f9fc;
+}
+.board-panels p,.board-panels li:not(.timeline-item) {
+  font-size:14px;
+}
+.pending-note,.callout {
+  color:#5d467a;
+  background:#f2edf9;
+}
+.form-message,[role=alert] {
+  color:#a32239;
+}
+.form-message {
+  background:#ffe1e7;
+}
+.toast {
+  color:#086447;
+  background:#d9f5e8;
+  font-size:14px;
+}
+.follow-up-row>div>a {
+  font-size:15px;
+}
+.follow-up-row p {
+  font-size:13px;
+}
+.main-content section.work-panel {
+  border-left:4px solid #7447e6;
+}
+.work-panel:has(.follow-up-row) {
+  background:#fff;
+}
+.work-panel nav a[aria-current=page] {
+  color:#5930ae;
+  background:#efe8ff;
+  border-radius:6px;
+  padding:2px 8px;
+  font-weight:650;
+}
+.work-panel .follow-up-row {
+  padding:14px 0;
+}
+.empty-state {
+  padding:28px 20px;
+}
+.data-toolbar input,.data-toolbar select {
+  font-size:14px;
+  min-height:42px;
+}
+.cell-meta,.main-content .data-table .cell-meta,.field-help,.main-content .field-help {
+  font-size:13px;
+  color:#526078;
+}
+.main-content .text-xs {
+  font-size:13px;
+}
+.main-content .text-sm {
+  font-size:15px;
+}
+.main-content .text-slate-500 {
+  color:#526078;
+}
+.main-content .text-slate-400 {
+  color:#526078;
+}
+input::placeholder {
+  color:#59677e;
+}
+.icon-button {
+  min-width:36px;
+  min-height:36px;
+}
+.main-content .form-surface>p:not(.form-message) {
+  font-size:14px;
+}
+@media(max-width:800px) {
+  h1,.page-header h1 {
+    font-size:28px;
+  }
+  .main-content .metric-card {
+    padding:18px;
+  }
+  .main-content .metric-card .metric-number {
+    font-size:30px;
+  }
+  .metric-top {
+    font-size:13px;
+  }
+  .nav-item,.mobile-drawer .nav-item {
+    font-size:14px;
+  }
+  .page-header p {
+    font-size:14px;
+  }
+  .button,.main-content form button:not(.icon-button):not([aria-label]) {
+    min-height:44px;
+  }
+  .main-content td {
+    padding:14px 12px!important;
+  }
+  .chart-card {
+    padding:20px;
+  }
+  .main-content .summary-value dd {
+    font-size:24px;
+  }
+}
+.roster-controls {
+  display:flex;
+  gap:8px;
+  margin:18px 0;
+}
+.roster-controls [aria-pressed=true] {
+  background:#efe8ff;
+  color:#5930ae;
+  border-color:#7447e6;
+}
+.pairing-roster {
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:20px;
+}
+.pairing-card {
+  padding:24px;
+  border-top:3px solid #7447e6;
+}
+.pairing-card header {
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  align-items:center;
+  font-size:13px;
+  color:#526078;
+}
+.pairing-people {
+  display:flex;
+  gap:16px;
+  align-items:center;
+  margin:24px 0 12px;
+}
+.pairing-people>span {
+  min-width:0;
+}
+.pairing-people small,.pairing-card dd small {
+  display:block;
+  font-size:13px;
+  color:#526078;
+}
+.pairing-people strong {
+  font-size:20px;
+  display:block;
+}
+.pairing-card dl {
+  display:grid;
+  grid-template-columns:1fr 1.5fr;
+  gap:16px;
+  padding:18px 0;
+  margin:16px 0;
+  border-top:1px solid #d8deea;
+}
+.pairing-card .button {
+  width:100%;
+}
+@media(max-width:1000px) {
+  .pairing-roster {
+    grid-template-columns:1fr;
+  }
+}
+
+.financial-summary .summary-value:first-child { background:var(--cbc-navy); border-color:var(--cbc-navy); }
+.main-content .financial-summary .summary-value:first-child dt { color:#ccd6e9!important; }
+.main-content .financial-summary .summary-value:first-child dd { color:white; }
+.main-content .summary-value dd.summary-explanation { font-size:14px; font-weight:500; letter-spacing:0; }
+
+/* Preserve readable identities when wide tables need their own horizontal scroll. */
+.main-content .data-table td { min-width:140px; }
+.main-content .data-table td:first-child { min-width:220px; }
+.main-content .data-table td[style*="text-align: right"] { white-space:nowrap; }
+.financial-summary .report-summary-grid { grid-template-columns:repeat(3,minmax(0,1fr)); }
+.financial-summary .summary-value:last-child { grid-column:1/-1; display:flex; align-items:center; justify-content:space-between; gap:20px; }
+.main-content .financial-summary .summary-value:last-child dd { margin-top:0; font-size:18px; }
+@media(max-width:800px) {
+  .financial-summary .report-summary-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  .main-content .financial-summary .summary-value dd { font-size:24px; }
+  .main-content .financial-summary .summary-value:last-child dd { font-size:16px; }
+}

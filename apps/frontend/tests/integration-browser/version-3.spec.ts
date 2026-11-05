@@ -4,7 +4,7 @@ import {readFileSync} from 'node:fs';
 import {resolve} from 'node:path';
 import {randomUUID} from 'node:crypto';
 
-const local = resolve(__dirname,'../../../../.local/cbc-demo');
+const local = (process.env.CBC_DEMO_DIRECTORY || resolve(__dirname,'../../../../.local/cbc-test'));
 const status = JSON.parse(readFileSync(resolve(local,'status.json'),'utf8'));
 const accounts = JSON.parse(readFileSync(resolve(local,'accounts.json'),'utf8')) as {email:string;password:string;role:string}[];
 const seed = JSON.parse(readFileSync(resolve(local,'records.json'),'utf8'));
@@ -97,11 +97,11 @@ test('REQ-008 V3 direct action replay checks role and quick edit ignores forged 
   const request = page.waitForRequest(r => r.method() === 'POST' && !!r.headers()['next-action']);
   await dialog.getByLabel('Location',{exact:true}).fill('Banff');await dialog.getByRole('button',{name:'Save changes',exact:true}).click();const call = await request;await expect(dialog.getByRole('status')).toContainText('saved successfully');
   expect((await admin.from('organizations').select('relationship_owner').eq('id',orgId).single()).data?.relationship_owner).toBeNull();
-  const context = await browser.newContext({baseURL:'http://127.0.0.1:3140'});
+  const context = await browser.newContext({baseURL:'http://127.0.0.1:3142'});
   try {
     const viewer = await context.newPage();await login(viewer,'viewer');
     const before = (await admin.from('organizations').select('updated_at').eq('id',orgId).single()).data?.updated_at;
-    const response = await viewer.request.post(call.url(),{headers:{'Next-Action':call.headers()['next-action'],'Content-Type':call.headers()['content-type'],'Origin':'http://127.0.0.1:3140'},data:call.postDataBuffer()!});
+    const response = await viewer.request.post(call.url(),{headers:{'Next-Action':call.headers()['next-action'],'Content-Type':call.headers()['content-type'],'Origin':'http://127.0.0.1:3142'},data:call.postDataBuffer()!});
     expect(response.status()).toBe(200);expect(await response.text()).toContain('Your role cannot edit these records');
     expect((await admin.from('organizations').select('updated_at').eq('id',orgId).single()).data?.updated_at).toBe(before);
   } finally {await context.close();}

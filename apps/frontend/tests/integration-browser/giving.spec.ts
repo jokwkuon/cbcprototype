@@ -1,7 +1,7 @@
 import {test,expect,type Page} from '@playwright/test';
 import {readFileSync} from 'node:fs';
 import {resolve} from 'node:path';
-const local=resolve(__dirname,'../../../../.local/cbc-demo');
+const local=(process.env.CBC_DEMO_DIRECTORY || resolve(__dirname,'../../../../.local/cbc-test'));
 const accounts=JSON.parse(readFileSync(resolve(local,'accounts.json'),'utf8')) as {email:string;password:string;role:string}[];
 const seed=JSON.parse(readFileSync(resolve(local,'giving-records.json'),'utf8'));
 const records=JSON.parse(readFileSync(resolve(local,'records.json'),'utf8'));

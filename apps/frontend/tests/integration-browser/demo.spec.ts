@@ -2,7 +2,7 @@ import { localDate } from "../../lib/presentation";
 import {test,expect,type Page} from "@playwright/test";
 import {readFileSync} from "node:fs";
 import {resolve} from "node:path";
-const privateDirectory=resolve(__dirname,"../../../../.local/cbc-demo");
+const privateDirectory=(process.env.CBC_DEMO_DIRECTORY || resolve(__dirname,"../../../../.local/cbc-test"));
 const accounts=JSON.parse(readFileSync(resolve(privateDirectory,"accounts.json"),"utf8")) as {email:string;password:string;role:string;name:string}[];
 const records=JSON.parse(readFileSync(resolve(privateDirectory,"records.json"),"utf8"));
 async function signIn(page:Page,role:string){
@@ -14,7 +14,7 @@ test("REQ-001/002/005/008: real Auth and complete record/relationship/action wor
  await signIn(page,"admin");
  await page.goto(`/organizations/${records.organizationId}`);await expect(page.getByRole("heading",{name:"Prairie Lantern Ventures",exact:true})).toBeVisible();
  await page.goto(`/contacts/${records.contactIds[0]}`);await expect(page.getByRole("heading",{name:"Amara Okafor",exact:true})).toBeVisible();
- const name=`Silver Birch Community Partners ${Date.now()}`,contactSurname=`Thompson ${Date.now()}`,contactName=`Maya ${contactSurname}`;
+ const name=`Silver Birch Community Partners`,contactSurname=`Thompson`,contactName=`Maya ${contactSurname}`;
  await page.goto("/organizations/new");await page.getByLabel("Organization Name").fill(name);await page.getByLabel("Relationship Owner").selectOption({label:"Jordan Ellis"});await page.getByRole("button",{name:"Save record"}).click();await expect(page.getByRole("heading",{name,exact:true})).toBeVisible();const orgUrl=page.url();
  await page.getByRole("link",{name:"Edit organization",exact:true}).click();await page.getByLabel("Notes",{exact:true}).fill("Discuss the scholarship partnership at the next review");await page.getByRole("button",{name:"Save record"}).click();await expect(page.getByText("Discuss the scholarship partnership at the next review",{exact:true})).toBeVisible();
  await page.goto("/contacts/new");await page.getByRole("textbox",{name:"First Name",exact:true}).fill("Maya");await page.getByRole("textbox",{name:"Last Name",exact:true}).fill(contactSurname);await page.getByLabel("Organization",{exact:true}).selectOption({label:name});await page.getByRole("button",{name:"Save record"}).click();await expect(page.getByRole("heading",{name:contactName,exact:true})).toBeVisible();const contactUrl=page.url();
@@ -24,7 +24,7 @@ test("REQ-001/002/005/008: real Auth and complete record/relationship/action wor
  await page.getByRole("link",{name:"Edit activity",exact:true}).click();await expect(page.getByRole("heading",{name:"Edit activity",exact:true})).toBeVisible();await page.getByLabel("Outcome",{exact:true}).fill("Send the partnership summary for review");await page.getByRole("button",{name:"Save record"}).click();await expect(page.getByText("Send the partnership summary for review",{exact:true})).toBeVisible();
  const action=`Action ${name}`;await page.getByLabel("Next Action").fill(action);await page.getByLabel("Action Owner",{exact:true}).selectOption({label:"Jordan Ellis"});await page.getByLabel("Due Date",{exact:true}).fill("2000-01-01");await page.getByRole("button",{name:"Save record"}).click();await expect(page.locator("article").filter({hasText:action})).toContainText("Overdue");
  await page.goto("/dashboard?work=team");
- const queue=page.locator('section').filter({has:page.getByRole('heading',{name:'Action Queue — overdue and next 7 days',exact:true})});
+ const queue=page.locator('section').filter({has:page.getByRole('heading',{name:'Your upcoming work',exact:true})});
  while(await queue.getByRole('link',{name:action,exact:true}).count()===0 && await queue.getByRole('link',{name:'Next actions',exact:true}).count()) {await queue.getByRole('link',{name:'Next actions',exact:true}).click();}
  await expect(queue.getByRole('link',{name:action,exact:true})).toBeVisible();
  await page.goto(activityUrl);await page.locator("article").filter({hasText:action}).getByRole("link",{name:"Edit follow-up",exact:true}).click();await expect(page.getByRole("heading",{name:"Edit follow-up",exact:true})).toBeVisible();await page.getByLabel("Completion",{exact:true}).selectOption("complete");await page.getByRole("button",{name:"Save record"}).click();await expect(page.locator("article").filter({hasText:action})).toContainText("Complete");
