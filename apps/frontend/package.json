@@ -33,5 +33,10 @@
     "supabase": "2.120.0",
     "tailwindcss": "4.3.3",
     "typescript": "5.9.3"
+  },
+  "overrides": {
+    "@typescript-eslint/typescript-estree": {
+      "minimatch": "11.0.1"
+    }
   }
 }

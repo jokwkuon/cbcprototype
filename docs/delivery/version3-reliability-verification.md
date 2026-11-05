@@ -25,7 +25,7 @@ REQ-001/002/004/005/006/007/008/013. Branch: `feature/version3-reliability-opera
 | Auth/PostgREST | **335 passed** | Core 20; Giving 39; Interests 59; Programs 68; Membership 32; Mentorship 25; Documents 22; Reports 70 |
 | Full real browser | **55/55 passed** | `CBC_DEMO_INSTANCE=test npm --prefix apps/frontend run test:integration`; saved privately as `reliability-full-browser-verification.json` |
 | Final targeted real browser | **3/3 passed** | Session/pagination/visual recheck after the last refreshed-props guard; latest `browser-verification.json` |
-| Final synthetic browser | **37/37 passed**, 49.4 seconds | `npm --prefix apps/frontend run test:e2e`; final CSS/form/search/history build, query failure/empty/access/mobile scenarios |
+| Final synthetic browser | **37/37 passed**, 52.9 seconds after dependency patch | `npm --prefix apps/frontend run test:e2e`; final CSS/form/search/history build, query failure/empty/access/mobile scenarios |
 | Lint / typecheck | **Passed** | `npm --prefix apps/frontend run lint` and `run typecheck` |
 | Production build | **Passed** | Both Playwright suites build production Next.js; no middleware deprecation remains |
 | Fresh/reconciled schemas | **805 normalized objects match**, 12 historical checksums verified | Includes public objects, private helper functions/schema privileges and pgcrypto placement/version. Actual added-column/grant negative controls pass |
@@ -90,3 +90,9 @@ Documentation commit follows these implementation commits; no release tag or CBC
 ## CI measurement correction
 
 First remote run at `1c42ec1` completed database and real Auth/API/browser jobs successfully. Synthetic frontend failed only the global Auth-call bound (4 versus ≤3), while its profile count remained one. The previous counter could include another request that outlived a browser navigation. Test fixture tokens now have unique IDs and counters can be queried by token hash; the measured render gets a dedicated fictional session. An explicit concurrent search verifies global Auth counts exceed the isolated counts. Original assertions remain one profile query and at most three Auth calls. Five local repeats and the full 37-scenario rerun passed; replacement CI results follow in GitHub. No production auth code, permission or test limit was changed for this correction.
+
+## Dependency advisory remediation
+
+Full npm audit identified eight moderate development-tool findings rooted in minimatch 10.2.6. Scoped override `@typescript-eslint/typescript-estree → minimatch 11.0.1` and lockfile update installed successfully with scripts disabled; install audit reported **0 vulnerabilities**. The application runtime dependency versions are unchanged. Advisory: [GHSA-g3hv-75wg-m249](https://github.com/advisories/GHSA-g3hv-75wg-m249). CI also runs `npm audit --audit-level=high`. Subsequent lint/type/unit and production/browser checks validate the override; it is a temporary maintenance measure pending upstream range adoption.
+
+Replacement GitHub Actions run at `fd7c50e`: **all three jobs passed** — [41959754485](https://github.com/jokwkuon/cbcprototype/actions/runs/41959754485). This includes full frontend/synthetic browser, disposable SQL/schema/restore, and isolated real Auth/API/browser integration. After the subsequent development-dependency override, local lint/type/36 units and production-build/37 browser scenarios passed again; explicit `npm audit --audit-level=moderate` reported **0 vulnerabilities**. New CI is triggered by the final push; do not attribute the earlier green run to an untested later commit.

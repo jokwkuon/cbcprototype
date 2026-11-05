@@ -111,3 +111,7 @@ Apply/seed only the guarded isolated local environment before running these suit
 Reports navigation reaches all six categories. `/reports/financial` reuses Giving summaries, exact complete record reads and source links; cash-year/organization filters do not turn all-time balances into historical snapshots. Sponsor Relationship provides manual agreement/renewal dates, linked interactions and opportunity references; pipeline/risk/renewal-rate metrics remain pending. Four other categories and event ROI/export remain explicitly pending. No migrations or permission changes are required.
 
 From the root, `node scripts/demo/verify-reports.mjs` runs 70 actual local report API checks after the existing named seed. Frontend report unit tests cover filters, exact cents and complete/paged failure handling; real-browser tests use isolated synthetic report records, while the fixture suite forces errors and slow loading. See [latest executed counts and limitations](../../docs/delivery/progress.md#reports-foundation). CBC report approval and manual demonstration remain pending.
+
+## Temporary lint dependency override
+
+The nested `@typescript-eslint/typescript-estree` minimatch dependency is pinned through npm overrides to 11.0.1 for GHSA-g3hv-75wg-m249. Keep the lockfile and Node 22+; remove this scoped override after upstream adopts a patched compatible range and the lint/build/CI checks pass. No application runtime version is changed by this override.

@@ -23,6 +23,7 @@ jobs:
           cache-dependency-path: apps/frontend/package-lock.json
       - run: npm ci
       - run: node --test ../../scripts/import/preview.test.mjs
+      - run: npm audit --audit-level=high
       - run: npm test
       - run: npm run typecheck
       - run: npm run lint
