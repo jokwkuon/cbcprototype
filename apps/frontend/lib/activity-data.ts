@@ -31,22 +31,6 @@ export async function lastContact(client:Client, parameters:{p_activity_id?:stri
   if(error) throw new Error("Unable to calculate Last Contact.");
   return data as string|null;
 }
-export async function relatedHistory(client:Client,kind:"organization"|"contact",id:string) {
-  let ids:string[]|undefined;
-  if(kind==="contact") {
-    const {data,error}=await client.from("activity_contacts").select("activity_id").eq("contact_id",id);
-    if(error) throw new Error("Unable to load activity links.");
-    ids=(data??[]).map(row=>String(row.activity_id));
-  }
-  let activities:Activity[]=[];
-  if(!ids||ids.length) {
-    let query=client.from("activities").select("*").order("occurred_at",{ascending:false}).order("id");
-    query=kind==="organization"?query.eq("organization_id",id):query.in("id",ids!);
-    const {data,error}=await query;if(error) throw new Error("Unable to load related activities."); activities=(data??[]) as Activity[];
-  }
-  const [tasks,last]=await Promise.all([followUps(client,activities.map(row=>row.id)),lastContact(client,kind==="organization"?{p_organization_id:id}:{p_contact_id:id})]);
-  return {activities,tasks,last};
-}
 export async function activityFormData(id?:string) {
   const {client,canWrite}=await crmContext();if(!canWrite) throw new Error("Your role has read-only access.");
   const [orgs,contacts,activity,links]=await Promise.all([

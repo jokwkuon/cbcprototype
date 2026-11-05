@@ -102,7 +102,11 @@ const server=http.createServer(async(req,res)=>{
     return current!=null&&(op==='lt'?current<value:op==='gt'?current>value:current<=value);
   }
   const or=url.searchParams.get('or');if(or)rows=rows.filter(row=>splitClauses(or.slice(1,-1)).some(clause=>matches(row,clause)));
+  const linkedContact=url.searchParams.get('activity_contacts.contact_id')??url.searchParams.get('activities.activity_contacts.contact_id');
+  if(linkedContact?.startsWith('eq.'))rows=rows.filter(row=>tables.activity_contacts.some(link=>link.contact_id===linkedContact.slice(3)&&link.activity_id===(table==='activities'?row.id:row.activity_id)));
   for(const [key,value] of url.searchParams){
+    if(key.includes('.'))continue;
+    if(value==='not.is.null')rows=rows.filter(row=>row[key]!=null);
     if(value.startsWith("in.(")){const ids=value.slice(4,-1).split(",");rows=rows.filter(row=>ids.includes(String(row[key])));}
     if(value==="is.null")rows=rows.filter(row=>row[key]==null);
     if(value.startsWith("eq."))rows=rows.filter(row=>String(row[key])===value.slice(3));

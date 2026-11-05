@@ -13,7 +13,7 @@ import type {Membership} from '../lib/membership-data';
 import type {Pair} from '../lib/mentorship-data';
 import type {DocumentRecord} from '../lib/document-data';
 import {DetailFields} from './fields';
-import {FollowUpList} from './activity-lists';
+import {HistorySectionFeed} from './relationship-history-feed';
 import {RelationshipQuickEdit} from './relationship-quick-edit';
 import {RelationshipPanels} from './relationship-panels';
 import {StatusBadge} from './data-table-client';
@@ -63,11 +63,9 @@ async function RecordActivity({kind,id,canWrite}:{kind:RelationshipKind;id:strin
   const {client} = await crmContext();
   let history;
   try {history = await relationshipHistory(client,kind,id);} catch {return <div className="record-feed" role="alert"><h3>Activity unavailable</h3><p>Unable to load history or follow-ups. No activity totals were inferred.</p><a href="">Retry workspace</a></div>;}
-  const open = history.tasks.filter(t => t.status !== 'Complete'), completed = history.tasks.filter(t => t.status === 'Complete');
-  return <div className="record-feed"><div className="record-feed-heading"><h3>Next steps</h3><span>{open.length} open</span></div><p className="record-last-contact">Last Contact · {displayTime(history.last)}</p><FollowUpList tasks={open.slice(0,3)} canWrite={canWrite}/>{open.length > 3 && <details className="record-completed"><summary>More open follow-ups ({open.length-3})</summary><FollowUpList tasks={open.slice(3)} canWrite={canWrite}/></details>}{completed.length > 0 && <details className="record-completed"><summary>Completed follow-ups ({completed.length})</summary><FollowUpList tasks={completed} canWrite={canWrite}/></details>}<div className="record-feed-heading timeline-heading"><h3>Activity timeline</h3><span>{history.activities.length} recorded</span></div>
-    <ol className="relationship-timeline">{history.activities.map(a => <li key={a.id}><span className="timeline-event-icon"><Icon name={a.activity_type.toLowerCase() === 'meeting' ? 'contacts' : 'activities'} size={15}/></span><div><div className="timeline-event-meta"><span>{a.activity_type}</span><time dateTime={a.occurred_at}>{displayTime(a.occurred_at)}</time></div><Link href={`/activities/${a.id}`}>{a.purpose || a.activity_type}</Link>{a.outcome && <p>{a.outcome}</p>}{a.key_discussion && <details><summary>Discussion notes</summary><p>{a.key_discussion}</p></details>}</div></li>)}</ol>{!history.activities.length && <div className="record-no-activity"><Icon name="activities" size={24}/><h3>No interactions recorded</h3><p>Log a conversation to keep its context and follow-ups together.</p></div>}
-  </div>;
+  return <div className="record-feed"><p className="record-last-contact">Last Contact · {displayTime(history.last)}</p><HistorySectionFeed key={`${kind}:${id}:open`} kind={kind} id={id} section="open" initial={history.open} canWrite={canWrite}/>{history.completed.total>0&&<details className="record-completed"><summary>Completed follow-ups ({history.completed.total})</summary><HistorySectionFeed key={`${kind}:${id}:completed`} kind={kind} id={id} section="completed" initial={history.completed} canWrite={canWrite}/></details>}<HistorySectionFeed key={`${kind}:${id}:activities`} kind={kind} id={id} section="activities" initial={history.activities}/></div>;
 }
+
 async function RecordRelated({kind,id}:{kind:RelationshipKind;id:string}) {
   const {client} = await crmContext(), isOrg = kind === 'organization', full = `/${isOrg ? 'organizations' : 'contacts'}/${id}`;
   const results = await Promise.allSettled([

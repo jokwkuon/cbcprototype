@@ -1,13 +1,9 @@
-import { localDate } from "../lib/presentation";
 import Link from "next/link";
-import type { Activity,FollowUp } from "../lib/activity-data";
 import { displayTime } from "../lib/activity-data";
 import { DetailFields } from "./fields";
-import { Pill } from "./ui";
-export function FollowUpList({tasks,canWrite=false}:{tasks:FollowUp[];canWrite?:boolean}) {
-  return <div className="space-y-3">{tasks.map(task=><article key={task.id} className="follow-up-row"><div className="flex flex-wrap items-center gap-3"><Link className="font-semibold" href={`/activities/${task.activity_id}`}>{task.description}</Link><Pill tone={task.status==="Overdue"?"danger":task.status==="Complete"?"success":"info"}>{task.status}</Pill></div><p className="text-sm">Due: {task.due_date?localDate(task.due_date):"No due date"} · Owner: {task.owner_id?(task.owner_name??"Assigned staff member (restricted or inactive)"):"Unassigned"}{task.organization_name?` · ${task.organization_name}`:""}</p>{canWrite&&<Link className="text-sm underline" href={`/activities/${task.activity_id}/follow-ups/${task.id}/edit`}>Edit follow-up</Link>}</article>)}{!tasks.length&&<p>Nothing needs your attention right now.</p>}</div>;
-}
-export function RelatedActivities({history}:{history:{activities:Activity[];tasks:FollowUp[];last:string|null}}) {
-  const next=history.tasks.find(task=>task.status!=="Complete");
-  return <section id="activities" className="card mt-5 p-6"><h2 className="mb-4 font-bold">Activities &amp; Follow-Ups</h2><DetailFields fields={[["Last Contact",displayTime(history.last)],["Next Action",next?<Link href={`/activities/${next.activity_id}`}>{next.description}</Link>:"No open action"],["Next Action Date",next?.due_date??"No due date"]]}/><div className="mt-6">{history.activities.map(activity=><div className="timeline-item" key={activity.id}><Link className="underline" href={`/activities/${activity.id}`}>{activity.purpose||activity.activity_type}</Link> · {activity.activity_type} · {displayTime(activity.occurred_at)}</div>)}{!history.activities.length&&<p>No related activities.</p>}</div></section>;
+import { HistorySectionFeed } from "./relationship-history-feed";
+export {FollowUpList} from "./follow-up-list";
+export function RelatedActivities({history,kind,id,canWrite}:{history:Awaited<ReturnType<typeof import('../lib/relationship-history').relationshipHistory>>;kind:'organization'|'contact';id:string;canWrite:boolean}) {
+  const next=history.open.rows[0];
+  return <section id="activities" className="card mt-5 p-6"><h2 className="mb-4 font-bold">Activities &amp; Follow-Ups</h2><DetailFields fields={[["Last Contact",displayTime(history.last)],["Next Action",next?<Link href={`/activities/${next.activity_id}`}>{next.description}</Link>:"No open action"],["Next Action Date",next?.due_date??"No due date"]]}/><HistorySectionFeed kind={kind} id={id} section="open" initial={history.open} canWrite={canWrite}/>{history.completed.total>0&&<details><summary>Completed follow-ups ({history.completed.total})</summary><HistorySectionFeed kind={kind} id={id} section="completed" initial={history.completed} canWrite={canWrite}/></details>}<HistorySectionFeed kind={kind} id={id} section="activities" initial={history.activities}/></section>;
 }
