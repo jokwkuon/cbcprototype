@@ -1,12 +1,13 @@
 // Test-only Supabase HTTP contract fixture. Never imported by application code.
 // Browser tests use in-memory synthetic records; actual RLS is tested in PostgreSQL separately.
 import http from "node:http";
-import { randomUUID } from "node:crypto";
+import { randomUUID, createHash } from "node:crypto";
 const id = n => `10000000-0000-4000-8000-${String(n).padStart(12,"0")}`;
 const profiles = ["admin","staff","staff","finance","viewer"].map((role,i)=>({id:id(i+1),role,is_active:true,full_name:["Morgan Hayes","Jordan Ellis","Simone Clarke","Evelyn Brooks","Noah Bennett"][i]}));
 const emptyTables=()=>({organizations:[],contacts:[],activities:[],activity_contacts:[],tasks:[],programs:[],program_cohorts:[],program_enrollments:[],program_enrollment_details:[],membership_details:[],mentorship_details:[],sponsor_interests:[],documents:[]});
 let tables=emptyTables();
 let requestCounts={};
+let requestCountsByToken={};
 let failActivities=false;
 let relationshipBehavior={};
 let failDashboard="";
@@ -17,7 +18,7 @@ const appOrigin=process.env.CBC_SYNTHETIC_APP_ORIGIN??"http://127.0.0.1:3100";
 const today=()=>new Intl.DateTimeFormat("en-CA",{timeZone:"America/Edmonton",year:"numeric",month:"2-digit",day:"2-digit"}).format(new Date());
 const encode = value => Buffer.from(JSON.stringify(value)).toString("base64url");
 const userFor = profile => ({ id:profile.id, email:`${profile.role}${profile.role==="staff"?"2":""}@example.test`, aud:"authenticated",role:"authenticated",app_metadata:{provider:"email",providers:["email"]},user_metadata:{full_name:profile.full_name},created_at:"2026-01-01T00:00:00Z" });
-const jwt = profile => `${encode({alg:"HS256",typ:"JWT"})}.${encode({sub:profile.id,aud:"authenticated",role:"authenticated",exp:Math.floor(Date.now()/1000)+3600,iat:Math.floor(Date.now()/1000)})}.synthetic-test-signature`;
+const jwt = profile => `${encode({alg:"HS256",typ:"JWT"})}.${encode({sub:profile.id,aud:"authenticated",role:"authenticated",jti:randomUUID(),exp:Math.floor(Date.now()/1000)+3600,iat:Math.floor(Date.now()/1000)})}.synthetic-test-signature`;
 function actor(req) { try { const payload=JSON.parse(Buffer.from(req.headers.authorization?.split(" ")[1].split(".")[1]??"","base64url")); return profiles.find(p=>p.id===payload.sub); } catch { return null; } }
 const server=http.createServer(async(req,res)=>{
   const url=new URL(req.url,`http://127.0.0.1:${port}`);
@@ -25,8 +26,9 @@ const server=http.createServer(async(req,res)=>{
   const send=(status,body)=>{res.writeHead(status,{"Content-Type":"application/json"});res.end(req.method==="HEAD"?undefined:JSON.stringify(body));};
   if(req.method==="OPTIONS")return send(200,{});
   let raw="";for await(const chunk of req)raw+=chunk;const body=raw?JSON.parse(raw):{};
-  if(url.pathname==="/__metrics-reset"){requestCounts={};return send(200,{});}
-  if(url.pathname==="/__metrics")return send(200,requestCounts);
+  if(url.pathname==="/__metrics-reset"){requestCounts={};requestCountsByToken={};return send(200,{});}
+  if(url.pathname==="/__metrics")return send(200,url.searchParams.has('token_hash')?(requestCountsByToken[url.searchParams.get('token_hash')]??{}):requestCounts);
+  if(req.headers.authorization){const hash=createHash('sha256').update(req.headers.authorization.replace(/^Bearer /,'')).digest('hex');const counts=requestCountsByToken[hash]??={};counts[url.pathname]=(counts[url.pathname]??0)+1;}
   requestCounts[url.pathname]=(requestCounts[url.pathname]||0)+1;
   if(url.pathname==="/__reset"){ tables=emptyTables(); relationshipBehavior={}; failActivities=false; failDashboard=""; emptyFinancialSummary=false; reportFixture=null; return send(200,{}); }
   if(url.pathname==="/__report-fixture"){reportFixture=body;return send(200,{});}

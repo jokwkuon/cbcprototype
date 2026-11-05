@@ -43,3 +43,5 @@ Current executed results and limitations: [verification](../delivery/version3-re
 - **HOST-02 (Medium, advisor finding):** hosted Auth leaked-password protection disabled. Enablement/configuration and any plan implications need operator approval; existing account data/identities/settings were not changed.
 
 Auth/API, cookie-loss reproducer, final browser checks and actual measured performance are recorded in the verification ledger. Remaining approved-scope engineering tasks are explicitly incomplete; this increment is not the entire production upgrade.
+
+- **TEST-02 (Medium, confirmed measurement isolation defect):** the synthetic operational browser test reset a process-global Auth counter, allowing in-flight requests to contribute to a supposed single-render measurement. CI observed 4 calls against ≤3 while the profile assertion remained one. Fixture tokens/counters now isolate the measured session; explicit concurrent traffic proves separation, and the original one-profile / ≤3-Auth assertions are retained. Five local repetitions passed. Production auth is unchanged.

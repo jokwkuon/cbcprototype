@@ -25,7 +25,7 @@ REQ-001/002/004/005/006/007/008/013. Branch: `feature/version3-reliability-opera
 | Auth/PostgREST | **335 passed** | Core 20; Giving 39; Interests 59; Programs 68; Membership 32; Mentorship 25; Documents 22; Reports 70 |
 | Full real browser | **55/55 passed** | `CBC_DEMO_INSTANCE=test npm --prefix apps/frontend run test:integration`; saved privately as `reliability-full-browser-verification.json` |
 | Final targeted real browser | **3/3 passed** | Session/pagination/visual recheck after the last refreshed-props guard; latest `browser-verification.json` |
-| Final synthetic browser | **37/37 passed**, 51.1 seconds | `npm --prefix apps/frontend run test:e2e`; final CSS/form/search/history build, query failure/empty/access/mobile scenarios |
+| Final synthetic browser | **37/37 passed**, 49.4 seconds | `npm --prefix apps/frontend run test:e2e`; final CSS/form/search/history build, query failure/empty/access/mobile scenarios |
 | Lint / typecheck | **Passed** | `npm --prefix apps/frontend run lint` and `run typecheck` |
 | Production build | **Passed** | Both Playwright suites build production Next.js; no middleware deprecation remains |
 | Fresh/reconciled schemas | **805 normalized objects match**, 12 historical checksums verified | Includes public objects, private helper functions/schema privileges and pgcrypto placement/version. Actual added-column/grant negative controls pass |
@@ -35,7 +35,7 @@ REQ-001/002/004/005/006/007/008/013. Branch: `feature/version3-reliability-opera
 | Hosted structural comparison | **775 objects on native local and hosted; 48 reported differences** | 47 ACL/default-ACL differences, one expected locally optimized policy difference. No missing/unexpected objects, function-body/column/constraint/index/trigger/view differences. Details below |
 | Hosted security advisor | One warning: leaked-password protection disabled | No setting/identity modification |
 | Screenshots | **34**, desktop 1440×1000 + mobile 390×844; **0 runtime/console errors, 0 body overflow** | Private `reliability-screenshots/manifest.json`; dashboard, relationships/full contact, activities, giving, programs, membership, mentorship, documents, settings, form and six reports. Dashboard desktop and organization mobile visually inspected |
-| Remote CI | Not yet observed | Workflow extended with real isolated Auth/API/browser checks, schema drift and synthetic restore; local success is not a GitHub Actions result |
+| Remote CI | First run: database and real integration **passed**; frontend 36/37, request-metric test failed | [Run 41958585757](https://github.com/jokwkuon/cbcprototype/actions/runs/41958585757). Global test counters could include other requests; scoped-token regression fix retains one-profile / ≤3-Auth assertions, passed five repeats, and adds explicit concurrent traffic. Local full 37-scenario rerun passed in 49.4s; subsequent CI run tracked separately |
 
 Walkthrough passed: sign-in → dashboard → Organization → Contact → interaction → assigned follow-up → team queue → completion → history. Finance contribution/edit/receipt/void/report/filter/export and denied-role scenarios passed in the same full suite. Sign-out/anonymous redirect and real refresh rotation passed in the new regression. Expiry is forced through cookie session metadata with a genuine refresh token; this does not prove server-expired JWT or simultaneous expired-tab renewal behavior.
 
@@ -86,3 +86,7 @@ No hosted mutation, Auth identity change, real import, release, merge or deploym
 | `73db54b` | Strengthened full synthetic restore and linked/financial fixture | 25 tables/23 rows/805 objects; exact partial+void balances and inactive denial |
 
 Documentation commit follows these implementation commits; no release tag or CBC approval is created.
+
+## CI measurement correction
+
+First remote run at `1c42ec1` completed database and real Auth/API/browser jobs successfully. Synthetic frontend failed only the global Auth-call bound (4 versus ≤3), while its profile count remained one. The previous counter could include another request that outlived a browser navigation. Test fixture tokens now have unique IDs and counters can be queried by token hash; the measured render gets a dedicated fictional session. An explicit concurrent search verifies global Auth counts exceed the isolated counts. Original assertions remain one profile query and at most three Auth calls. Five local repeats and the full 37-scenario rerun passed; replacement CI results follow in GitHub. No production auth code, permission or test limit was changed for this correction.
