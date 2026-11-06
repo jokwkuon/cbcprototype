@@ -1,9 +1,11 @@
 # Calgary Black Chambers: Operations Platform Requirements & Workflows
 
+> **Scope correction, 2026-11-05:** CBC wants its **own native HubSpot-like CRM and Eventbrite-like events platform**, not API integrations with either vendor. The app must own sponsorship pipelines, event pages, registrations, tickets, check-ins and reporting. External email delivery and card-payment rails, if ever enabled, require separate provider/merchant approval. Any remaining reference to Eventbrite reflects the existing public website or optional legacy data migration, **not a dependency for the new app**. See the dedicated Codex execution work order in `docs/delivery/codex-native-cbc-platform-execution.md`.
+
 **Status:** Discovery draft for CBC user review — not an approved specification, implementation authorization, or production access policy.  
 **Prepared:** 2026-11-05  
 **Basis:** CBC operational meeting notes supplied by the project owner; public CBC website pages reviewed on 2026-11-05; current prototype documentation and code on `feature/version3-reliability-operations`.  
-**Scope:** Operational platform built on the existing relationship/impact prototype, not a replacement for CBC's website or event-ticketing vendor.  
+**Scope:** CBC-owned operational platform, including a **native CRM and native event-registration/ticketing system**. No HubSpot or Eventbrite API is required for core workflows. Existing WordPress event marketing may remain separate until CBC approves a publishing approach.  
 **Data rule:** Public-safe requirements only. No real records, guest lists, student data, sponsor agreement terms, staff credentials, internal budgets, or other confidential material are included.
 
 ## 1. The product we are building
@@ -27,7 +29,7 @@ CBC's **working four-pillar taxonomy** is Scholarship, Mentorship, Fellowship an
 
 ### Non-goals for initial delivery
 
-No replacement for Eventbrite ticket sales, no self-service payment processing, no unreviewed mass email, no production accounting ledger, no automated scholarship adjudication, no automated mentorship matching, no individual no-show punitive scoring, no speculative impact/ROI score, and no public upload of sensitive documents or participant data.
+No third-party CRM/ticketing API dependency, no self-service **card** processing until a compliant merchant provider is approved, no unreviewed mass email, no production accounting ledger, no automated scholarship adjudication, no automated mentorship matching, no individual no-show punitive scoring, no speculative impact/ROI score, and no public upload of sensitive documents or participant data.
 
 ## 2. Evidence, observed needs, and uncertainty
 
@@ -93,7 +95,7 @@ Priority: **P0** = first useful operations release; **P1** = second release; **P
 | EVT-01 | P0 | Create an event with series/category/pillar, start/end, timezone, coordinator, location, venue, state, capacity and publishing source | New |
 | EVT-02 | P0 | Compare venue options: quoted fixed cost, per-person cost, catering/AV/taxes/fees, accessible capacity, deposit terms and decision | New |
 | EVT-03 | P0 | Distinguish capacity from ticket allocation, active registrations, invitations, waitlisted, cancellations and confirmed check-ins | New |
-| EVT-04 | P0 | Import/sync registrations and check-ins from an approved Eventbrite integration, with idempotent source IDs and visible sync status | New; integration feasibility check |
+| EVT-04 | P0 | Offer **CBC-hosted public event page and registration form**, free/complimentary ticket types, capacity-safe inventory, confirmation and unique tickets; any legacy Eventbrite CSV is optional one-time migration only | New |
 | EVT-05 | P0 | Enable authorized manual/QR check-in with duplicate-scan protection, timestamp, ticket type and undo with audit reason | New |
 | EVT-06 | P0 | Show capacity risk, actual attendance/no-show, ticket type and walk-in counts; no-show excludes cancelled/invalid tickets | New; definitions to confirm |
 | EVT-07 | P0 | Event closeout links cost lines, sponsorship benefits, attendance totals, note summaries and required follow-ups | New |
@@ -131,8 +133,8 @@ Priority: **P0** = first useful operations release; **P1** = second release; **P
 1. Create a series (e.g. Monthly Speaker Series) or one-off event (e.g. a dinner or gala); link pillar, sponsor, coordinator and series year.
 2. Record tentative dates and venue options. Compare seating limits, fixed fee, per-head minimum, catering, AV, deposit, tax/fees and availability. Mark quote expiry and approval.
 3. Select approved venue and capacity. Separate total safety capacity from saleable seats, held sponsor seats, accessible seating, staff/volunteer spots and public allocation; do not over-sell beyond approved rules.
-4. Set event budget, ticket categories and sponsor commitments; confirm which party collects ticket revenue.
-5. Publish through existing event channel; connect external event ID. Import or reconcile registrations and amendments. Failed/partial sync is visible and retryable.
+4. Set event budget, native free/complimentary ticket categories and sponsor commitments. Paid-ticket charging is a separate approval gate requiring a compliant payment processor.
+5. Publish an accessible CBC-owned event page and open native registration. Create orders/admissions atomically; send only locally recorded confirmation previews until email sending is approved. Optional legacy CSV import is migration-only, idempotent and reviewable.
 6. Show active registrations vs usable capacity, waitlist, expected turnout and outstanding tasks. Attendance forecast is an estimate with method/period displayed; it must not automatically change ticket allocations.
 7. Check in valid attendees using the source registration/ticket identifier or authorized manual entry. Duplicate scans do not create duplicate attendees. Support walk-in and correction flow.
 8. Close event; freeze an auditable attendance snapshot, reconcile costs, issue survey links, create approved follow-up tasks and mark sponsor benefits delivered with evidence.
@@ -296,7 +298,7 @@ These are candidates, not an instruction to create all tables or run migrations 
 
 ### Integration priorities
 
-1. **Eventbrite**: Validate actual CBC account access, data export quality and API feasibility; start with a reversible CSV import and reconciliation if API permissions are unavailable. Eventbrite remains registration/ticket authority. Never claim real-time sync until proven.
+1. **Native registration and ticketing (CBC owns the authority)**: Event pages, custom fields, orders/admissions, inventory, waitlist, QR codes, check-in, cancellations and reports live in CBC's own system. Do not call Eventbrite APIs or rely on Eventbrite as an operational source. Optional Eventbrite CSV files may be migrated later after CBC approval, with source identifiers and explicit deduplication. Card payments require a separately approved compliant processor; do not store card numbers. Never claim real-time sync until proven.
 2. **Calendars**: Start internal calendar over native event/task records. Later, evaluate Google Workspace sync with consent, OAuth/organization approvals, per-user scopes, retry and duplicate policies.
 3. **Surveys**: First-party mobile survey/QR can be a standalone secure module; consider existing survey tools only if CBC already uses them. Do not leak form responses into analytics vendors by default.
 4. **Email**: Transactional reminders and approved templates only. Check Google Workspace sending limitations and deliverability before choosing sender. Audit recipient authorization, bounce/suppression and unsubscribe.
@@ -332,9 +334,9 @@ Use one stable navigation system with optional workspace shortcuts. Do not hide 
 
 ## 11. Recommended delivery sequence and gates
 
-**Release A — useful daily operations (P0):** role/assignment-aware personalized homepage; personal/team calendar; linked meeting notes and actions; event planning with venue/capacity/budget; reversible registration import; authorized check-in; sponsor-benefit ledger and simple event closeout. Use local fictional data. Build a thin end-to-end flow, not isolated pretty modules.
+**Release A — useful daily operations (P0):** role/assignment-aware personalized homepage; personal/team calendar; linked meeting notes and actions; **CBC-owned event publishing, free ticket registration, inventory and QR check-in**; event venue/capacity/budget; an improved sponsor pipeline and benefit ledger; simple event closeout. Optional CSV import is not the primary registration route. Use local fictional data. Build a thin end-to-end flow, not isolated pretty modules.
 
-**Release B — engagement and reporting (P1):** QR survey and protected aggregate results; approved follow-up/reminder automation; membership/event participation; scholarship confirmed award records; mentorship scheduling; impact milestone/evidence workflows; expanded reports.
+**Release B — engagement and reporting (P1):** QR survey and protected aggregate results; approved follow-up/reminder automation; membership/event participation; scholarship confirmed award records; mentorship scheduling; impact milestone/evidence workflows; expanded reports; optional ticket payment setup only if an approved merchant provider exists.
 
 **Release C — specialized and external (P2):** CBAA nomination/judging/table workflow, deeper calendar and provider integration, stronger document workflows, finance connectors, advanced analyses only with approved definitions.
 
@@ -344,7 +346,7 @@ Use one stable navigation system with optional workspace shortcuts. Do not hide 
 
 **T1 Staff personalization:** sign in as two synthetic users with different assignments and roles; Home widgets and worklists differ. Reorder widgets; preferences survive sign-out/sign-in. Direct URL/API/CSV cannot bypass role restrictions.
 
-**T2 Event registration and no-show:** create fictional event; select venue; set 100 approved public seats; import 80 valid admissions; cancel 10; check in 52 of the remaining 70; after close show exactly 18 eligible no-shows and 25.7% provisional no-show. Keep purchase/ticket/person counts distinct and show source IDs. Re-run identical import, no duplicates.
+**T2 Event registration and no-show:** create fictional event; select venue; set 100 approved public seats; register 80 valid admissions through CBC-owned public forms; cancel 10; check in 52 of the remaining 70; after close show exactly 18 eligible no-shows and 25.7% provisional no-show. Keep purchaser/order/admission/person counts distinct. Race two concurrent registrations for the last seat: only one can succeed.
 
 **T3 Check-in:** first ticket scan succeeds; repeat scan is clearly flagged, not added. A documented correction reopens the admission and records actor/time/reason. A disabled/nonexistent ticket fails safely.
 
@@ -370,7 +372,7 @@ Ranked from blockers to nice-to-haves:
 |---|---|---|
 | D01 | Confirm four pillars and whether Impact is a standalone pillar or cross-cutting function for reports | President + Impact director |
 | D02 | Which operational users will demo/review each module; who accepts workflows for CBC? | President + coordinator |
-| D03 | Does CBC own Eventbrite organizer account; can an authorized person export registrations/check-in and access API? | Event lead |
+| D03 | Which CBC-controlled domain will host native public event pages and registration? Are there prior Eventbrite rosters that require an optional CSV migration? | Event lead + website admin |
 | D04 | What does "registered" mean: ticket quantity, named guest, household/group, or unique person? | Event lead |
 | D05 | Which seats count in capacity: public, sponsors, staff, accessible/holds, walk-ins? | Event lead + venue |
 | D06 | How are cancellations, transfers, no-shows and multi-session admissions handled? | Event lead |
@@ -394,7 +396,7 @@ Ranked from blockers to nice-to-haves:
 Request **one example each** before implementing fields and automations:
 1. Sponsor agreement or benefit checklist (remove rates, parties, signatures and confidential details).
 2. Actual event planning checklist and two anonymized venue quotes with cost structure.
-3. Eventbrite export column headers plus fictional example rows, including cancellations and check-in statuses; no real attendee emails.
+3. Desired public registration form questions and ticket categories with fictional attendee rows, including cancellation and check-in examples; legacy Eventbrite CSV headers only if migration is needed.
 4. One approved event financial report/budget template, with fictional amounts.
 5. Survey questions and a sample follow-up email, with opt-in policy.
 6. Meeting agenda/notes/action tracker (fictional).
