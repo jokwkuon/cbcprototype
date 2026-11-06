@@ -2,7 +2,7 @@
 
 **Status:** Discovery draft for CBC user review — not an approved specification, implementation authorization, or production access policy.  
 **Prepared:** 2026-11-05  
-**Basis:** CBC operational meeting notes supplied by the project owner; public CBC website pages reviewed on 2026-11-05; current prototype documentation and code on \`feature/version3-reliability-operations\`.  
+**Basis:** CBC operational meeting notes supplied by the project owner; public CBC website pages reviewed on 2026-11-05; current prototype documentation and code on `feature/version3-reliability-operations`.  
 **Scope:** Operational platform built on the existing relationship/impact prototype, not a replacement for CBC's website or event-ticketing vendor.  
 **Data rule:** Public-safe requirements only. No real records, guest lists, student data, sponsor agreement terms, staff credentials, internal budgets, or other confidential material are included.
 
@@ -43,11 +43,11 @@ No replacement for Eventbrite ticket sales, no self-service payment processing, 
 | Prototype code and README | Organizations, contacts, activity/follow-ups, giving, programs/recipients, mentorship, membership, reports, bounded search and RLS | Synthetic/local demonstrations are not proof of production readiness or CBC approval |
 | Public event URL and two YouTube links | References supplied by owner | Direct event and video content could not be independently reviewed; do not attribute content to them |
 
-Website findings reflect publicly visible copy, which may be stale or inconsistent. Existing \`docs/project/decisions.md\`, \`docs/project/scope.md\` and \`docs/architecture/access-matrix-proposal.md\` remain authoritative records of unresolved approvals. This discovery document is additive and does not silently revise those decisions.
+Website findings reflect publicly visible copy, which may be stale or inconsistent. Existing `docs/project/decisions.md`, `docs/project/scope.md` and `docs/architecture/access-matrix-proposal.md` remain authoritative records of unresolved approvals. This discovery document is additive and does not silently revise those decisions.
 
 ## 3. Operating model and shared relationships
 
-\`\`\`text
+```text
 Organization / person
   -> contact and relationship owner
   -> meetings / notes / tasks / calendar items
@@ -56,7 +56,7 @@ Organization / person
   -> funded events -> registrations -> check-ins -> surveys -> follow-up
   -> supported programs -> cohorts -> participants / award records -> evidence
   -> aggregate reporting (respect permissions and approved metric definitions)
-\`\`\`
+```
 
 A record may participate in several workflows. Use explicit links and stable IDs, not inferred matches based on names or email addresses. Store source-system IDs for imports. Design in a way that lets one person attend many events and belong to several program cohorts without duplicate identities.
 
@@ -269,28 +269,28 @@ Keep **missing**, **pending approval**, **query unavailable**, **not applicable*
 
 ### Reuse the existing identities and rules
 
-Retain existing \`organizations\`, \`contacts\`, \`profiles\`, \`activities\`, \`tasks\`/follow-ups, \`opportunities\`, \`contributions\`, \`cash_receipts\`, programs/cohorts/recipients/enrollments, memberships, mentorship pairs/check-ins, documents metadata and reports. Reuse documented exact-CAD semantics and RLS. Do not replace the working model or create competing totals.
+Retain existing `organizations`, `contacts`, `profiles`, `activities`, `tasks`/follow-ups, `opportunities`, `contributions`, `cash_receipts`, programs/cohorts/recipients/enrollments, memberships, mentorship pairs/check-ins, documents metadata and reports. Reuse documented exact-CAD semantics and RLS. Do not replace the working model or create competing totals.
 
 ### Candidate additive entities
 
 | New entity | Key fields / links | Key invariant |
 |---|---|---|
-| \`event_series\` | id, name, pillar, coordinator, season, external_source | Series does not imply a ticket sale |
-| \`events\` | id, series_id?, type, start/end, zone, venue_id?, status, capacity settings, owner | Dates and status changes are audited |
-| \`venues\` and \`venue_quotes\` | name, location, quote version, capacity, fixed/per-person cost, deposit, expiry | Quote is not invoice/actual |
-| \`event_ticket_types\`, \`event_admissions\` | event_id, source_system, source_event_id, source_ticket_id, holder reference?, quantity/state, import status | Unique external IDs; cancellation history retained |
-| \`event_checkins\` | admission_id?, event_id, timestamp, actor, channel, correction reason | No duplicate active check-in per eligible admission/session |
-| \`event_survey_forms\`, \`event_survey_responses\` | event_id, form/version, response mode, consent, response metadata | Anonymous responses cannot silently map to person |
-| \`sponsorship_benefits\` | sponsor/org, agreement ref, event/program, description, owner, due, status, evidence ref | No benefit inferred from donation amount |
-| \`meeting_records\`, \`meeting_attendees\` | activity link, participant, decision, classification | Notes remain under record access controls |
-| \`calendar_items\`, \`calendar_attendees\` | item type/linked record, start/end, zone, external IDs, visibility | Personal visibility not equivalent to record access |
-| \`budgets\`, \`budget_versions\`, \`budget_lines\` | period, cost centre, event/program, approval, amount/source | Approved version is immutable |
-| \`vendors\`, \`expense_records\` | payee, category, event/program, invoice reference, due/paid, approved amount | Expenses never mixed with giving receipts |
-| \`award_programs\`, \`award_cycles\`, \`award_records\` | recipient, donor, cycle, review status, confirmed amount, administrator | Awarded != paid != CBC cash |
-| \`impact_initiatives\`, \`impact_milestones\`, \`impact_evidence\` | pillar/focus, org partner, owner, activity/output/outcome, reviewer and source | Unverified impact is never reported as achieved |
-| \`user_dashboard_preferences\` | profile ID, schema version, widgets, order, default scope | Self-only writes and permission intersection |
-| \`integration_connections\`, \`sync_runs\` | provider, tenant/event, cursor, status, errors | No external secret stored in client-visible rows |
-| \`notification_templates\`, \`message_jobs\`, \`communication_consent\` | approved version, channel, recipient, status, reason | No send without authorization and consent decision |
+| `event_series` | id, name, pillar, coordinator, season, external_source | Series does not imply a ticket sale |
+| `events` | id, series_id?, type, start/end, zone, venue_id?, status, capacity settings, owner | Dates and status changes are audited |
+| `venues` and `venue_quotes` | name, location, quote version, capacity, fixed/per-person cost, deposit, expiry | Quote is not invoice/actual |
+| `event_ticket_types`, `event_admissions` | event_id, source_system, source_event_id, source_ticket_id, holder reference?, quantity/state, import status | Unique external IDs; cancellation history retained |
+| `event_checkins` | admission_id?, event_id, timestamp, actor, channel, correction reason | No duplicate active check-in per eligible admission/session |
+| `event_survey_forms`, `event_survey_responses` | event_id, form/version, response mode, consent, response metadata | Anonymous responses cannot silently map to person |
+| `sponsorship_benefits` | sponsor/org, agreement ref, event/program, description, owner, due, status, evidence ref | No benefit inferred from donation amount |
+| `meeting_records`, `meeting_attendees` | activity link, participant, decision, classification | Notes remain under record access controls |
+| `calendar_items`, `calendar_attendees` | item type/linked record, start/end, zone, external IDs, visibility | Personal visibility not equivalent to record access |
+| `budgets`, `budget_versions`, `budget_lines` | period, cost centre, event/program, approval, amount/source | Approved version is immutable |
+| `vendors`, `expense_records` | payee, category, event/program, invoice reference, due/paid, approved amount | Expenses never mixed with giving receipts |
+| `award_programs`, `award_cycles`, `award_records` | recipient, donor, cycle, review status, confirmed amount, administrator | Awarded != paid != CBC cash |
+| `impact_initiatives`, `impact_milestones`, `impact_evidence` | pillar/focus, org partner, owner, activity/output/outcome, reviewer and source | Unverified impact is never reported as achieved |
+| `user_dashboard_preferences` | profile ID, schema version, widgets, order, default scope | Self-only writes and permission intersection |
+| `integration_connections`, `sync_runs` | provider, tenant/event, cursor, status, errors | No external secret stored in client-visible rows |
+| `notification_templates`, `message_jobs`, `communication_consent` | approved version, channel, recipient, status, reason | No send without authorization and consent decision |
 
 These are candidates, not an instruction to create all tables or run migrations now. Avoid unnecessary new profile identities and generic polymorphic IDs without referential checks. Document event-source ownership before choosing one-way or two-way sync.
 
@@ -416,7 +416,7 @@ Request **one example each** before implementing fields and automations:
 - CBAAs: https://calgaryblackchambers.ca/awards/
 - Event URL supplied but not successfully accessed: https://calgaryblackchambers.ca/event/behind-the-game-emerging-leaders-fighting-for-the-starting-lineup/
 - Videos supplied but content not verified: https://www.youtube.com/watch?v=wSX9chemyJU and https://www.youtube.com/watch?v=_D8z1KoBWpo
-- Current repository audit/decisions: \`README.md\`, \`docs/project/scope.md\`, \`docs/project/decisions.md\`, \`docs/architecture/access-matrix-proposal.md\`, \`docs/requirements/module-matrix.md\` and \`docs/audits/version3-engineering-remediation.md\` on the parent branch.
+- Current repository audit/decisions: `README.md`, `docs/project/scope.md`, `docs/project/decisions.md`, `docs/architecture/access-matrix-proposal.md`, `docs/requirements/module-matrix.md` and `docs/audits/version3-engineering-remediation.md` on the parent branch.
 
 **Public-site consistency items:** About/older Scholarship content sometimes speaks of three pillars; public Impact material supports a fourth area. Mentorship/Impact pages give different calendar wording for the 2026/27 intake. Awards page contains both old and new event announcements. Some public Impact content repeats Mentorship copy. Do not convert these inconsistencies into silent operational defaults.
 
