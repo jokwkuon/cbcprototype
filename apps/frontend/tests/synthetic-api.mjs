@@ -4,7 +4,7 @@ import http from "node:http";
 import { randomUUID, createHash } from "node:crypto";
 const id = n => `10000000-0000-4000-8000-${String(n).padStart(12,"0")}`;
 const profiles = ["admin","staff","staff","finance","viewer"].map((role,i)=>({id:id(i+1),role,is_active:true,full_name:["Morgan Hayes","Jordan Ellis","Simone Clarke","Evelyn Brooks","Noah Bennett"][i]}));
-const emptyTables=()=>({organizations:[],contacts:[],activities:[],activity_contacts:[],tasks:[],programs:[],program_cohorts:[],program_enrollments:[],program_enrollment_details:[],membership_details:[],mentorship_details:[],sponsor_interests:[],documents:[]});
+const emptyTables=()=>({organizations:[],contacts:[],activities:[],activity_contacts:[],tasks:[],programs:[],program_cohorts:[],program_enrollments:[],program_enrollment_details:[],program_recipients:[],membership_details:[],mentorship_details:[],sponsor_interests:[],documents:[],contribution_details:[]});
 let tables=emptyTables();
 let requestCounts={};
 let requestCountsByToken={};
@@ -62,6 +62,14 @@ const server=http.createServer(async(req,res)=>{
   }
   if(url.pathname.includes("/rpc/")){
     if(table==="giving_summary"&&emptyFinancialSummary)return send(200,{year:body.p_year,period_end:today(),comparison_basis:"Synthetic empty calendar year",annual_cash:"0",lifetime_cash:"0",prior_cash:"0",pledged:"0",outstanding:"0",in_kind_declared:"0",yoy_delta:"0",yoy_percent:null});
+    if(table==="program_summary"){
+      let rows=tables.program_enrollments;
+      if(body.p_program_id) rows=rows.filter(r=>r.program_id===body.p_program_id);
+      if(body.p_cohort_id) rows=rows.filter(r=>r.cohort_id===body.p_cohort_id);
+      const known=rows.filter(r=>r.support_amount!=null&&r.support_amount!=="");
+      const sum=known.reduce((n,r)=>n+Number(r.support_amount),0);
+      return send(200,{participants:new Set(rows.map(r=>r.recipient_id)).size,enrollments:rows.length,known_support:known.length?sum.toFixed(2):null,known_support_count:known.length,unknown_support_count:rows.length-known.length,currency:"CAD"});
+    }
     if(table==="activity_today")return send(200,today());
     if(table==="activity_last_contact"){
       const target=tables.activities.find(a=>a.id===body.p_activity_id),targetContacts=tables.activity_contacts.filter(c=>c.activity_id===target?.id).map(c=>c.contact_id);
@@ -87,6 +95,7 @@ const server=http.createServer(async(req,res)=>{
   let rows=table==="profiles"?[profile]:table==="staff_directory"?profiles.filter(p=>p.role==="staff"&&(profile.role==="admin"||p.id===profile.id&&profile.role==="staff")).map(p=>({id:p.id,display_name:p.full_name})):table==="follow_ups"?taskRows:tables[table];
   if(table==="organization_directory") rows=tables.organizations.map(r=>({...r,name:r.name,context:r.industry||"Industry not recorded",status:r.relationship_status||"Prospect",category:r.organization_type||"Type not recorded",categoryId:r.organization_type||"",location:r.location||"",priority:r.priority_level||"Medium",email:"",search_text:[r.name,r.industry,r.organization_type,r.location,r.id].filter(Boolean).join(" ")}));
   if(table==="contact_directory") rows=tables.contacts.map(r=>{const o=tables.organizations.find(o=>o.id===r.organization_id);return {...r,name:`${r.first_name} ${r.last_name}`,context:r.title||"Title not recorded",status:r.contact_type||"Type not recorded",category:o?.name||"Not linked",categoryId:r.organization_id||"",email:r.email||"",location:"",priority:"",search_text:[r.first_name,r.last_name,r.title,o?.name,r.email,r.id].filter(Boolean).join(" ")};});
+  if(table==="program_recipient_details") rows=tables.program_recipients.map(r=>({id:r.id,display_name:r.name||"Recipient",alumni_since:r.alumni_since??null,alumni_cash:r.alumni_cash??null}));
   if(!rows)return send(404,{message:"Unknown synthetic table"});
   function splitClauses(expression) {
     let depth=0,quoted=false,escaped=false,start=0;const parts=[];

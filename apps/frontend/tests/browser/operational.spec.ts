@@ -27,6 +27,6 @@ test('REQ-001/002/005/008 bounded search, server paging, personal queue and requ
   expect(globalMetrics['/auth/v1/user']).toBeGreaterThan(metrics['/auth/v1/user']);
   expect(metrics['/rest/v1/profiles']).toBe(1);
   expect(metrics['/auth/v1/user']).toBeLessThanOrEqual(3); // Middleware/SDK checks remain separate; profile count proves shared render context.
-  await page.goto('/dashboard');await expect(page.getByRole('link',{name:'Assigned to me',exact:true})).toHaveAttribute('aria-current','page');await page.getByRole('link',{name:'Team actions',exact:true}).click();await expect(page).toHaveURL(/work=team/);await expect(page.getByRole('link',{name:'Team actions',exact:true})).toHaveAttribute('aria-current','page');
+  await page.goto('/dashboard');await expect(page.getByRole('link',{name:'Team actions',exact:true})).toHaveAttribute('aria-current','page');await page.getByRole('link',{name:'Assigned to me',exact:true}).click();await expect(page).toHaveURL(/work=mine/);await expect(page.getByRole('link',{name:'Assigned to me',exact:true})).toHaveAttribute('aria-current','page');
   await page.getByRole('link',{name:'Unassigned',exact:true}).click();await expect(page).toHaveURL(/work=unassigned/);
 });
