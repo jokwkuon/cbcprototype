@@ -1,0 +1,4 @@
+import {test} from 'node:test';import assert from 'node:assert/strict';import {parseMentorship} from '../lib/mentorship-validation.ts';
+const a='60000000-0000-4000-8000-000000000001',b='60000000-0000-4000-8000-000000000002';
+function form(v:Record<string,string>){const f=new FormData();for(const [k,x]of Object.entries(v))f.set(k,x);return f;}
+test('REQ-011 pairing rejects self and chronology; feedback is raw text',()=>{const v={organization_id:a,mentor_id:a,mentee_id:b,program_id:a,cohort_id:a,start_date:'2026-01-01',status:'Active'};assert.equal(parseMentorship('pair',form(v)).status,'Active');assert.throws(()=>parseMentorship('pair',form({...v,mentee_id:a})));assert.throws(()=>parseMentorship('pair',form({...v,target_end_date:'2025-01-01'})));assert.equal(parseMentorship('checkin',form({pair_id:a,checked_in_on:'2026-01-01',mentor_satisfaction:'More time requested'})).mentor_satisfaction,'More time requested');});

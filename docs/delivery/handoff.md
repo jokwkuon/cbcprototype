@@ -1,0 +1,11 @@
+# Handoff checklist
+- [ ] CBC controls repository and approved service accounts.
+- [ ] Source code, tests, migrations and documentation present.
+- [ ] Development environment setup reproduced by second person.
+- [ ] Approved data import and rollback documented.
+- [ ] KPI definitions and manual reconciliations documented.
+- [ ] Backup/restoration method documented and tested for production.
+- [ ] Access control and access revocation verified.
+- [ ] Hosting costs and service ownership explained.
+- [ ] Known defects and unfinished issues itemized.
+- [ ] CBC signs final acceptance and names ongoing maintainer.

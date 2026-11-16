@@ -1,0 +1,33 @@
+.env
+.env.*
+!.env.example
+data/private/
+data/raw/
+data/exports/
+credentials.json
+service-account*.json
+*.pem
+*.key
+node_modules/
+.next/
+dist/
+build/
+coverage/
+.venv/
+__pycache__/
+.pytest_cache/
+*.db
+*.sqlite
+.DS_Store
+
+# Local architecture reference and generated verification artifacts
+CBC Database Architecture 2026.pdf
+*.tsbuildinfo
+apps/frontend/test-results/
+apps/frontend/playwright-report/
+
+# Local Supabase integration runtime, credentials and generated migration copies
+.local/
+environments/demo/supabase/migrations/
+environments/demo/supabase/.temp/
+environments/demo/supabase/.branches/

@@ -1,0 +1,50 @@
+[
+  {
+    "name": "202610130001_initial_crm.sql",
+    "sha256": "e25e2bf39b9be5b9ffadac9f009b10b7da8e1ec918572f6228c782b43fd21278"
+  },
+  {
+    "name": "20261027032358_organization_ownership.sql",
+    "sha256": "fdcaee90a6ef02c62b856175d4ea6f274c6ad83238ad656da67430ada6c89d42"
+  },
+  {
+    "name": "20261027032422_crm_fields.sql",
+    "sha256": "3ae0bd7c185377c9f8fc6bba4212d9537d72f837addacef37813ec5905bb4dcd"
+  },
+  {
+    "name": "20261027041158_activities_followups.sql",
+    "sha256": "958dcc73bd6b382bc3a91a438b80a00a16714915dbfcc56a5a9921d1ba48b32f"
+  },
+  {
+    "name": "20261027060754_sponsorship_giving.sql",
+    "sha256": "a63d57eef54f82a1101b09a4f00c6870db790d431203bb7733da74aac4ca0edb"
+  },
+  {
+    "name": "20261028015014_sponsor_interests.sql",
+    "sha256": "e81589dd1c4db01cec6eba79cdcb2c2da0d8898bc8313adacdada9843b242ca9"
+  },
+  {
+    "name": "20261029144615_programs_recipients.sql",
+    "sha256": "5365c45c6295a4cfedf7ae1a62a4a5311fd65df50df466c66437c925a3b6e6d9"
+  },
+  {
+    "name": "20261102233024_membership.sql",
+    "sha256": "3e94bc4a3d40c0b3ae776a135634401cc7552ae6e3ff41f5f9bb7a63bfc33b92"
+  },
+  {
+    "name": "20261102233407_mentorship.sql",
+    "sha256": "cb796b2dd2559c16082b9a6a8fa47d5e9efb68b312c178502bce3985d981d246"
+  },
+  {
+    "name": "20261102233752_documents.sql",
+    "sha256": "310306241dd73043ae59bbb97946a83b72e83595f8f5e489b8202b46285f8b6a"
+  },
+  {
+    "name": "20261104214044_operational_directory.sql",
+    "sha256": "6baf019901f0d86f57514215800c8854109478f0287a30e755a0d74b5fe354df"
+  },
+  {
+    "name": "20261105002247_role_helper_hardening.sql",
+    "sha256": "eaf28872f1f9ad073fae7f12f518ec0d192f331d327b96fa4c5dddd594cb0b50"
+  }
+]

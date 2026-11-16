@@ -1,0 +1,82 @@
+import { test, expect, type Page } from "@playwright/test";
+async function signIn(page: Page, role: string) {
+  await page.goto("/login"); await page.getByLabel("Email",{exact:true}).fill(`${role}@example.test`);
+  await page.getByLabel("Password",{exact:true}).fill("synthetic-test-password"); await page.getByRole("button",{name:"Sign in",exact:true}).click();
+  await expect(page).toHaveURL(/\/dashboard$/);
+}
+test.beforeEach(async({request})=>{await request.post("http://127.0.0.1:54339/__reset");});
+test("REQ-001/002: create, read, update, linked navigation and inline validation",async({page})=>{
+  await signIn(page,"admin");
+  await page.goto("/organizations/new");
+  await page.getByLabel("Organization Name").fill("Copper Finch Ventures");
+  await page.getByLabel("Organization Type",{exact:true}).fill("Community Partner");
+  await page.getByLabel("Industry",{exact:true}).fill("Professional services");
+  await page.getByLabel("Location",{exact:true}).fill("Calgary");
+  await page.getByLabel("Estimated Opportunity",{exact:true}).fill("1234.56");
+  await page.getByLabel("Relationship Status",{exact:true}).selectOption("Cultivate");
+  await page.getByLabel("Priority Level",{exact:true}).selectOption("High");
+  await page.getByLabel("Relationship Owner").selectOption({label:"Jordan Ellis"});
+  await page.getByLabel("Relationship Strength").selectOption("High");
+  await page.getByLabel("Potential",{exact:true}).selectOption("Low");
+  await page.getByLabel("Website",{exact:true}).fill("javascript:alert(1)");
+  await page.getByRole("button",{name:"Save record"}).click();
+  await expect(page.getByRole("alert").filter({hasText:"Please correct"})).toContainText("correct");
+  await expect(page.getByLabel("Organization Name")).toHaveValue("Copper Finch Ventures");
+  await page.getByLabel("Website",{exact:true}).fill("example.test");
+  await page.getByRole("button",{name:"Save record"}).click();
+  await expect(page.getByRole("heading",{name:"Copper Finch Ventures",exact:true})).toBeVisible();
+  for (const label of ["Organization Name","Organization Type","Industry","Website","Primary Contact","Relationship Owner","Relationship Status","Relationship Strength","Priority Level","Potential","Estimated Opportunity","Notes"]) await expect(page.locator("dt").filter({hasText:new RegExp(`^${label}$`)})).toBeVisible();
+  for (const value of ["Community Partner","Professional services","Calgary","1234.56","Cultivate","https://example.test/"]) await expect(page.locator("#overview").getByText(value,{exact:true})).toBeVisible();
+  const orgUrl=page.url(); await expect(page.locator("main").getByText("Jordan Ellis",{exact:true})).toBeVisible();
+  await expect(page.locator("#giving-history")).toContainText("No contributions recorded");
+  await expect(page.locator("#giving-history")).toContainText("Financial summary unavailable");
+  await page.getByRole("link",{name:"Edit organization",exact:true}).click();
+  await page.getByLabel("Potential",{exact:true}).selectOption("High");
+  await page.getByLabel("Notes",{exact:true}).fill("Discuss renewal at the next quarterly review");
+  await page.getByRole("button",{name:"Save record"}).click();await expect(page.getByText("Discuss renewal at the next quarterly review",{exact:true})).toBeVisible();
+  await page.goto("/contacts/new");
+  await page.getByRole("textbox",{name:"First Name",exact:true}).fill("Maya");await page.getByRole("textbox",{name:"Last Name",exact:true}).fill("Thompson");
+  await page.getByLabel("Organization",{exact:true}).selectOption({label:"Copper Finch Ventures"});
+  await page.getByLabel("Contact Type",{exact:true}).fill("Decision Maker");await page.getByLabel("Influence Level",{exact:true}).selectOption("High");
+  await page.getByLabel("Interests",{exact:true}).fill("Scholarships");
+  await page.getByLabel("Email",{exact:true}).fill("person@example.test");
+  await page.getByLabel("Phone",{exact:true}).fill("555-0100");
+  await page.getByLabel("Notes",{exact:true}).fill("Interested in mentoring emerging entrepreneurs");
+  await page.getByRole("button",{name:"Save record"}).click();
+  await expect(page.getByRole("heading",{name:"Maya Thompson",exact:true})).toBeVisible();
+  await expect(page.locator("main").getByText("Jordan Ellis",{exact:true})).toBeVisible();
+  for (const label of ["First Name","Last Name","Title","Organization","Email","Phone","Contact Type","Influence Level","Relationship Owner","Interests","Notes"]) await expect(page.locator("dt").filter({hasText:new RegExp(`^${label}$`)})).toBeVisible();
+  for (const value of ["person@example.test","555-0100","Decision Maker","Interested in mentoring emerging entrepreneurs"]) await expect(page.locator("#profile").getByText(value,{exact:true})).toBeVisible();
+  await expect(page.getByText("Definition pending",{exact:true})).toHaveCount(1);
+  await expect(page.locator("#giving-history")).toContainText("No contributions recorded");
+  await expect(page.locator("#giving-history")).toContainText("Financial summary unavailable");
+  const contactUrl=page.url();
+  await page.getByRole("link",{name:"Edit contact",exact:true}).click();await page.getByLabel("Title",{exact:true}).fill("Partnerships Director");
+  await page.getByRole("button",{name:"Save record"}).click();await expect(page.getByText("Partnerships Director",{exact:true})).toBeVisible();
+  await page.getByRole("link",{name:"Copper Finch Ventures",exact:true}).click();await expect(page).toHaveURL(orgUrl);
+  await page.getByRole("link",{name:"Edit organization",exact:true}).click();await page.getByLabel("Primary Contact",{exact:true}).selectOption({label:"Maya Thompson"});
+  await page.getByRole("button",{name:"Save record"}).click();
+  await expect(page.getByRole("link",{name:"Maya Thompson",exact:true})).toHaveCount(2);
+  await page.goto(contactUrl);await page.reload();await expect(page.getByText("Scholarships",{exact:true})).toBeVisible();
+  await page.goto("/organizations");await page.getByPlaceholder("Search organizations…").fill("Copper Finch");await page.getByPlaceholder("Search organizations…").press("Enter");
+  await expect(page.getByRole("list",{name:"Organizations",exact:true}).getByRole("link").filter({hasText:"Copper Finch Ventures"})).toBeVisible();
+});
+test("REQ-008: staff self-assignment only and no edit owner control",async({page})=>{
+  await signIn(page,"staff2");await page.goto("/organizations/new");
+  await expect(page.getByLabel("Relationship Owner").locator("option")).toHaveCount(2);
+  await page.getByLabel("Organization Name").fill("Meadowline Community Partners");await page.getByLabel("Relationship Owner").selectOption({label:"Jordan Ellis"});
+  await page.getByRole("button",{name:"Save record"}).click();await page.getByRole("link",{name:"Edit organization",exact:true}).click();
+  await expect(page.getByLabel("Relationship Owner")).toHaveCount(0);
+  await page.getByLabel("Potential",{exact:true}).selectOption("High");await page.getByRole("button",{name:"Save record"}).click();
+  await expect(page.locator("main").getByText("Jordan Ellis",{exact:true})).toBeVisible();
+});
+for(const role of ["finance","viewer"]){test(`REQ-008: ${role} has no create controls`,async({page})=>{
+  await signIn(page,role);await page.goto("/organizations");await expect(page.getByRole("link",{name:"+ Add organization",exact:true})).toHaveCount(0);
+  await page.goto("/contacts");await expect(page.getByRole("link",{name:"+ Add contact",exact:true})).toHaveCount(0);
+});}
+test("REQ-008: anonymous redirect and mobile navigation",async({page})=>{
+ await page.goto("/organizations");await expect(page).toHaveURL(/\/login$/);
+ await signIn(page,"admin");await page.setViewportSize({width:390,height:844});
+ await page.getByRole("button",{name:"Open navigation",exact:true}).click();await page.getByRole("navigation",{name:"Mobile navigation"}).getByRole("link",{name:"Contacts",exact:true}).click();
+ await expect(page.getByRole("heading",{name:"Contacts",exact:true})).toBeVisible();
+});
