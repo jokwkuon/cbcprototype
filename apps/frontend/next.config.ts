@@ -9,6 +9,7 @@ if (process.env.NEXT_SERVER_ACTION_ALLOWED_ORIGINS) {
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
+  ...(process.env.CBC_NEXT_DIST ? { distDir: process.env.CBC_NEXT_DIST } : {}),
   experimental: { agentUpgrade: "security", serverActions: { allowedOrigins: [...allowedOrigins] } },
 };
 export default nextConfig;

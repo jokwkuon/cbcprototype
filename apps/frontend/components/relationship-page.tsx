@@ -13,7 +13,7 @@ export async function RelationshipPage({kind,params}:{kind:RelationshipKind;para
   // Ignore array-valued/ambiguous query parameters at the server boundary.
   const view = Object.fromEntries(Object.entries(params).filter(([,value]) => typeof value === 'string')) as DirectoryParams;
   const {rows,total,page,options} = await relationshipDirectory(client,kind,view);
-  const selected = view.selected || rows[0]?.id;
+  const selected = view.selected;
   return <Shell><div className="relationship-surface"><header className="relationship-page-heading"><div><div className="relationship-eyebrow">Relationships</div><h1>{title}</h1><p>{kind === 'organization' ? 'Work with the organizations behind your partnerships.' : 'People, conversations and the relationships that connect them.'}</p></div>{canWrite && <Link className="button button-primary" href={`/${title.toLowerCase()}/new`}><Icon name="plus" size={15}/>Add {kind}</Link>}</header>
     <RelationshipDirectory kind={kind} rows={rows} total={total} page={page} options={options} params={view} initialSelected={selected}>{selected && <Suspense key={selected} fallback={<RecordLoading/>}><RelationshipRecord kind={kind} id={selected}/></Suspense>}</RelationshipDirectory>
   </div></Shell>;
