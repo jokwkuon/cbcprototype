@@ -1,13 +1,14 @@
 import {Shell} from '../../../components/shell';
 import {CrmForm} from '../../../components/crm-form';
 import {activityFormData} from '../../../lib/activity-data';
-import {crmContext} from '../../../lib/crm-context';
+import {crmContext,ownerOptions} from '../../../lib/crm-context';
 import {validId} from '../../../lib/crm-validation';
 import {createActivity} from '../actions';
 
 export default async function NewActivity({searchParams}:{searchParams:Promise<{organization?:string;contact?:string}>}) {
   const data = await activityFormData(), params = await searchParams;
   const {client} = await crmContext();
+  const owners = await ownerOptions(client);
   let organization = typeof params.organization === 'string' && validId(params.organization) && data!.fields.find(f => f.name === 'organization_id')?.options?.some(o => o.id === params.organization) ? params.organization : '';
   let contact = '';
   if (typeof params.contact === 'string' && validId(params.contact)) {
@@ -16,5 +17,5 @@ export default async function NewActivity({searchParams}:{searchParams:Promise<{
     if (person) {contact = person.id;organization = person.organization_id || organization;}
   }
   const cancel = contact ? `/contacts?selected=${contact}` : organization ? `/organizations?selected=${organization}` : '/activities';
-  return <Shell><h1 className="text-3xl font-bold">Add activity</h1><p>Log the interaction and participants, then add one or more follow-up actions on its detail page.</p><CrmForm action={createActivity} {...data!} values={{...data!.values,...(organization ? {organization_id:organization} : {}),...(contact ? {contact_ids:[contact]} : {})}} cancelHref={cancel}/></Shell>;
+  return <Shell><h1 className="text-3xl font-bold">Add activity</h1><p>Log the interaction and, if you already know the next step, record the first follow-up before leaving this page.</p><CrmForm action={createActivity} {...data!} values={{...data!.values,...(organization ? {organization_id:organization} : {}),...(contact ? {contact_ids:[contact]} : {})}} cancelHref={cancel}><fieldset className="form-section"><legend>First follow-up, optional</legend><div className="form-fields"><label>Next action<input name="followup_description" placeholder="Leave blank if there is no next step"/></label><label>Action owner<select name="followup_owner_id" defaultValue=""><option value="">Unassigned</option>{owners.map(owner => <option key={owner.id} value={owner.id}>{owner.name}</option>)}</select></label><label>Due date<input name="followup_due_date" type="date"/></label></div><p className="field-help">This follow-up is saved with the meeting. Add a second follow-up, for a different owner, on the next screen.</p></fieldset></CrmForm></Shell>;
 }

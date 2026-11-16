@@ -407,6 +407,8 @@ input::placeholder {
 .exec-outcome-list { margin:8px 0 16px; padding:0; list-style:none; }
 .exec-outcome-list li { padding:8px 0; border-bottom:1px solid #edf0f4; color:#344054; }
 .exec-money-bars { margin:8px 0 18px; }
+.relationship-split[aria-busy="true"] .relationship-selection { pointer-events:none; }
+.relationship-split[aria-busy="true"] .relationship-selection::before { content:"Updating the selected record…"; display:block; margin:0 0 8px; color:#5d467a; font-size:13px; }
 .nav-item { white-space:normal; line-height:1.35; align-items:flex-start; }
 .nav-item svg { margin-top:2px; }
 @media(max-width:1150px) {

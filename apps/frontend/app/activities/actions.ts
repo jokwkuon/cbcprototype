@@ -2,7 +2,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { crmContext } from "../../lib/crm-context";
-import { activityValues, parseActivity, parseFollowUp } from "../../lib/activity-validation";
+import { activityValues, parseActivity, parseFollowUp, validDate } from "../../lib/activity-validation";
 import { formValues, recordId, validId, ValidationError, type FormState } from "../../lib/crm-validation";
 function refreshActivity() {
   for(const path of ["/activities","/organizations","/contacts"]) revalidatePath(path,"layout");
@@ -19,9 +19,20 @@ async function saveActivity(editing:boolean,form:FormData):Promise<FormState> {
   try {
     const {client,canWrite}=await crmContext();if(!canWrite) throw new Error("Your role cannot change activities.");
     const parsed=parseActivity(form);
+    const followupDescription=editing?"":String(form.get("followup_description")??"").trim();
+    const followupOwner=String(form.get("followup_owner_id")??"").trim();
+    const followupDue=String(form.get("followup_due_date")??"").trim();
+    if(followupDescription){
+      if(followupOwner&&!validId(followupOwner)) throw new Error("Select a permitted staff member for the follow-up, or leave the owner unassigned.");
+      if(followupDue&&!validDate(followupDue)) throw new Error("Enter a valid follow-up due date, or leave it blank.");
+    }
     const {data,error}=await client.rpc("save_activity",{p_id:editing?recordId(form):null,p_values:parsed.values,p_contacts:parsed.contacts});
     if(error||!data) throw new Error("Unable to save activity. Check linked records and your access, then try again.");
     id=String(data);
+    if(followupDescription){
+      const saved=await client.from("tasks").insert({activity_id:id,description:followupDescription,owner_id:followupOwner||null,due_date:followupDue||null,completed_at:null}).select("id").single();
+      if(saved.error){refreshActivity();redirect(`/activities/${id}`);}
+    }
   } catch(error) {return saveError(error,form,true);}
   refreshActivity();redirect(`/activities/${id}`);
 }

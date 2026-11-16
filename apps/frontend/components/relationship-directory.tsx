@@ -18,7 +18,9 @@ export function RelationshipDirectory({kind, rows, total, page, options, params,
   const [pending, startTransition] = useTransition();
   const search = useRef<HTMLInputElement>(null);
   const title = kind === 'organization' ? 'Organizations' : 'Contacts';
-  const selected = params.selected || initialSelected || '';
+  const serverSelected = params.selected || initialSelected || '';
+  const selected = queryParams.get("selected") || serverSelected;
+  const selectionReady = !selected || selected === serverSelected;
   const status = params.status || '', group = params.group === 'category' ? 'category' : params.group === 'status' ? 'status' : '';
   const sort = params.sort === 'desc' ? 'desc' : 'asc';
   const pages = Math.max(1, Math.ceil(total / 10));
@@ -85,7 +87,7 @@ export function RelationshipDirectory({kind, rows, total, page, options, params,
         {total > 0 && <div className="directory-pagination"><span>{(page-1)*10+1}–{Math.min(page*10,total)} of {total}</span><button aria-label="Previous page" disabled={page === 1} onClick={() => navigate({page:String(page-1)})}>←</button><span>{page} / {pages}</span><button aria-label="Next page" disabled={page === pages} onClick={() => navigate({page:String(page+1)})}>→</button></div>}
       </section>
       <section className="relationship-selection" aria-label="Selected record">
-        {selected ? <><Link className="return-results" href={href({selected:''})} scroll={false}><Icon name="chevron" size={13}/> Back to results</Link>{!rows.some(r => r.id === selected) ? <p className="selection-notice">This record is outside the current filters. Your results remain on the left; this record may be on another page.</p> : null}{children}</> : <div className="directory-welcome"><span><Icon name={title.toLowerCase()} size={30}/></span><h2>Keep the relationship in view</h2><p>Select a record to see its activity, people and next steps. Your place in the list stays here.</p><small>Use ↑ ↓ to move through records, then Enter to open.</small></div>}
+        {selected ? <><Link className="return-results" href={href({selected:''})} scroll={false}><Icon name="chevron" size={13}/> Back to results</Link><Link className="button" href={`/${kind === 'organization' ? 'organizations' : 'contacts'}/${selected}`}>Open full record</Link>{!selectionReady ? <p role="status">Opening the selected record…</p> : <>{!rows.some(r => r.id === selected) ? <p className="selection-notice">This record is outside the current filters. Your results remain on the left; this record may be on another page.</p> : null}{children}</>}</> : <div className="directory-welcome"><span><Icon name={title.toLowerCase()} size={30}/></span><h2>Keep the relationship in view</h2><p>Select a record to see its activity, people and next steps. Your place in the list stays here.</p><small>Use ↑ ↓ to move through records, then Enter to open.</small></div>}
       </section>
     </div>
   </div>;

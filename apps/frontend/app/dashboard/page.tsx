@@ -7,7 +7,6 @@ import { GivingTrend, RelationshipBreakdown } from "../../components/dashboard-c
 import { FinancialSummary } from "../../components/giving";
 import { ActionQueue } from "../../components/action-queue";
 import { AgreementRenewals, ExecutiveSections } from "../../components/executive-sections";
-import { readAll } from "../../lib/read-all";
 import { crmContext } from "../../lib/crm-context";
 import { businessToday } from "../../lib/activity-data";
 import { givingSummary, type GivingSummary } from "../../lib/giving-data";
@@ -24,14 +23,15 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
   const { work, workPage } = await searchParams;
   const scope = work === "mine" || work === "unassigned" ? work : "team";
   const { client: c, canWrite } = await crmContext();
-  const [orgResult, contactResult, statusResult, recentResult] = await Promise.all([
+  const relationshipStatuses = ["Prospect", "Cultivate", "Proposal", "Committed", "Active", "Lapsed"];
+  const [orgResult, contactResult, recentResult, ...statusResults] = await Promise.all([
     c.from("organizations").select("id", { count: "exact", head: true }),
     c.from("contacts").select("id", { count: "exact", head: true }),
-    readAll<{ id: string; relationship_status: string }>((from, to) => c.from("organizations").select("id,relationship_status", { count: "exact" }).order("id").range(from, to)).then(data => ({ data, error: null }), () => ({ data: null, error: true })),
     c.from("organizations").select("id,name,created_at,relationship_status").order("created_at", { ascending: false }).limit(5),
+    ...relationshipStatuses.map(status => c.from("organizations").select("id", { count: "exact", head: true }).eq("relationship_status", status)),
   ]);
-  const failed = [orgResult, contactResult, statusResult, recentResult].some(result => result.error) || orgResult.count === null || contactResult.count === null;
-  const counts = (statusResult.data || []).reduce((totals, row) => ({ ...totals, [row.relationship_status]: (totals[row.relationship_status] || 0) + 1 }), {} as Record<string, number>);
+  const failed = [orgResult, contactResult, recentResult, ...statusResults].some(result => result.error) || orgResult.count === null || contactResult.count === null || statusResults.some(result => result.count === null);
+  const counts = Object.fromEntries(relationshipStatuses.map((status, index) => [status, statusResults[index]?.count ?? 0]));
   let finance: GivingSummary | null = null;
   try {
     const today = await businessToday(c);
@@ -45,9 +45,9 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
     <PageHeader title="Executive Dashboard" subtitle="Live view of CBC funding, relationships, programs, membership and community impact." action={<Link className="button button-secondary" href="/reports/executive"><Icon name="reports" size={14} />Export report</Link>} />
     {canWrite && <div className="dashboard-quick"><Link className="button button-primary" href="/activities/new"><Icon name="plus" size={13} />Log an interaction</Link><Link className="button" href="/organizations/new">Add organization</Link><Link className="button" href="/giving/new">Record a contribution</Link><Link className="button" href="/membership/new">Start a membership</Link></div>}
     <section className="metric-grid exec-kpis" aria-label="Executive KPIs">
-      <KpiCard label="Sponsorship revenue" value={finance ? money(finance.annual_cash) : "Unavailable"} context={revenueContext} href="/reports/financial" icon="giving" />
+      <KpiCard label="Sponsorship revenue" value={finance ? money(finance.annual_cash) : "Unavailable"} context={revenueContext} href={finance ? `/reports/financial?year=${finance.year}` : "/reports/financial"} icon="giving" />
       <KpiCard label="Active sponsors" value={failed ? "Unavailable" : String(counts.Active || 0)} context="Organizations with relationship status Active. There is no separate sponsor category." href="/organizations?status=Active" icon="organizations" />
-      <KpiCard label="Sponsor pipeline" value={finance ? money(finance.pledged) : "Unavailable"} context="Open cash commitments (Committed or Invoiced). This is not received revenue." href="/giving" icon="activities" />
+      <KpiCard label="Sponsor pipeline" value={finance ? money(finance.pledged) : "Unavailable"} context="Open cash commitments (Committed or Invoiced). This is not received revenue." href="/giving?balance=outstanding" icon="activities" />
       <KpiCard label="Renewal rate" value="Pending" context="No approved renewal-rate formula. Scheduled renewal dates are listed with funding and membership." icon="clock" pending />
       <KpiCard label="Active members" value={activeMembers === null ? "Unavailable" : String(activeMembers)} context="Membership terms that have started and are not past their renewal date." href="/membership" icon="membership" />
     </section>
@@ -74,7 +74,7 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
       <p className="pending-note">No annual fundraising target is stored, so percent of goal is not shown. Event ROI is not shown because event cost is not recorded and no formula is approved.</p>
       {finance && <div className="report-bars exec-money-bars" aria-label="Received cash and outstanding commitments">
         <div><span>Received this year</span><div><i style={{ width: `${Number(finance.annual_cash) / Math.max(Number(finance.annual_cash), Number(finance.outstanding), 1) * 100}%` }} /></div><b>{money(finance.annual_cash)}</b></div>
-        <div><span>Outstanding now</span><div><i style={{ width: `${Number(finance.outstanding) / Math.max(Number(finance.annual_cash), Number(finance.outstanding), 1) * 100}%` }} /></div><b>{money(finance.outstanding)}</b></div>
+        <div><Link href="/giving?balance=outstanding">Outstanding now</Link><div><i style={{ width: `${Number(finance.outstanding) / Math.max(Number(finance.annual_cash), Number(finance.outstanding), 1) * 100}%` }} /></div><b>{money(finance.outstanding)}</b></div>
       </div>}
       {finance && <p className="chart-caption">Received cash is this calendar period only. Outstanding is the current balance on open commitments. The bars are not a percent of a goal, and commitments are not treated as cash.</p>}
       <AgreementRenewals />

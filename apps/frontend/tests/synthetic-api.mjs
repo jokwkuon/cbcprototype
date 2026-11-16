@@ -46,7 +46,7 @@ const server=http.createServer(async(req,res)=>{
   if(url.pathname==="/auth/v1/logout")return send(200,{});
   if(!profile)return send(401,{message:"Sign in"});
   const table=url.pathname.split("/").at(-1);
-  const dashboardQuery=table==="contacts"&&req.method==="HEAD"?"contacts":table==="organizations"?(req.method==="HEAD"?"organizations":["relationship_status","id,relationship_status"].includes(url.searchParams.get("select"))?"statuses":url.searchParams.get("limit")==="5"?"recent":""):"";
+  const dashboardQuery=table==="contacts"&&req.method==="HEAD"?"contacts":table==="organizations"?(req.method==="HEAD"?(url.searchParams.has("relationship_status")?"statuses":"organizations"):["relationship_status","id,relationship_status"].includes(url.searchParams.get("select"))?"statuses":url.searchParams.get("limit")==="5"?"recent":""):"";
   if(failDashboard&&dashboardQuery===failDashboard)return send(500,{message:"Synthetic dashboard failure"});
   if(relationshipBehavior.delayTable===table&&relationshipBehavior.delay)await new Promise(resolve=>setTimeout(resolve,relationshipBehavior.delay));
   if(relationshipBehavior.writeDelay&&req.method==="PATCH")await new Promise(resolve=>setTimeout(resolve,relationshipBehavior.writeDelay));
